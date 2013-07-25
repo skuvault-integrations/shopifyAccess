@@ -1,15 +1,17 @@
-﻿namespace ShopifyAccess
+﻿using ShopifyAccess.Models.Core.Configuration;
+
+namespace ShopifyAccess
 {
 	public interface IShopifyFactory
 	{
-		IShopifyService CreateService();
+		IShopifyService CreateService(ShopifyCommandConfig config);
 	}
 
 	public sealed class ShopifyFactory : IShopifyFactory
 	{
-		public IShopifyService CreateService()
+		public IShopifyService CreateService( ShopifyCommandConfig config )
 		{
-			return new ShopifyService();
+			return new ShopifyService( config );
 		}
 	}
 }
