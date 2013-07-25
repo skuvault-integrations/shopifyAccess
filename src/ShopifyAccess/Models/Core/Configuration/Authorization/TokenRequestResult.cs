@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace ShopifyAccess.Models.Core.Configuration
+namespace ShopifyAccess.Models.Core.Configuration.Authorization
 {
 	[ DataContract ]
 	internal class TokenRequestResult

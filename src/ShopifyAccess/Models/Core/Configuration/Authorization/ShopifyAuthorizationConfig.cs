@@ -3,7 +3,7 @@ using System.Web;
 using CuttingEdge.Conditions;
 using ShopifyAccess.Services;
 
-namespace ShopifyAccess.Models.Core.Configuration
+namespace ShopifyAccess.Models.Core.Configuration.Authorization
 {
 	public class ShopifyAuthorizationConfig : ShopifyConfigBase, IShopifyConfig
 	{

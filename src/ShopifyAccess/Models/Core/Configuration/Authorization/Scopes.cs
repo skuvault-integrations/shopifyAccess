@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using CuttingEdge.Conditions;
 
-namespace ShopifyAccess.Models.Core.Configuration
+namespace ShopifyAccess.Models.Core.Configuration.Authorization
 {
 	public class Scopes
 	{

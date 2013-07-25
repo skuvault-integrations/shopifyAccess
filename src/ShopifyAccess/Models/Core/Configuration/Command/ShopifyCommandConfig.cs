@@ -1,6 +1,6 @@
 ﻿using CuttingEdge.Conditions;
 
-namespace ShopifyAccess.Models.Core.Configuration
+namespace ShopifyAccess.Models.Core.Configuration.Command
 {
 	public class ShopifyCommandConfig : ShopifyConfigBase
 	{

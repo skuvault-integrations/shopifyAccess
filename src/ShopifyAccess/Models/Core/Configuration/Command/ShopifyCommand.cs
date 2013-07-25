@@ -1,4 +1,4 @@
-﻿namespace ShopifyAccess.Models.Core
+﻿namespace ShopifyAccess.Models.Core.Configuration.Command
 {
 	public class ShopifyCommand
 	{

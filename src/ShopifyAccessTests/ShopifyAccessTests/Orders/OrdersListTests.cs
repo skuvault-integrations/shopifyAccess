@@ -1,7 +1,8 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using NUnit.Framework;
 using ShopifyAccess;
-using ShopifyAccess.Models.Core.Configuration;
+using ShopifyAccess.Models.Core.Configuration.Command;
 
 namespace ShopifyAccessTests.Orders
 {
@@ -13,21 +14,41 @@ namespace ShopifyAccessTests.Orders
 		private const string AccessToken = "ce22522b5b2ad8cce975429ec265db4c";
 
 		[ Test ]
-		public void OrdersLoaded()
+		public void OrdersFilteredByDateLoaded()
 		{
 			var config = new ShopifyCommandConfig( ShopName, AccessToken );
 			var service = this.ShopifyFactory.CreateService( config );
-			var orders = service.GetOrders();
+			var orders = service.GetOrders( DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
 
 			orders.Count.Should().Be( 1 );
 		}
 
 		[ Test ]
-		public void OrdersLoadedAsync()
+		public void OrdersFilteredByDateLoadedAsync()
 		{
 			var config = new ShopifyCommandConfig( ShopName, AccessToken );
 			var service = this.ShopifyFactory.CreateService( config );
-			var orders = service.GetOrdersAsync();
+			var orders = service.GetOrdersAsync( DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
+
+			orders.Result.Count.Should().Be( 1 );
+		}
+
+		[ Test ]
+		public void OrdersFilteredFulfillmentStatusDateLoaded()
+		{
+			var config = new ShopifyCommandConfig( ShopName, AccessToken );
+			var service = this.ShopifyFactory.CreateService( config );
+			var orders = service.GetOrders( ShopifyOrderFulfillmentStatus.any );
+
+			orders.Count.Should().Be( 1 );
+		}
+
+		[ Test ]
+		public void OrdersFilteredFulfillmentStatusDateLoadedAsync()
+		{
+			var config = new ShopifyCommandConfig( ShopName, AccessToken );
+			var service = this.ShopifyFactory.CreateService( config );
+			var orders = service.GetOrdersAsync( ShopifyOrderFulfillmentStatus.any );
 
 			orders.Result.Count.Should().Be( 1 );
 		}
@@ -37,7 +58,7 @@ namespace ShopifyAccessTests.Orders
 		{
 			var config = new ShopifyCommandConfig( ShopName, "blabla" );
 			var service = this.ShopifyFactory.CreateService( config );
-			var orders = service.GetOrders();
+			var orders = service.GetOrders( DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
 
 			orders.Should().BeNull();
 		}
@@ -47,7 +68,7 @@ namespace ShopifyAccessTests.Orders
 		{
 			var config = new ShopifyCommandConfig( "blabla", AccessToken );
 			var service = this.ShopifyFactory.CreateService( config );
-			var orders = service.GetOrders();
+			var orders = service.GetOrders( DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
 
 			orders.Should().BeNull();
 		}

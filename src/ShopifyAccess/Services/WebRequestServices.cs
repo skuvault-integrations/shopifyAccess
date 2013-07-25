@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using CuttingEdge.Conditions;
 using Netco.Logging;
 using ServiceStack.Text;
-using ShopifyAccess.Models.Core;
-using ShopifyAccess.Models.Core.Configuration;
+using ShopifyAccess.Models.Core.Configuration.Authorization;
+using ShopifyAccess.Models.Core.Configuration.Command;
 
 namespace ShopifyAccess.Services
 {
@@ -29,12 +29,12 @@ namespace ShopifyAccess.Services
 			this._commandConfig = config;
 		}
 
-		public T GetResponse< T >( ShopifyCommand command )
+		public T GetResponse<T>(ShopifyCommand command, string endpoint)
 		{
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
 			var result = default( T );
-			var uri = new Uri( string.Concat( this._commandConfig.Host, command.Command ) );
+			var uri = new Uri( string.Concat( this._commandConfig.Host, command.Command, endpoint ) );
 			var request = this.CreateServiceGetRequest( uri );
 
 			try
@@ -50,12 +50,12 @@ namespace ShopifyAccess.Services
 			return result;
 		}
 
-		public async Task< T > GetResponseAsync< T >( ShopifyCommand command )
+		public async Task< T > GetResponseAsync< T >( ShopifyCommand command, string endpoint )
 		{
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
 			var result = default( T );
-			var uri = new Uri( string.Concat( this._commandConfig.Host, command.Command ) );
+			var uri = new Uri( string.Concat( this._commandConfig.Host, command.Command, endpoint ) );
 			var request = this.CreateServiceGetRequest( uri );
 
 			try
