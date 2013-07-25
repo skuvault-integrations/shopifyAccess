@@ -18,5 +18,11 @@ namespace ShopifyAccess.Services
 			var endpoint = string.Format( "?{0}={1}", ShopifyOrderCommandEndpointName.FulfillmentStatus.Name, status );
 			return endpoint;
 		}
+
+		public string CreateProductVariantUpdateEndpoint( long variantId )
+		{
+			var endpoint = string.Format( "{0}.json", variantId );
+			return endpoint;
+		}
 	}
 }

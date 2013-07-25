@@ -38,7 +38,7 @@ namespace ShopifyAccess.Services
 			try
 			{
 				var request = this.CreateServiceGetRequest( command, endpoint );
-				using( var response = ( HttpWebResponse )request.GetResponse() )
+				using( var response = request.GetResponse() )
 					result = ParseResponse< T >( response );
 			}
 			catch( WebException e )
@@ -69,12 +69,52 @@ namespace ShopifyAccess.Services
 			return result;
 		}
 
+		public T PutData< T >( ShopifyCommand command, string endpoint, string jsonContent )
+		{
+			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
+
+			var result = default( T );
+			try
+			{
+				var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
+				using( var response = request.GetResponse() )
+					result = ParseResponse< T >( response );
+			}
+			catch( WebException e )
+			{
+				this.LogShopifyResponseerror( command, e.Message );
+			}
+
+			return result;
+		}
+
+		public async Task< T > PutDataAsync< T >( ShopifyCommand command, string endpoint, string jsonContent )
+		{
+			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
+
+			var result = default( T );
+			try
+			{
+				var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
+				using( var response = await request.GetResponseAsync() )
+					result = ParseResponse< T >( response );
+			}
+			catch( WebException e )
+			{
+				this.LogShopifyResponseerror( command, e.Message );
+			}
+
+			return result;
+		}
+
 		public string RequestPermanentToken( string code )
 		{
 			var result = string.Empty;
-			var tokenRequestUrl = new Uri( string.Concat( this._authorizationConfig.Host, ShopifyCommand.GetAccessToken.Command ) );
+			var command = ShopifyCommand.GetAccessToken;
+			var tokenRequestUrl = new Uri( string.Concat( this._authorizationConfig.Host, command.Command ) );
 			var tokenRequestPostContent = string.Format( "client_id={0}&client_secret={1}&code={2}", this._authorizationConfig.ApiKey, this._authorizationConfig.Sekret, code );
 			var request = this.CreateServicePostRequest( tokenRequestUrl, tokenRequestPostContent );
+
 			try
 			{
 				using( var response = request.GetResponse() )
@@ -82,10 +122,29 @@ namespace ShopifyAccess.Services
 			}
 			catch( WebException e )
 			{
-				this.LogShopifyResponseerror( ShopifyCommand.GetAccessToken, e.Message );
+				this.LogShopifyResponseerror( command, e.Message );
 			}
 
 			return result;
+		}
+
+		private HttpWebRequest CreateServicePutRequest( ShopifyCommand command, string endpoint, string content )
+		{
+			var uri = new Uri( string.Concat( this._commandConfig.Host, command.Command, endpoint ) );
+			var request = ( HttpWebRequest )WebRequest.Create( uri );
+			request.KeepAlive = true;
+			request.Credentials = CredentialCache.DefaultCredentials;
+			request.Method = WebRequestMethods.Http.Put;
+			request.ContentType = "application/json";
+			request.Headers.Add( "X-Shopify-Access-Token", this._commandConfig.AccessToken );
+
+			if( !string.IsNullOrEmpty( content ) )
+			{
+				using( var writer = new StreamWriter( request.GetRequestStream() ) )
+					writer.Write( content );
+			}
+
+			return request;
 		}
 
 		private HttpWebRequest CreateServicePostRequest( Uri uri, string content )

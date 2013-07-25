@@ -1,5 +1,4 @@
-﻿using ShopifyAccess.Models.Core.Configuration;
-using ShopifyAccess.Models.Core.Configuration.Command;
+﻿using ShopifyAccess.Models.Core.Configuration.Command;
 
 namespace ShopifyAccess
 {

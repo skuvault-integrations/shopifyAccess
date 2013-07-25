@@ -60,7 +60,6 @@
     </Compile>
     <Compile Include="IShopifyService.cs" />
     <Compile Include="Models\Core\Configuration\Command\ShopifyOrderCommandEndpint.cs" />
-    <Compile Include="Models\Core\Configuration\IShopifyConfig.cs" />
     <Compile Include="Models\Core\Configuration\Authorization\Scope.cs" />
     <Compile Include="Models\Core\Configuration\Authorization\Scopes.cs" />
     <Compile Include="Models\Core\Configuration\Command\ShopifyCommandConfig.cs" />
@@ -72,6 +71,7 @@
     <Compile Include="Models\Core\Configuration\Authorization\ShopifyScopeName.cs" />
     <Compile Include="Models\Core\Configuration\Authorization\TokenRequestResult.cs" />
     <Compile Include="Models\Order\ShopifyOrders.cs" />
+    <Compile Include="Models\ProductVariant\ProductVariant.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\EndpointsBuilder.cs" />
     <Compile Include="Services\WebRequestServices.cs" />
@@ -81,9 +81,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\Profuct\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
