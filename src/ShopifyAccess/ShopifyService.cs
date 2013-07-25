@@ -1,4 +1,5 @@
-﻿using CuttingEdge.Conditions;
+﻿using System.Threading.Tasks;
+using CuttingEdge.Conditions;
 using ShopifyAccess.Models.Core;
 using ShopifyAccess.Models.Core.Configuration;
 using ShopifyAccess.Models.Order;
@@ -22,6 +23,11 @@ namespace ShopifyAccess
 		public ShopifyOrders GetOrders()
 		{
 			return this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetAllOrders );
+		}
+
+		public async Task< ShopifyOrders > GetOrdersAsync()
+		{
+			return await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetAllOrders );
 		}
 	}
 }

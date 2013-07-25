@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace ShopifyAccess.Models.Order
@@ -11,6 +12,9 @@ namespace ShopifyAccess.Models.Order
 
 		[ DataMember( Name = "total_price" ) ]
 		public string Total { get; set; }
+
+		[ DataMember( Name = "created_at" ) ]
+		public DateTime CreationDate { get; set; }
 
 		[ DataMember( Name = "line_items" ) ]
 		public IList< ShopifyOrderItem > OrderItems { get; set; }

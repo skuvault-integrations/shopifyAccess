@@ -23,6 +23,16 @@ namespace ShopifyAccessTests.Orders
 		}
 
 		[ Test ]
+		public void OrdersLoadedAsync()
+		{
+			var config = new ShopifyCommandConfig( ShopName, AccessToken );
+			var service = this.ShopifyFactory.CreateService( config );
+			var orders = service.GetOrdersAsync();
+
+			orders.Result.Count.Should().Be( 1 );
+		}
+
+		[ Test ]
 		public void OrdersNotLoaded_IncorrectToken()
 		{
 			var config = new ShopifyCommandConfig( ShopName, "blabla" );
