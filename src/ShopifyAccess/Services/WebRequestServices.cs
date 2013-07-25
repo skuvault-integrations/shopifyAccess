@@ -29,18 +29,17 @@ namespace ShopifyAccess.Services
 			this._commandConfig = config;
 		}
 
-		public T GetResponse<T>(ShopifyCommand command, string endpoint)
+		public T GetResponse< T >( ShopifyCommand command, string endpoint )
 		{
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
 			var result = default( T );
-			var uri = new Uri( string.Concat( this._commandConfig.Host, command.Command, endpoint ) );
-			var request = this.CreateServiceGetRequest( uri );
 
 			try
 			{
-				var response = ( HttpWebResponse )request.GetResponse();
-				result = ParseResponse< T >( response );
+				var request = this.CreateServiceGetRequest( command, endpoint );
+				using( var response = ( HttpWebResponse )request.GetResponse() )
+					result = ParseResponse< T >( response );
 			}
 			catch( WebException e )
 			{
@@ -55,11 +54,10 @@ namespace ShopifyAccess.Services
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
 			var result = default( T );
-			var uri = new Uri( string.Concat( this._commandConfig.Host, command.Command, endpoint ) );
-			var request = this.CreateServiceGetRequest( uri );
 
 			try
 			{
+				var request = this.CreateServiceGetRequest( command, endpoint );
 				using( var response = await request.GetResponseAsync() )
 					result = ParseResponse< T >( response );
 			}
@@ -107,9 +105,11 @@ namespace ShopifyAccess.Services
 			return request;
 		}
 
-		private HttpWebRequest CreateServiceGetRequest( Uri uri )
+		private HttpWebRequest CreateServiceGetRequest( ShopifyCommand command, string endpoint )
 		{
+			var uri = new Uri( string.Concat( this._commandConfig.Host, command.Command, endpoint ) );
 			var request = ( HttpWebRequest )WebRequest.Create( uri );
+
 			request.Method = WebRequestMethods.Http.Get;
 			request.Headers.Add( "X-Shopify-Access-Token", this._commandConfig.AccessToken );
 
