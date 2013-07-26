@@ -15,6 +15,7 @@ namespace ShopifyAccess.Services
 		private readonly ShopifyAuthorizationConfig _authorizationConfig;
 		private readonly ShopifyCommandConfig _commandConfig;
 
+		#region Constructors
 		public WebRequestServices( ShopifyAuthorizationConfig config )
 		{
 			Condition.Requires( config, "config" ).IsNotNull();
@@ -28,7 +29,9 @@ namespace ShopifyAccess.Services
 
 			this._commandConfig = config;
 		}
+		#endregion
 
+		#region Requests handling
 		public T GetResponse< T >( ShopifyCommand command, string endpoint )
 		{
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
@@ -69,42 +72,36 @@ namespace ShopifyAccess.Services
 			return result;
 		}
 
-		public T PutData< T >( ShopifyCommand command, string endpoint, string jsonContent )
+		public void PutData( ShopifyCommand command, string endpoint, string jsonContent )
 		{
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
-			var result = default( T );
 			try
 			{
 				var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
-				using( var response = request.GetResponse() )
-					result = ParseResponse< T >( response );
+				using( var response = ( HttpWebResponse )request.GetResponse() )
+					this.LogUpdateInfo( endpoint, response.StatusCode );
 			}
 			catch( WebException e )
 			{
 				this.LogShopifyResponseerror( command, e.Message );
 			}
-
-			return result;
 		}
 
-		public async Task< T > PutDataAsync< T >( ShopifyCommand command, string endpoint, string jsonContent )
+		public async Task PutDataAsync( ShopifyCommand command, string endpoint, string jsonContent )
 		{
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
-			var result = default( T );
 			try
 			{
 				var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
 				using( var response = await request.GetResponseAsync() )
-					result = ParseResponse< T >( response );
+					this.LogUpdateInfo( endpoint, ( ( HttpWebResponse )response ).StatusCode );
 			}
 			catch( WebException e )
 			{
 				this.LogShopifyResponseerror( command, e.Message );
 			}
-
-			return result;
 		}
 
 		public string RequestPermanentToken( string code )
@@ -128,21 +125,35 @@ namespace ShopifyAccess.Services
 			return result;
 		}
 
+		private T ParseResponse< T >( WebResponse response )
+		{
+			var result = default( T );
+
+			using( var stream = response.GetResponseStream() )
+			{
+				var reader = new StreamReader( stream );
+				var jsonResponse = reader.ReadToEnd();
+
+				if( !String.IsNullOrEmpty( jsonResponse ) )
+					result = jsonResponse.FromJson< T >();
+			}
+
+			return result;
+		}
+		#endregion
+
+		#region WebRequest configuration
 		private HttpWebRequest CreateServicePutRequest( ShopifyCommand command, string endpoint, string content )
 		{
 			var uri = new Uri( string.Concat( this._commandConfig.Host, command.Command, endpoint ) );
 			var request = ( HttpWebRequest )WebRequest.Create( uri );
-			request.KeepAlive = true;
-			request.Credentials = CredentialCache.DefaultCredentials;
+
 			request.Method = WebRequestMethods.Http.Put;
 			request.ContentType = "application/json";
 			request.Headers.Add( "X-Shopify-Access-Token", this._commandConfig.AccessToken );
 
-			if( !string.IsNullOrEmpty( content ) )
-			{
-				using( var writer = new StreamWriter( request.GetRequestStream() ) )
-					writer.Write( content );
-			}
+			using( var writer = new StreamWriter( request.GetRequestStream() ) )
+				writer.Write( content );
 
 			return request;
 		}
@@ -174,26 +185,18 @@ namespace ShopifyAccess.Services
 
 			return request;
 		}
+		#endregion
 
-		private T ParseResponse< T >( WebResponse response )
-		{
-			var result = default( T );
-
-			using( var stream = response.GetResponseStream() )
-			{
-				var reader = new StreamReader( stream );
-				var jsonResponse = reader.ReadToEnd();
-
-				if( !String.IsNullOrEmpty( jsonResponse ) )
-					result = jsonResponse.FromJson< T >();
-			}
-
-			return result;
-		}
-
+		#region Logging
 		private void LogShopifyResponseerror( ShopifyCommand command, string message )
 		{
 			this.Log().Error( "Failed to execute Shopify command {0}. Error: {1}", command.Command, message );
 		}
+
+		private void LogUpdateInfo( string endpoint, HttpStatusCode statusCode )
+		{
+			this.Log().Info( "PUT/POST call for the endpoint '{0}' has been completed with code '{1}'.", endpoint, statusCode );
+		}
+		#endregion
 	}
 }

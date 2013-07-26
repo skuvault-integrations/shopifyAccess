@@ -12,54 +12,57 @@ namespace ShopifyAccess
 	public class ShopifyService : IShopifyService
 	{
 		private readonly WebRequestServices _webRequestServices;
-		private readonly EndpointsBuilder _endpointsBuilder;
 
 		public ShopifyService( ShopifyCommandConfig config )
 		{
 			Condition.Requires( config, "config" ).IsNotNull();
 
 			this._webRequestServices = new WebRequestServices( config );
-			this._endpointsBuilder = new EndpointsBuilder();
 		}
 
+		#region GetOrders
 		public ShopifyOrders GetOrders( DateTime dateFrom, DateTime dateTo )
 		{
-			var endpoint = this._endpointsBuilder.CreateOrdersDateRangeEndpoint( dateFrom, dateTo );
+			var endpoint = EndpointsBuilder.CreateOrdersDateRangeEndpoint( dateFrom, dateTo );
 			return this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetAllOrders, endpoint );
 		}
 
 		public async Task< ShopifyOrders > GetOrdersAsync( DateTime dateFrom, DateTime dateTo )
 		{
-			var endpoint = this._endpointsBuilder.CreateOrdersDateRangeEndpoint( dateFrom, dateTo );
+			var endpoint = EndpointsBuilder.CreateOrdersDateRangeEndpoint( dateFrom, dateTo );
 			return await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetAllOrders, endpoint );
 		}
 
 		public ShopifyOrders GetOrders( ShopifyOrderFulfillmentStatus status )
 		{
-			var endpoint = this._endpointsBuilder.CreateOrdersFulfillmentStatusEndpoint( status );
+			var endpoint = EndpointsBuilder.CreateOrdersFulfillmentStatusEndpoint( status );
 			return this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetAllOrders, endpoint );
 		}
 
 		public async Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderFulfillmentStatus status )
 		{
-			var endpoint = this._endpointsBuilder.CreateOrdersFulfillmentStatusEndpoint( status );
+			var endpoint = EndpointsBuilder.CreateOrdersFulfillmentStatusEndpoint( status );
 			return await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetAllOrders, endpoint );
 		}
+		#endregion
 
-		public ProductVariant UpdateProductVariantQuantity( ProductVariant variant )
+		#region Update variants
+		public void UpdateProductVariantQuantity( ProductVariant variant )
 		{
-			var endpoint = this._endpointsBuilder.CreateProductVariantUpdateEndpoint( variant.Id );
-			var jsonContent = "variant" + ":" + variant.ToJson() ;
+			var endpoint = EndpointsBuilder.CreateProductVariantUpdateEndpoint( variant.Id );
+			//just simpliest way to serialize with the root name.
+			var jsonContent = new { variant }.ToJson();
 
-			return this._webRequestServices.PutData< ProductVariant >( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent );
+			this._webRequestServices.PutData( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent );
 		}
 
-		public async Task< ProductVariant > UpdateProductVariantQuantityAsync( ProductVariant variant )
+		public async Task UpdateProductVariantQuantityAsync( ProductVariant variant )
 		{
-			var endpoint = this._endpointsBuilder.CreateProductVariantUpdateEndpoint( variant.Id );
-			var jsonContent = variant.ToJson();
+			var endpoint = EndpointsBuilder.CreateProductVariantUpdateEndpoint( variant.Id );
+			var jsonContent = new { variant }.ToJson();
 
-			return await this._webRequestServices.PutDataAsync< ProductVariant >( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent );
+			await this._webRequestServices.PutDataAsync( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent );
 		}
+		#endregion
 	}
 }

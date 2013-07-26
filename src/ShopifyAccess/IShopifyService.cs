@@ -8,12 +8,43 @@ namespace ShopifyAccess
 {
 	public interface IShopifyService
 	{
+		/// <summary>
+		/// Get orders by date range
+		/// </summary>
+		/// <param name="dateFrom">created_at_min. Show orders created after date (format: 2008-01-01 03:00)</param>
+		/// <param name="dateTo">created_at_max. Show orders created before date (format: 2008-01-01 03:00)</param>
+		/// <returns>Orders collection</returns>
 		ShopifyOrders GetOrders( DateTime dateFrom, DateTime dateTo );
+
+		/// <summary>
+		/// Get orders by date range async
+		/// </summary>
+		/// <param name="dateFrom">created_at_min. Show orders created after date (format: 2008-01-01 03:00)</param>
+		/// <param name="dateTo">created_at_max. Show orders created before date (format: 2008-01-01 03:00)</param>
+		/// <returns>Orders collection</returns>
 		Task< ShopifyOrders > GetOrdersAsync( DateTime dateFrom, DateTime dateTo );
+
+		/// <summary>
+		/// Get shipped orders
+		/// </summary>
+		/// <param name="status">fulfillment_status. Shipped,partial, unshipped or any</param>
+		/// <returns>Orders collection</returns>
 		ShopifyOrders GetOrders( ShopifyOrderFulfillmentStatus status );
+
+		/// <summary>
+		/// Get shipped orders async
+		/// </summary>
+		/// <param name="status">fulfillment_status. Shipped,partial, unshipped or any</param>
 		Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderFulfillmentStatus status );
 
-		ProductVariant UpdateProductVariantQuantity( ProductVariant variant );
-		Task< ProductVariant > UpdateProductVariantQuantityAsync( ProductVariant variant );
+		/// <summary>
+		/// Updates variant (inventory item)
+		/// </summary>
+		void UpdateProductVariantQuantity( ProductVariant variant );
+
+		/// <summary>
+		/// Updates variant (inventory item) async
+		/// </summary>
+		Task UpdateProductVariantQuantityAsync( ProductVariant variant );
 	}
 }
