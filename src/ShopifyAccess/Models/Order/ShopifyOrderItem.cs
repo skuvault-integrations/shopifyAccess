@@ -10,5 +10,11 @@ namespace ShopifyAccess.Models.Order
 
 		[ DataMember( Name = "id" ) ]
 		public string Sku { get; set; }
+
+		[ DataMember( Name = "quantity" ) ]
+		public int Quantity { get; set; }
+
+		[ DataMember( Name = "price" ) ]
+		public decimal Price { get; set; }
 	}
 }

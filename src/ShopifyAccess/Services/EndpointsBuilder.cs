@@ -1,5 +1,6 @@
 ﻿using System;
 using ShopifyAccess.Models.Core.Configuration.Command;
+using ShopifyAccess.Models.Order;
 
 namespace ShopifyAccess.Services
 {

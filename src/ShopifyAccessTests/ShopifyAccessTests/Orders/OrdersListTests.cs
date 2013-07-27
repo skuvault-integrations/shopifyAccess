@@ -3,6 +3,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using ShopifyAccess;
 using ShopifyAccess.Models.Core.Configuration.Command;
+using ShopifyAccess.Models.Order;
 
 namespace ShopifyAccessTests.Orders
 {

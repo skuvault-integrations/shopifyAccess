@@ -13,15 +13,4 @@
 
 		public string Name { get; private set; }
 	}
-
-	public enum ShopifyOrderFulfillmentStatus
-	{
-		// ReSharper disable InconsistentNaming
-		Undefined,
-		shipped,
-		partial,
-		unshipped,
-		any
-		// ReSharper restore InconsistentNaming
-	}
 }

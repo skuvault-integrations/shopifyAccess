@@ -66,12 +66,15 @@
     <Compile Include="Models\Core\Configuration\Authorization\ShopifyAuthorizationConfig.cs" />
     <Compile Include="Models\Core\Configuration\ShopifyConfigBase.cs" />
     <Compile Include="Models\Core\Configuration\Command\ShopifyCommand.cs" />
+    <Compile Include="Models\Order\ShopifyBillingAddress.cs" />
+    <Compile Include="Models\Order\ShopifyFulfillment.cs" />
+    <Compile Include="Models\Order\ShopifyCustomer.cs" />
     <Compile Include="Models\Order\ShopifyOrder.cs" />
     <Compile Include="Models\Order\ShopifyOrderItem.cs" />
     <Compile Include="Models\Core\Configuration\Authorization\ShopifyScopeName.cs" />
     <Compile Include="Models\Core\Configuration\Authorization\TokenRequestResult.cs" />
     <Compile Include="Models\Order\ShopifyOrders.cs" />
-    <Compile Include="Models\ProductVariant\ProductVariant.cs" />
+    <Compile Include="Models\ProductVariant\ShopifyProductVariant.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\EndpointsBuilder.cs" />
     <Compile Include="Services\WebRequestServices.cs" />

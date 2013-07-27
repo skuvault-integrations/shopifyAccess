@@ -47,7 +47,7 @@ namespace ShopifyAccess
 		#endregion
 
 		#region Update variants
-		public void UpdateProductVariantQuantity( ProductVariant variant )
+		public void UpdateProductVariantQuantity( ShopifyProductVariant variant )
 		{
 			var endpoint = EndpointsBuilder.CreateProductVariantUpdateEndpoint( variant.Id );
 			//just simpliest way to serialize with the root name.
@@ -56,7 +56,7 @@ namespace ShopifyAccess
 			this._webRequestServices.PutData( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent );
 		}
 
-		public async Task UpdateProductVariantQuantityAsync( ProductVariant variant )
+		public async Task UpdateProductVariantQuantityAsync( ShopifyProductVariant variant )
 		{
 			var endpoint = EndpointsBuilder.CreateProductVariantUpdateEndpoint( variant.Id );
 			var jsonContent = new { variant }.ToJson();

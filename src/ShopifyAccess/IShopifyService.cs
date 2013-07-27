@@ -44,11 +44,11 @@ namespace ShopifyAccess
 		/// <summary>
 		/// Updates variant (inventory item)
 		/// </summary>
-		void UpdateProductVariantQuantity( ProductVariant variant );
+		void UpdateProductVariantQuantity( ShopifyProductVariant variant );
 
 		/// <summary>
 		/// Updates variant (inventory item) async
 		/// </summary>
-		Task UpdateProductVariantQuantityAsync( ProductVariant variant );
+		Task UpdateProductVariantQuantityAsync( ShopifyProductVariant variant );
 	}
 }

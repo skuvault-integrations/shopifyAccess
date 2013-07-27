@@ -19,7 +19,7 @@ namespace ShopifyAccessTests.Products
 		{
 			var config = new ShopifyCommandConfig( ShopName, AccessToken );
 			var service = this.ShopifyFactory.CreateService( config );
-			var variantToUpdate = new ProductVariant { Id = VariantId, Quantity = 100, InventoryManagement = InventoryManagement.Shopify };
+			var variantToUpdate = new ShopifyProductVariant { Id = VariantId, Quantity = 100, InventoryManagement = InventoryManagement.Shopify };
 			service.UpdateProductVariantQuantity( variantToUpdate );
 		}
 	}
