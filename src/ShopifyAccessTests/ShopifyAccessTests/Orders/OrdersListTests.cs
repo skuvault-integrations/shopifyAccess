@@ -38,7 +38,7 @@ namespace ShopifyAccessTests.Orders
 		{
 			var config = new ShopifyCommandConfig( ShopName, AccessToken );
 			var service = this.ShopifyFactory.CreateService( config );
-			var orders = service.GetOrders( ShopifyOrderFulfillmentStatus.any );
+			var orders = service.GetOrders( ShopifyOrderFulfillmentStatus.any, DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
 
 			orders.Count.Should().Be( 1 );
 		}
@@ -48,7 +48,7 @@ namespace ShopifyAccessTests.Orders
 		{
 			var config = new ShopifyCommandConfig( ShopName, AccessToken );
 			var service = this.ShopifyFactory.CreateService( config );
-			var orders = service.GetOrdersAsync( ShopifyOrderFulfillmentStatus.any );
+			var orders = service.GetOrdersAsync( ShopifyOrderFulfillmentStatus.any, DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
 
 			orders.Result.Count.Should().Be( 1 );
 		}

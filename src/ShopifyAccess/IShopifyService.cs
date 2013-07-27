@@ -25,17 +25,21 @@ namespace ShopifyAccess
 		Task< ShopifyOrders > GetOrdersAsync( DateTime dateFrom, DateTime dateTo );
 
 		/// <summary>
-		/// Get shipped orders
+		/// Get orders by date and fulfillment status
 		/// </summary>
-		/// <param name="status">fulfillment_status. Shipped,partial, unshipped or any</param>
+		/// <param name="status">Fulfillment_status. Shipped, partial, unshipped or any</param>
+		/// <param name="dateFrom">created_at_min. Show orders created after date (format: 2008-01-01 03:00)</param>
+		/// <param name="dateTo">created_at_max. Show orders created before date (format: 2008-01-01 03:00)</param>
 		/// <returns>Orders collection</returns>
-		ShopifyOrders GetOrders( ShopifyOrderFulfillmentStatus status );
+		ShopifyOrders GetOrders( ShopifyOrderFulfillmentStatus status, DateTime dateFrom, DateTime dateTo );
 
 		/// <summary>
 		/// Get shipped orders async
 		/// </summary>
+		/// <param name="dateFrom">created_at_min. Show orders created after date (format: 2008-01-01 03:00)</param>
+		/// <param name="dateTo">created_at_max. Show orders created before date (format: 2008-01-01 03:00)</param>
 		/// <param name="status">fulfillment_status. Shipped,partial, unshipped or any</param>
-		Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderFulfillmentStatus status );
+		Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderFulfillmentStatus status, DateTime dateFrom, DateTime dateTo );
 
 		/// <summary>
 		/// Updates variant (inventory item)

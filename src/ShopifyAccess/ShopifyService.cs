@@ -23,25 +23,25 @@ namespace ShopifyAccess
 		#region GetOrders
 		public ShopifyOrders GetOrders( DateTime dateFrom, DateTime dateTo )
 		{
-			var endpoint = EndpointsBuilder.CreateOrdersDateRangeEndpoint( dateFrom, dateTo );
+			var endpoint = EndpointsBuilder.CreateOrdersEndpoint( dateFrom, dateTo );
 			return this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetAllOrders, endpoint );
 		}
 
 		public async Task< ShopifyOrders > GetOrdersAsync( DateTime dateFrom, DateTime dateTo )
 		{
-			var endpoint = EndpointsBuilder.CreateOrdersDateRangeEndpoint( dateFrom, dateTo );
+			var endpoint = EndpointsBuilder.CreateOrdersEndpoint( dateFrom, dateTo );
 			return await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetAllOrders, endpoint );
 		}
 
-		public ShopifyOrders GetOrders( ShopifyOrderFulfillmentStatus status )
+		public ShopifyOrders GetOrders( ShopifyOrderFulfillmentStatus status, DateTime dateFrom, DateTime dateTo )
 		{
-			var endpoint = EndpointsBuilder.CreateOrdersFulfillmentStatusEndpoint( status );
+			var endpoint = EndpointsBuilder.CreateOrdersEndpoint( status, dateFrom, dateTo );
 			return this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetAllOrders, endpoint );
 		}
 
-		public async Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderFulfillmentStatus status )
+		public async Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderFulfillmentStatus status, DateTime dateFrom, DateTime dateTo )
 		{
-			var endpoint = EndpointsBuilder.CreateOrdersFulfillmentStatusEndpoint( status );
+			var endpoint = EndpointsBuilder.CreateOrdersEndpoint( status, dateFrom, dateTo );
 			return await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetAllOrders, endpoint );
 		}
 		#endregion

@@ -5,7 +5,7 @@ namespace ShopifyAccess.Services
 {
 	internal static class EndpointsBuilder
 	{
-		public static string CreateOrdersDateRangeEndpoint( DateTime startDate, DateTime endDate )
+		public static string CreateOrdersEndpoint( DateTime startDate, DateTime endDate )
 		{
 			var endpoint = string.Format( "?{0}={1}&{2}={3}",
 				ShopifyOrderCommandEndpointName.OrdersDateFrom.Name, startDate.ToString( "o" ),
@@ -13,9 +13,12 @@ namespace ShopifyAccess.Services
 			return endpoint;
 		}
 
-		public static string CreateOrdersFulfillmentStatusEndpoint( ShopifyOrderFulfillmentStatus status )
+		public static string CreateOrdersEndpoint( ShopifyOrderFulfillmentStatus status, DateTime startDate, DateTime endDate )
 		{
-			var endpoint = string.Format( "?{0}={1}", ShopifyOrderCommandEndpointName.FulfillmentStatus.Name, status );
+			var endpoint = string.Format( "?{0}={1}&{2}={3}&{4}={5}",
+				ShopifyOrderCommandEndpointName.FulfillmentStatus.Name, status,
+				ShopifyOrderCommandEndpointName.OrdersDateFrom.Name, startDate.ToString( "o" ),
+				ShopifyOrderCommandEndpointName.OrdersDateTo.Name, endDate.ToString( "o" ) );
 			return endpoint;
 		}
 

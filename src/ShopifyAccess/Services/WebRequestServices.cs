@@ -46,7 +46,7 @@ namespace ShopifyAccess.Services
 			}
 			catch( WebException e )
 			{
-				this.Log().Error( "Failed to execute Shopify command {0}. Error: {1}", command.Command, e.Message );
+				this.LogShopifyResponseerror( command, e.Message );
 			}
 
 			return result;
