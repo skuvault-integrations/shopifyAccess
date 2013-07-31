@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using ShopifyAccess.Models.Core.Configuration.Command;
 using ShopifyAccess.Models.Order;
 using ShopifyAccess.Models.ProductVariant;
 

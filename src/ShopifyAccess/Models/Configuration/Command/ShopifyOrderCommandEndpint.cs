@@ -1,4 +1,4 @@
-﻿namespace ShopifyAccess.Models.Core.Configuration.Command
+﻿namespace ShopifyAccess.Models.Configuration.Command
 {
 	internal class ShopifyOrderCommandEndpointName
 	{

@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 using CuttingEdge.Conditions;
 using Netco.Logging;
 using ServiceStack.Text;
-using ShopifyAccess.Models.Core.Configuration.Authorization;
-using ShopifyAccess.Models.Core.Configuration.Command;
+using ShopifyAccess.Exceptions;
+using ShopifyAccess.Models.Configuration.Authorization;
+using ShopifyAccess.Models.Configuration.Command;
 
 namespace ShopifyAccess.Services
 {
@@ -36,7 +37,7 @@ namespace ShopifyAccess.Services
 		{
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
-			var result = default( T );
+			T result;
 
 			try
 			{
@@ -46,7 +47,7 @@ namespace ShopifyAccess.Services
 			}
 			catch( WebException e )
 			{
-				this.LogShopifyResponseerror( command, e.Message );
+				throw new ShopifyException( command, e.Message );
 			}
 
 			return result;
@@ -56,7 +57,7 @@ namespace ShopifyAccess.Services
 		{
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
-			var result = default( T );
+			T result;
 
 			try
 			{
@@ -66,7 +67,7 @@ namespace ShopifyAccess.Services
 			}
 			catch( WebException e )
 			{
-				this.LogShopifyResponseerror( command, e.Message );
+				throw new ShopifyException( command, e.Message );
 			}
 
 			return result;
@@ -84,7 +85,7 @@ namespace ShopifyAccess.Services
 			}
 			catch( WebException e )
 			{
-				this.LogShopifyResponseerror( command, e.Message );
+				throw new ShopifyException( command, e.Message );
 			}
 		}
 
@@ -100,16 +101,16 @@ namespace ShopifyAccess.Services
 			}
 			catch( WebException e )
 			{
-				this.LogShopifyResponseerror( command, e.Message );
+				throw new ShopifyException( command, e.Message );
 			}
 		}
 
 		public string RequestPermanentToken( string code )
 		{
-			var result = string.Empty;
+			string result;
 			var command = ShopifyCommand.GetAccessToken;
 			var tokenRequestUrl = new Uri( string.Concat( this._authorizationConfig.Host, command.Command ) );
-			var tokenRequestPostContent = string.Format( "client_id={0}&client_secret={1}&code={2}", this._authorizationConfig.ApiKey, this._authorizationConfig.Sekret, code );
+			var tokenRequestPostContent = string.Format( "client_id={0}&client_secret={1}&code={2}", this._authorizationConfig.ApiKey, this._authorizationConfig.Secret, code );
 			var request = this.CreateServicePostRequest( tokenRequestUrl, tokenRequestPostContent );
 
 			try
@@ -119,7 +120,7 @@ namespace ShopifyAccess.Services
 			}
 			catch( WebException e )
 			{
-				this.LogShopifyResponseerror( command, e.Message );
+				throw new ShopifyException( command, e.Message );
 			}
 
 			return result;
@@ -188,11 +189,6 @@ namespace ShopifyAccess.Services
 		#endregion
 
 		#region Logging
-		private void LogShopifyResponseerror( ShopifyCommand command, string message )
-		{
-			this.Log().Error( "Failed to execute Shopify command {0}. Error: {1}", command.Command, message );
-		}
-
 		private void LogUpdateInfo( string endpoint, HttpStatusCode statusCode )
 		{
 			this.Log().Info( "PUT/POST call for the endpoint '{0}' has been completed with code '{1}'.", endpoint, statusCode );

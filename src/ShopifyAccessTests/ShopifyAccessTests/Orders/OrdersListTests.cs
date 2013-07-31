@@ -2,7 +2,8 @@
 using FluentAssertions;
 using NUnit.Framework;
 using ShopifyAccess;
-using ShopifyAccess.Models.Core.Configuration.Command;
+using ShopifyAccess.Exceptions;
+using ShopifyAccess.Models.Configuration.Command;
 using ShopifyAccess.Models.Order;
 
 namespace ShopifyAccessTests.Orders
@@ -59,9 +60,15 @@ namespace ShopifyAccessTests.Orders
 		{
 			var config = new ShopifyCommandConfig( ShopName, "blabla" );
 			var service = this.ShopifyFactory.CreateService( config );
-			var orders = service.GetOrders( DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
-
-			orders.Should().BeNull();
+			ShopifyOrders orders = null;
+			try
+			{
+				orders = service.GetOrders( DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
+			}
+			catch( ShopifyException )
+			{
+				orders.Should().BeNull();
+			}
 		}
 
 		[ Test ]
@@ -69,9 +76,15 @@ namespace ShopifyAccessTests.Orders
 		{
 			var config = new ShopifyCommandConfig( "blabla", AccessToken );
 			var service = this.ShopifyFactory.CreateService( config );
-			var orders = service.GetOrders( DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
-
-			orders.Should().BeNull();
+			ShopifyOrders orders = null;
+			try
+			{
+				orders = service.GetOrders( DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
+			}
+			catch( ShopifyException )
+			{
+				orders.Should().BeNull();
+			}
 		}
 	}
 }

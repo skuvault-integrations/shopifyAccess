@@ -3,17 +3,17 @@ using System.Web;
 using CuttingEdge.Conditions;
 using ShopifyAccess.Services;
 
-namespace ShopifyAccess.Models.Core.Configuration.Authorization
+namespace ShopifyAccess.Models.Configuration.Authorization
 {
 	public class ShopifyAuthorizationConfig : ShopifyConfigBase
 	{
 		public string ApiKey { get; private set; }
-		public string Sekret { get; private set; }
+		public string Secret { get; private set; }
 		public string ShopName { get; private set; }
 		public Scopes Scopes { get; private set; }
 		public string RedirectUrl { get; private set; }
 
-		public ShopifyAuthorizationConfig( string apiKey, string sekret, string shopName )
+		public ShopifyAuthorizationConfig( string apiKey, string secret, string shopName )
 			: base( shopName )
 		{
 			Condition.Requires( apiKey, "apiKey" ).IsNotNullOrWhiteSpace();
@@ -22,19 +22,19 @@ namespace ShopifyAccess.Models.Core.Configuration.Authorization
 
 			this.ShopName = shopName;
 			this.ApiKey = apiKey;
-			this.Sekret = sekret;
+			this.Secret = secret;
 		}
 
-		public ShopifyAuthorizationConfig( string apiKey, string sekret, string shopName, Scopes scopes )
-			: this( apiKey, sekret, shopName )
+		public ShopifyAuthorizationConfig( string apiKey, string secret, string shopName, Scopes scopes )
+			: this( apiKey, secret, shopName )
 		{
 			Condition.Requires( scopes, "scopes" ).IsNotNull();
 
 			this.Scopes = scopes;
 		}
 
-		public ShopifyAuthorizationConfig( string apiKey, string sekret, string shopName, Scopes scopes, string redirectUrl )
-			: this( apiKey, sekret, shopName, scopes )
+		public ShopifyAuthorizationConfig( string apiKey, string secret, string shopName, Scopes scopes, string redirectUrl )
+			: this( apiKey, secret, shopName, scopes )
 		{
 			Condition.Requires( redirectUrl, "redirectUrl" ).IsNotNullOrWhiteSpace();
 

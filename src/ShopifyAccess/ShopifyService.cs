@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CuttingEdge.Conditions;
-using ShopifyAccess.Models.Core.Configuration.Command;
+using ShopifyAccess.Models.Configuration.Command;
 using ShopifyAccess.Models.Order;
 using ShopifyAccess.Models.ProductVariant;
 using ShopifyAccess.Services;

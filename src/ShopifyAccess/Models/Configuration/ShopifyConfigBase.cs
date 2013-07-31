@@ -1,4 +1,4 @@
-﻿namespace ShopifyAccess.Models.Core.Configuration
+﻿namespace ShopifyAccess.Models.Configuration
 {
 	public class ShopifyConfigBase
 	{
