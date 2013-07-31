@@ -28,11 +28,25 @@ namespace ShopifyAccess.Models.Order
 		[ DataMember( Name = "customer" ) ]
 		public ShopifyCustomer Customer { get; set; }
 
-		//public DateTime? ShipDate { get; set; }
+		[ DataMember( Name = "closed_at" ) ]
+		public DateTime? ClosedAt { get; set; }
 
-		//public bool IsShipped
-		//{
-		//	get { return ShipDate.HasValue; }
-		//}
+		public bool IsShipped
+		{
+			get { return ClosedAt.HasValue; }
+		}
+	}
+
+	public enum ShopifyFinantialStatus
+	{
+		// ReSharper disable InconsistentNaming
+		Undefined,
+		pending,
+		partially_paid,
+		paid,
+		partially_refunded,
+		refunded,
+		voided
+		// ReSharper restore InconsistentNaming
 	}
 }
