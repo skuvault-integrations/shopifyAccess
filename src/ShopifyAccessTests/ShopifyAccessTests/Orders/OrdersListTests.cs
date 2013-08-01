@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using FluentAssertions;
+using LINQtoCSV;
 using NUnit.Framework;
 using ShopifyAccess;
 using ShopifyAccess.Exceptions;
@@ -12,14 +14,24 @@ namespace ShopifyAccessTests.Orders
 	public class OrdersListTests
 	{
 		private readonly IShopifyFactory ShopifyFactory = new ShopifyFactory();
-		private const string ShopName = "skuvault";
-		private const string AccessToken = "ce22522b5b2ad8cce975429ec265db4c";
+		private ShopifyCommandConfig Config;
+
+		[ SetUp ]
+		public void Init()
+		{
+			const string credentialsFilePath = @"..\..\Files\ShopifyCredentials.csv";
+
+			var cc = new CsvContext();
+			var testConfig = cc.Read< TestCommandConfig >( credentialsFilePath, new CsvFileDescription { FirstLineHasColumnNames = true } ).FirstOrDefault();
+
+			if( testConfig != null )
+				this.Config = new ShopifyCommandConfig( testConfig.ShopName, testConfig.AccessToken );
+		}
 
 		[ Test ]
 		public void OrdersFilteredByDateLoaded()
 		{
-			var config = new ShopifyCommandConfig( ShopName, AccessToken );
-			var service = this.ShopifyFactory.CreateService( config );
+			var service = this.ShopifyFactory.CreateService( this.Config );
 			var orders = service.GetOrders( DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
 
 			orders.Count.Should().Be( 1 );
@@ -28,8 +40,7 @@ namespace ShopifyAccessTests.Orders
 		[ Test ]
 		public void OrdersFilteredByDateLoadedAsync()
 		{
-			var config = new ShopifyCommandConfig( ShopName, AccessToken );
-			var service = this.ShopifyFactory.CreateService( config );
+			var service = this.ShopifyFactory.CreateService( this.Config );
 			var orders = service.GetOrdersAsync( DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
 
 			orders.Result.Count.Should().Be( 1 );
@@ -38,8 +49,7 @@ namespace ShopifyAccessTests.Orders
 		[ Test ]
 		public void OrdersFilteredFulfillmentStatusDateLoaded()
 		{
-			var config = new ShopifyCommandConfig( ShopName, AccessToken );
-			var service = this.ShopifyFactory.CreateService( config );
+			var service = this.ShopifyFactory.CreateService( this.Config );
 			var orders = service.GetOrders( ShopifyOrderFulfillmentStatus.any, DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
 
 			orders.Count.Should().Be( 1 );
@@ -48,8 +58,7 @@ namespace ShopifyAccessTests.Orders
 		[ Test ]
 		public void OrdersFilteredFulfillmentStatusDateLoadedAsync()
 		{
-			var config = new ShopifyCommandConfig( ShopName, AccessToken );
-			var service = this.ShopifyFactory.CreateService( config );
+			var service = this.ShopifyFactory.CreateService( this.Config );
 			var orders = service.GetOrdersAsync( ShopifyOrderFulfillmentStatus.any, DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
 
 			orders.Result.Count.Should().Be( 1 );
@@ -58,7 +67,7 @@ namespace ShopifyAccessTests.Orders
 		[ Test ]
 		public void OrdersNotLoaded_IncorrectToken()
 		{
-			var config = new ShopifyCommandConfig( ShopName, "blabla" );
+			var config = new ShopifyCommandConfig( this.Config.ShopName, "blabla" );
 			var service = this.ShopifyFactory.CreateService( config );
 			ShopifyOrders orders = null;
 			try
@@ -74,7 +83,7 @@ namespace ShopifyAccessTests.Orders
 		[ Test ]
 		public void OrdersNotLoaded_IncorrectShopName()
 		{
-			var config = new ShopifyCommandConfig( "blabla", AccessToken );
+			var config = new ShopifyCommandConfig( "blabla", this.Config.AccessToken );
 			var service = this.ShopifyFactory.CreateService( config );
 			ShopifyOrders orders = null;
 			try

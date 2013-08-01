@@ -32,3 +32,4 @@ _ReSharper*/
 build
 log
 /src/TeapplixAccessTests/Files/teapplix_test_credentials.csv
+/src/ShopifyAccessTests/ShopifyAccessTests/Files/ShopifyCredentials.csv

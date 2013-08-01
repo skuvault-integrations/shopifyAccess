@@ -9,7 +9,6 @@ namespace ShopifyAccess.Models.Configuration.Authorization
 	{
 		public string ApiKey { get; private set; }
 		public string Secret { get; private set; }
-		public string ShopName { get; private set; }
 		public Scopes Scopes { get; private set; }
 		public string RedirectUrl { get; private set; }
 
@@ -18,9 +17,7 @@ namespace ShopifyAccess.Models.Configuration.Authorization
 		{
 			Condition.Requires( apiKey, "apiKey" ).IsNotNullOrWhiteSpace();
 			Condition.Requires( apiKey, "apiKey" ).IsNotNullOrWhiteSpace();
-			Condition.Requires( shopName, "shopName" ).IsNotNullOrWhiteSpace();
 
-			this.ShopName = shopName;
 			this.ApiKey = apiKey;
 			this.Secret = secret;
 		}
