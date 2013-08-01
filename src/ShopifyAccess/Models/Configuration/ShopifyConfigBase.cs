@@ -9,7 +9,7 @@ namespace ShopifyAccess.Models.Configuration
 
 		protected ShopifyConfigBase( string shopName )
 		{
-			Condition.Requires(shopName, "shopName").IsNotNullOrWhiteSpace();
+			Condition.Requires( shopName, "shopName" ).IsNotNullOrWhiteSpace();
 
 			this.Host = string.Format( "https://{0}.myshopify.com", shopName );
 			this.ShopName = shopName;

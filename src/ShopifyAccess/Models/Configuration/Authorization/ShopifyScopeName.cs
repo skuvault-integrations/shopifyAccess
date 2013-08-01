@@ -19,7 +19,7 @@
 		public string Name { get; private set; }
 	}
 
-	public enum ShopifyScopeAccessLevelEnum
+	public enum ShopifyScopeAccessLevel
 	{
 		Undefined,
 		Read,
