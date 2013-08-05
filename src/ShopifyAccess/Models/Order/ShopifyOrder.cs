@@ -25,6 +25,9 @@ namespace ShopifyAccess.Models.Order
 		[ DataMember( Name = "billing_address" ) ]
 		public ShopifyBillingAddress BillingAddress { get; set; }
 
+		[ DataMember( Name = "shipping_address" ) ]
+		public ShopifyShippingAddress ShippingAddress { get; set; }
+
 		[ DataMember( Name = "customer" ) ]
 		public ShopifyCustomer Customer { get; set; }
 
