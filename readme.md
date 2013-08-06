@@ -1,0 +1,1 @@
+ShopifyAccess is .NET wrapper around [Shopify API](http://docs.shopify.com/api) was created to simplify and speed up working with it.
