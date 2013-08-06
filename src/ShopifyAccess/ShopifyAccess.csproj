@@ -75,6 +75,7 @@
     <Compile Include="Models\Configuration\Authorization\ShopifyScopeName.cs" />
     <Compile Include="Models\Configuration\Authorization\TokenRequestResult.cs" />
     <Compile Include="Models\Order\ShopifyOrders.cs" />
+    <Compile Include="Models\Order\ShopifyShippingAddress.cs" />
     <Compile Include="Models\ProductVariant\ShopifyProductVariant.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\EndpointsBuilder.cs" />
