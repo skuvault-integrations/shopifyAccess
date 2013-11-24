@@ -32,7 +32,7 @@ namespace ShopifyAccessTests.Orders
 		public void OrdersFilteredByDateLoaded()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var orders = service.GetOrders( DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
+			var orders = service.GetOrders( DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow );
 
 			orders.Count.Should().Be( 1 );
 		}
@@ -41,7 +41,7 @@ namespace ShopifyAccessTests.Orders
 		public void OrdersFilteredByDateLoadedAsync()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var orders = service.GetOrdersAsync( DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
+			var orders = service.GetOrdersAsync( DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow );
 
 			orders.Result.Count.Should().Be( 1 );
 		}
@@ -50,7 +50,7 @@ namespace ShopifyAccessTests.Orders
 		public void OrdersFilteredFulfillmentStatusDateLoaded()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var orders = service.GetOrders( ShopifyOrderFulfillmentStatus.any, DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
+			var orders = service.GetOrders( ShopifyOrderFulfillmentStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow );
 
 			orders.Count.Should().Be( 1 );
 		}
@@ -59,7 +59,7 @@ namespace ShopifyAccessTests.Orders
 		public void OrdersFilteredFulfillmentStatusDateLoadedAsync()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var orders = service.GetOrdersAsync( ShopifyOrderFulfillmentStatus.any, DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
+			var orders = service.GetOrdersAsync( ShopifyOrderFulfillmentStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow );
 
 			orders.Result.Count.Should().Be( 1 );
 		}
@@ -72,7 +72,7 @@ namespace ShopifyAccessTests.Orders
 			ShopifyOrders orders = null;
 			try
 			{
-				orders = service.GetOrders( DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
+				orders = service.GetOrders( DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow );
 			}
 			catch( ShopifyException )
 			{
@@ -88,7 +88,7 @@ namespace ShopifyAccessTests.Orders
 			ShopifyOrders orders = null;
 			try
 			{
-				orders = service.GetOrders( DateTime.UtcNow.AddDays( -40 ), DateTime.UtcNow );
+				orders = service.GetOrders( DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow );
 			}
 			catch( ShopifyException )
 			{

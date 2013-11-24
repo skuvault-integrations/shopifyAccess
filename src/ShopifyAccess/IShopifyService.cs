@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ShopifyAccess.Models.Order;
 using ShopifyAccess.Models.ProductVariant;
@@ -41,13 +42,13 @@ namespace ShopifyAccess
 		Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderFulfillmentStatus status, DateTime dateFrom, DateTime dateTo );
 
 		/// <summary>
-		/// Updates variant (inventory item)
+		/// Update variants (inventory items)
 		/// </summary>
-		void UpdateProductVariantQuantity( ShopifyProductVariant variant );
+		void UpdateProductVariants( IEnumerable< ShopifyProductVariant > variants );
 
 		/// <summary>
-		/// Updates variant (inventory item) async
+		/// Update variants (inventory items) async
 		/// </summary>
-		Task UpdateProductVariantQuantityAsync( ShopifyProductVariant variant );
+		Task UpdateProductVariantsAsync( IEnumerable< ShopifyProductVariant > variants );
 	}
 }

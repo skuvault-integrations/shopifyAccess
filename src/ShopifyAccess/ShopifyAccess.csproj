@@ -60,6 +60,7 @@
     </Compile>
     <Compile Include="Exceptions\ShopifyException.cs" />
     <Compile Include="IShopifyService.cs" />
+    <Compile Include="Misc\ActionPolicies.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyOrderCommandEndpint.cs" />
     <Compile Include="Models\Configuration\Authorization\Scope.cs" />
     <Compile Include="Models\Configuration\Authorization\Scopes.cs" />
