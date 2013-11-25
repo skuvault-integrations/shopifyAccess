@@ -28,54 +28,154 @@ namespace ShopifyAccess
 		#region GetOrders
 		public ShopifyOrders GetOrders( DateTime dateFrom, DateTime dateTo )
 		{
-			ShopifyOrders orders = null;
+			ShopifyOrders orders;
+			var endpoint = EndpointsBuilder.CreateOrdersEndpoint( dateFrom, dateTo );
+			var ordersCount = this.GetOrdersCount( endpoint );
 
-			ActionPolicies.ShopifySubmitPolicy.Do( () =>
-				{
-					var endpoint = EndpointsBuilder.CreateOrdersEndpoint( dateFrom, dateTo );
-					orders = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetAllOrders, endpoint );
-				} );
+			if( ordersCount > RequestMaxLimit )
+				orders = this.CollectOrdersFromSinglePage( endpoint );
+			else
+				orders = this.CollectOrdersFromAllPages( endpoint, ordersCount );
 
 			return orders;
 		}
 
 		public async Task< ShopifyOrders > GetOrdersAsync( DateTime dateFrom, DateTime dateTo )
 		{
-			ShopifyOrders orders = null;
+			ShopifyOrders orders;
+			var endpoint = EndpointsBuilder.CreateOrdersEndpoint( dateFrom, dateTo );
+			var ordersCount = await this.GetOrdersCountAsync( endpoint );
 
-			await ActionPolicies.QueryAsync.Do( async () =>
-				{
-					var endpoint = EndpointsBuilder.CreateOrdersEndpoint( dateFrom, dateTo );
-					orders = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetAllOrders, endpoint );
-				} );
+			if( ordersCount > RequestMaxLimit )
+				orders = await this.CollectOrdersFromSinglePageAsync( endpoint );
+			else
+				orders = await this.CollectOrdersFromAllPagesAsync( endpoint, ordersCount );
 
 			return orders;
 		}
 
 		public ShopifyOrders GetOrders( ShopifyOrderFulfillmentStatus status, DateTime dateFrom, DateTime dateTo )
 		{
-			ShopifyOrders orders = null;
+			ShopifyOrders orders;
+			var endpoint = EndpointsBuilder.CreateOrdersEndpoint( status, dateFrom, dateTo );
+			var ordersCount = this.GetOrdersCount( endpoint );
 
-			ActionPolicies.ShopifySubmitPolicy.Do( () =>
-				{
-					var endpoint = EndpointsBuilder.CreateOrdersEndpoint( status, dateFrom, dateTo );
-					orders = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetAllOrders, endpoint );
-				} );
+			if( ordersCount > RequestMaxLimit )
+				orders = this.CollectOrdersFromSinglePage( endpoint );
+			else
+				orders = this.CollectOrdersFromAllPages( endpoint, ordersCount );
 
 			return orders;
 		}
 
 		public async Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderFulfillmentStatus status, DateTime dateFrom, DateTime dateTo )
 		{
-			ShopifyOrders orders = null;
+			ShopifyOrders orders;
+			var endpoint = EndpointsBuilder.CreateOrdersEndpoint( status, dateFrom, dateTo );
+			var ordersCount = await this.GetOrdersCountAsync( endpoint );
 
-			await ActionPolicies.QueryAsync.Do( async () =>
+			if( ordersCount > RequestMaxLimit )
+				orders = await this.CollectOrdersFromSinglePageAsync( endpoint );
+			else
+				orders = await this.CollectOrdersFromAllPagesAsync( endpoint, ordersCount );
+
+			return orders;
+		}
+
+		private ShopifyOrders CollectOrdersFromAllPages( string mainEndpoint, int ordersCount )
+		{
+			var pagesCount = this.CalculatePagesCount( ordersCount );
+			var orders = new ShopifyOrders();
+
+			for( var i = 0; i < pagesCount; i++ )
+			{
+				var endpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetFirstPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
+
+				ActionPolicies.ShopifySubmitPolicy.Do( () =>
+					{
+						var ordersWithinPage = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, endpoint );
+						orders.Orders.AddRange( ordersWithinPage.Orders );
+
+						//API requirement
+						Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
+					} );
+			}
+
+			return orders;
+		}
+
+		private async Task< ShopifyOrders > CollectOrdersFromAllPagesAsync( string mainEndpoint, int ordersCount )
+		{
+			var pagesCount = this.CalculatePagesCount( ordersCount );
+			var orders = new ShopifyOrders();
+
+			for( var i = 0; i < pagesCount; i++ )
+			{
+				var endpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetFirstPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
+
+				await ActionPolicies.QueryAsync.Do( async () =>
+					{
+						var ordersWithinPage = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, endpoint );
+						orders.Orders.AddRange( ordersWithinPage.Orders );
+
+						//API requirement
+						Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
+					} );
+			}
+
+			return orders;
+		}
+
+		private ShopifyOrders CollectOrdersFromSinglePage( string mainEndpoint )
+		{
+			ShopifyOrders orders = null;
+			var endpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetFirstPageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
+
+			ActionPolicies.ShopifySubmitPolicy.Do( () =>
 				{
-					var endpoint = EndpointsBuilder.CreateOrdersEndpoint( status, dateFrom, dateTo );
-					orders = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetAllOrders, endpoint );
+					orders = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, endpoint );
+
+					//API requirement
+					Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
 				} );
 
 			return orders;
+		}
+
+		private async Task< ShopifyOrders > CollectOrdersFromSinglePageAsync( string mainEndpoint )
+		{
+			ShopifyOrders orders = null;
+			var endpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetFirstPageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
+
+			await ActionPolicies.QueryAsync.Do( async () =>
+				{
+					orders = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, endpoint );
+
+					//API requirement
+					Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
+				} );
+
+			return orders;
+		}
+
+		private int GetOrdersCount( string endpoint )
+		{
+			var count = 0;
+			ActionPolicies.ShopifySubmitPolicy.Do( () =>
+				{
+					count = this._webRequestServices.GetResponse< OrdersCount >( ShopifyCommand.GetOrdersCount, endpoint ).Count;
+				} );
+			return count;
+		}
+
+		private async Task< int > GetOrdersCountAsync( string endpoint )
+		{
+			var count = 0;
+			await ActionPolicies.QueryAsync.Do( async () =>
+				{
+					count = ( await this._webRequestServices.GetResponseAsync< OrdersCount >( ShopifyCommand.GetOrdersCount, endpoint ) ).Count;
+				} );
+			return count;
 		}
 		#endregion
 
@@ -102,6 +202,102 @@ namespace ShopifyAccess
 				products = await this.CollectProductsFromAllPagesAsync( productsCount );
 			else
 				products = await this.CollectProductsFromSinglePageAsync();
+
+			return products;
+		}
+
+		private int GetProductsCount()
+		{
+			var count = 0;
+			ActionPolicies.ShopifySubmitPolicy.Do( () =>
+				{
+					count = this._webRequestServices.GetResponse< ProductsCount >( ShopifyCommand.GetProductsCount, EndpointsBuilder.EmptyEndpoint ).Count;
+				} );
+			return count;
+		}
+
+		private async Task< int > GetProductsCountAsync()
+		{
+			var count = 0;
+			await ActionPolicies.QueryAsync.Do( async () =>
+				{
+					count = ( await this._webRequestServices.GetResponseAsync< ProductsCount >( ShopifyCommand.GetProductsCount, EndpointsBuilder.EmptyEndpoint ) ).Count;
+				} );
+			return count;
+		}
+
+		private ShopifyProducts CollectProductsFromAllPages( int productsCount )
+		{
+			var pagesCount = this.CalculatePagesCount( productsCount );
+			var products = new ShopifyProducts();
+
+			for( var i = 0; i < pagesCount; i++ )
+			{
+				var endpoint = EndpointsBuilder.CreateGetFirstPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) );
+
+				ActionPolicies.ShopifySubmitPolicy.Do( () =>
+					{
+						var productsWithinPage = this._webRequestServices.GetResponse< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
+						products.Products.AddRange( productsWithinPage.Products );
+
+						//API requirement
+						Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
+					} );
+			}
+
+			return products;
+		}
+
+		private async Task< ShopifyProducts > CollectProductsFromAllPagesAsync( int productsCount )
+		{
+			var pagesCount = this.CalculatePagesCount( productsCount );
+			var products = new ShopifyProducts();
+
+			for( var i = 0; i < pagesCount; i++ )
+			{
+				var endpoint = EndpointsBuilder.CreateGetFirstPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) );
+
+				await ActionPolicies.QueryAsync.Do( async () =>
+					{
+						var productsWithinPage = await this._webRequestServices.GetResponseAsync< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
+						products.Products.AddRange( productsWithinPage.Products );
+
+						//API requirement
+						Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
+					} );
+			}
+
+			return products;
+		}
+
+		private ShopifyProducts CollectProductsFromSinglePage()
+		{
+			ShopifyProducts products = null;
+			var endpoint = EndpointsBuilder.CreateGetFirstPageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
+
+			ActionPolicies.ShopifySubmitPolicy.Do( () =>
+				{
+					products = this._webRequestServices.GetResponse< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
+
+					//API requirement
+					Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
+				} );
+
+			return products;
+		}
+
+		private async Task< ShopifyProducts > CollectProductsFromSinglePageAsync()
+		{
+			ShopifyProducts products = null;
+			var endpoint = EndpointsBuilder.CreateGetFirstPageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
+
+			await ActionPolicies.QueryAsync.Do( async () =>
+				{
+					products = await this._webRequestServices.GetResponseAsync< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
+
+					//API requirement
+					Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
+				} );
 
 			return products;
 		}
@@ -139,102 +335,6 @@ namespace ShopifyAccess
 		#endregion
 
 		#region Misc
-		private int GetProductsCount()
-		{
-			var count = 0;
-			ActionPolicies.ShopifySubmitPolicy.Do( () =>
-				{
-					count = this._webRequestServices.GetResponse< ProductsCount >( ShopifyCommand.GetProductsCount, EndpointsBuilder.EmptyEndpoint ).Count;
-				} );
-			return count;
-		}
-
-		private async Task< int > GetProductsCountAsync()
-		{
-			var count = 0;
-			await ActionPolicies.QueryAsync.Do( async () =>
-				{
-					count = ( await this._webRequestServices.GetResponseAsync< ProductsCount >( ShopifyCommand.GetProductsCount, EndpointsBuilder.EmptyEndpoint ) ).Count;
-				} );
-			return count;
-		}
-
-		private ShopifyProducts CollectProductsFromAllPages( int productsCount )
-		{
-			var pagesCount = this.CalculatePagesCount( productsCount );
-			var products = new ShopifyProducts();
-
-			for( var i = 0; i < pagesCount; i++ )
-			{
-				var endpoint = EndpointsBuilder.CreateGetFirstProductsPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit, "variants" ) );
-
-				ActionPolicies.ShopifySubmitPolicy.Do( () =>
-					{
-						var productsWithinPage = this._webRequestServices.GetResponse< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
-						products.Products.AddRange( productsWithinPage.Products );
-
-						//API requirement
-						Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
-					} );
-			}
-
-			return products;
-		}
-
-		private async Task< ShopifyProducts > CollectProductsFromAllPagesAsync( int productsCount )
-		{
-			var pagesCount = this.CalculatePagesCount( productsCount );
-			var products = new ShopifyProducts();
-
-			for( var i = 0; i < pagesCount; i++ )
-			{
-				var endpoint = EndpointsBuilder.CreateGetFirstProductsPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit, "variants" ) );
-
-				await ActionPolicies.QueryAsync.Do( async () =>
-					{
-						var productsWithinPage = await this._webRequestServices.GetResponseAsync< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
-						products.Products.AddRange( productsWithinPage.Products );
-
-						//API requirement
-						Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
-					} );
-			}
-
-			return products;
-		}
-
-		private ShopifyProducts CollectProductsFromSinglePage()
-		{
-			ShopifyProducts products = null;
-			var endpoint = EndpointsBuilder.CreateGetFirstProductsPageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit, "variants" ) );
-
-			ActionPolicies.ShopifySubmitPolicy.Do( () =>
-				{
-					products = this._webRequestServices.GetResponse< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
-
-					//API requirement
-					Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
-				} );
-
-			return products;
-		}
-
-		private async Task< ShopifyProducts > CollectProductsFromSinglePageAsync()
-		{
-			ShopifyProducts products = null;
-			var endpoint = EndpointsBuilder.CreateGetFirstProductsPageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit, "variants" ) );
-
-			await ActionPolicies.QueryAsync.Do( async () =>
-				{
-					products = await this._webRequestServices.GetResponseAsync< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
-
-					//API requirement
-					Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
-				} );
-
-			return products;
-		}
-
 		private int CalculatePagesCount( int productsCount )
 		{
 			var result = ( int )Math.Ceiling( ( double )productsCount / RequestMaxLimit );

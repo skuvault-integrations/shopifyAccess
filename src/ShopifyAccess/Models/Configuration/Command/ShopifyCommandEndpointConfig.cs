@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using CuttingEdge.Conditions;
+﻿using CuttingEdge.Conditions;
 
 namespace ShopifyAccess.Models.Configuration.Command
 {
@@ -7,10 +6,9 @@ namespace ShopifyAccess.Models.Configuration.Command
 	{
 		public int Page { get; private set; }
 		public int Limit { get; private set; }
-		public string Fields { get; private set; }
 
-		public ShopifyCommandEndpointConfig( int page, int limit, params string[] fields )
-			: this( limit, fields )
+		public ShopifyCommandEndpointConfig( int page, int limit )
+			: this( limit )
 		{
 			Condition.Requires( page, "page" ).IsGreaterThan( 0 );
 			Condition.Requires( limit, "limit" ).IsGreaterThan( 0 );
@@ -18,12 +16,11 @@ namespace ShopifyAccess.Models.Configuration.Command
 			this.Page = page;
 		}
 
-		public ShopifyCommandEndpointConfig( int limit, params string[] fields )
+		public ShopifyCommandEndpointConfig( int limit )
 		{
 			Condition.Requires( limit, "limit" ).IsGreaterThan( 0 );
 
 			this.Limit = limit;
-			this.Fields = string.Join( ",", fields.ToArray() );
 		}
 	}
 }

@@ -13,5 +13,10 @@ namespace ShopifyAccess.Models.Order
 		{
 			get { return this.Orders.Count; }
 		}
+
+		public ShopifyOrders()
+		{
+			this.Orders = new List< ShopifyOrder >();
+		}
 	}
 }

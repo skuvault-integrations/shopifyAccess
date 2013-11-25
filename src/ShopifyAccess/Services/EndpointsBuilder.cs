@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using ShopifyAccess.Models.Configuration.Command;
 using ShopifyAccess.Models.Order;
 
@@ -31,23 +32,31 @@ namespace ShopifyAccess.Services
 			return endpoint;
 		}
 
-		public static string CreateGetFirstProductsPageEndpoint( ShopifyCommandEndpointConfig config )
+		public static string CreateGetFirstPageEndpoint( ShopifyCommandEndpointConfig config )
 		{
-			var endpoint = string.Format( "?{0}={1}&{2}={3}",
-				ShopifyCommandEndpointName.Limit.Name, config.Limit,
-				ShopifyCommandEndpointName.Fields.Name, config.Fields
+			var endpoint = string.Format( "?{0}={1}",
+				ShopifyCommandEndpointName.Limit.Name, config.Limit
 				);
 			return endpoint;
 		}
 
-		public static string CreateGetProductsEndpoint( ShopifyCommandEndpointConfig config )
+		public static string CreateGetNextPageEndpoint( ShopifyCommandEndpointConfig config )
 		{
-			var endpoint = string.Format( "?{0}={1}&{2}={3}&{4}={5}",
+			var endpoint = string.Format( "?{0}={1}&{2}={3}",
 				ShopifyCommandEndpointName.Limit.Name, config.Limit,
-				ShopifyCommandEndpointName.Page.Name, config.Page,
-				ShopifyCommandEndpointName.Fields.Name, config.Fields
+				ShopifyCommandEndpointName.Page.Name, config.Page
 				);
 			return endpoint;
+		}
+
+		public static string ConcatEndpoints( this string mainEndpoint, params string[] endpoints )
+		{
+			var result = new StringBuilder( mainEndpoint );
+
+			foreach( var endpoint in endpoints )
+				result.Append( endpoint.Replace( "?", "&" ) );
+
+			return result.ToString();
 		}
 	}
 }

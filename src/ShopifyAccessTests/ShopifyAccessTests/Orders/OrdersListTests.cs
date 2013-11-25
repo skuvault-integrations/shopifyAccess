@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
 using LINQtoCSV;
@@ -75,7 +76,7 @@ namespace ShopifyAccessTests.Orders
 			{
 				orders = service.GetOrders( DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow );
 			}
-			catch( ShopifyException )
+			catch( WebException )
 			{
 				orders.Should().BeNull();
 			}
@@ -91,7 +92,7 @@ namespace ShopifyAccessTests.Orders
 			{
 				orders = service.GetOrders( DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow );
 			}
-			catch( ShopifyException )
+			catch( WebException )
 			{
 				orders.Should().BeNull();
 			}

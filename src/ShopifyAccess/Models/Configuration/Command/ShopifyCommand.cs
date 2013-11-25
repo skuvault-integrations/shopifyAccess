@@ -9,6 +9,7 @@
 		public static readonly ShopifyCommand GetProducts = new ShopifyCommand( "/admin/products.json" );
 		public static readonly ShopifyCommand GetProductsCount = new ShopifyCommand( "/admin/products/count.json" );
 		public static readonly ShopifyCommand GetOrdersCount = new ShopifyCommand( "/admin/orders/count.json" );
+		public static readonly ShopifyCommand GetOrders = new ShopifyCommand( "/admin/orders.json" );
 
 		private ShopifyCommand( string command )
 		{
