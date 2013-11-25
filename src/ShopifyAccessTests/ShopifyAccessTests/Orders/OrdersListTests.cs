@@ -6,7 +6,6 @@ using FluentAssertions;
 using LINQtoCSV;
 using NUnit.Framework;
 using ShopifyAccess;
-using ShopifyAccess.Exceptions;
 using ShopifyAccess.Models.Configuration.Command;
 using ShopifyAccess.Models.Order;
 

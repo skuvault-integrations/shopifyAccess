@@ -58,7 +58,6 @@
     <Compile Include="..\Global\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Exceptions\ShopifyException.cs" />
     <Compile Include="IShopifyService.cs" />
     <Compile Include="Misc\ActionPolicies.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyOrderCommandEndpint.cs" />
