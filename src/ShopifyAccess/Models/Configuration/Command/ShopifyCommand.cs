@@ -6,6 +6,9 @@
 		public static readonly ShopifyCommand GetAccessToken = new ShopifyCommand( "/admin/oauth/access_token" );
 		public static readonly ShopifyCommand GetAllOrders = new ShopifyCommand( "/admin/orders.json" );
 		public static readonly ShopifyCommand UpdateProductVariant = new ShopifyCommand( "/admin/variants/" );
+		public static readonly ShopifyCommand GetProducts = new ShopifyCommand( "/admin/products.json" );
+		public static readonly ShopifyCommand GetProductsCount = new ShopifyCommand( "/admin/products/count.json" );
+		public static readonly ShopifyCommand GetOrdersCount = new ShopifyCommand( "/admin/orders/count.json" );
 
 		private ShopifyCommand( string command )
 		{

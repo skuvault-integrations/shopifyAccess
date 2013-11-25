@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
 using LINQtoCSV;
 using NUnit.Framework;
@@ -38,12 +39,12 @@ namespace ShopifyAccessTests.Orders
 		}
 
 		[ Test ]
-		public void OrdersFilteredByDateLoadedAsync()
+		public async Task OrdersFilteredByDateLoadedAsync()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var orders = service.GetOrdersAsync( DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow );
+			var orders = await service.GetOrdersAsync( DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow );
 
-			orders.Result.Count.Should().Be( 1 );
+			orders.Count.Should().Be( 1 );
 		}
 
 		[ Test ]
@@ -56,12 +57,12 @@ namespace ShopifyAccessTests.Orders
 		}
 
 		[ Test ]
-		public void OrdersFilteredFulfillmentStatusDateLoadedAsync()
+		public async Task OrdersFilteredFulfillmentStatusDateLoadedAsync()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var orders = service.GetOrdersAsync( ShopifyOrderFulfillmentStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow );
+			var orders = await service.GetOrdersAsync( ShopifyOrderFulfillmentStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow );
 
-			orders.Result.Count.Should().Be( 1 );
+			orders.Count.Should().Be( 1 );
 		}
 
 		[ Test ]

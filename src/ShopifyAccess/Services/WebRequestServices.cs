@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using CuttingEdge.Conditions;
 using Netco.Logging;
 using ServiceStack.Text;
-using ShopifyAccess.Exceptions;
 using ShopifyAccess.Models.Configuration.Authorization;
 using ShopifyAccess.Models.Configuration.Command;
 
@@ -35,40 +34,20 @@ namespace ShopifyAccess.Services
 		#region Requests handling
 		public T GetResponse< T >( ShopifyCommand command, string endpoint )
 		{
-			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
-
 			T result;
-
-			try
-			{
-				var request = this.CreateServiceGetRequest( command, endpoint );
-				using( var response = request.GetResponse() )
-					result = ParseResponse< T >( response );
-			}
-			catch( WebException e )
-			{
-				throw new ShopifyException( command, e.Message );
-			}
+			var request = this.CreateServiceGetRequest( command, endpoint );
+			using( var response = request.GetResponse() )
+				result = ParseResponse< T >( response );
 
 			return result;
 		}
 
 		public async Task< T > GetResponseAsync< T >( ShopifyCommand command, string endpoint )
 		{
-			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
-
 			T result;
-
-			try
-			{
-				var request = this.CreateServiceGetRequest( command, endpoint );
-				using( var response = await request.GetResponseAsync() )
-					result = ParseResponse< T >( response );
-			}
-			catch( WebException e )
-			{
-				throw new ShopifyException( command, e.Message );
-			}
+			var request = this.CreateServiceGetRequest( command, endpoint );
+			using( var response = await request.GetResponseAsync() )
+				result = ParseResponse< T >( response );
 
 			return result;
 		}
@@ -77,32 +56,18 @@ namespace ShopifyAccess.Services
 		{
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
-			try
-			{
-				var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
-				using( var response = ( HttpWebResponse )request.GetResponse() )
-					this.LogUpdateInfo( endpoint, response.StatusCode );
-			}
-			catch( WebException e )
-			{
-				throw new ShopifyException( command, e.Message );
-			}
+			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
+			using( var response = ( HttpWebResponse )request.GetResponse() )
+				this.LogUpdateInfo( endpoint, response.StatusCode );
 		}
 
 		public async Task PutDataAsync( ShopifyCommand command, string endpoint, string jsonContent )
 		{
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
-			try
-			{
-				var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
-				using( var response = await request.GetResponseAsync() )
-					this.LogUpdateInfo( endpoint, ( ( HttpWebResponse )response ).StatusCode );
-			}
-			catch( WebException e )
-			{
-				throw new ShopifyException( command, e.Message );
-			}
+			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
+			using( var response = await request.GetResponseAsync() )
+				this.LogUpdateInfo( endpoint, ( ( HttpWebResponse )response ).StatusCode );
 		}
 
 		public string RequestPermanentToken( string code )
@@ -113,15 +78,8 @@ namespace ShopifyAccess.Services
 			var tokenRequestPostContent = string.Format( "client_id={0}&client_secret={1}&code={2}", this._authorizationConfig.ApiKey, this._authorizationConfig.Secret, code );
 			var request = this.CreateServicePostRequest( tokenRequestUrl, tokenRequestPostContent );
 
-			try
-			{
-				using( var response = request.GetResponse() )
-					result = this.ParseResponse< TokenRequestResult >( response ).Token;
-			}
-			catch( WebException e )
-			{
-				throw new ShopifyException( command, e.Message );
-			}
+			using( var response = request.GetResponse() )
+				result = this.ParseResponse< TokenRequestResult >( response ).Token;
 
 			return result;
 		}

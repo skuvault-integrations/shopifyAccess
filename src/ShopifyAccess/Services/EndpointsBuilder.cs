@@ -6,6 +6,8 @@ namespace ShopifyAccess.Services
 {
 	internal static class EndpointsBuilder
 	{
+		public static readonly string EmptyEndpoint = string.Empty;
+
 		public static string CreateOrdersEndpoint( DateTime startDate, DateTime endDate )
 		{
 			var endpoint = string.Format( "?{0}={1}&{2}={3}",
@@ -26,6 +28,25 @@ namespace ShopifyAccess.Services
 		public static string CreateProductVariantUpdateEndpoint( long variantId )
 		{
 			var endpoint = string.Format( "{0}.json", variantId );
+			return endpoint;
+		}
+
+		public static string CreateGetFirstProductsPageEndpoint( ShopifyCommandEndpointConfig config )
+		{
+			var endpoint = string.Format( "?{0}={1}&{2}={3}",
+				ShopifyCommandEndpointName.Limit.Name, config.Limit,
+				ShopifyCommandEndpointName.Fields.Name, config.Fields
+				);
+			return endpoint;
+		}
+
+		public static string CreateGetProductsEndpoint( ShopifyCommandEndpointConfig config )
+		{
+			var endpoint = string.Format( "?{0}={1}&{2}={3}&{4}={5}",
+				ShopifyCommandEndpointName.Limit.Name, config.Limit,
+				ShopifyCommandEndpointName.Page.Name, config.Page,
+				ShopifyCommandEndpointName.Fields.Name, config.Fields
+				);
 			return endpoint;
 		}
 	}

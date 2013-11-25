@@ -7,7 +7,7 @@ namespace ShopifyAccess.Models.Order
 	public class ShopifyOrders
 	{
 		[ DataMember( Name = "orders" ) ]
-		public IList< ShopifyOrder > Orders { get; private set; }
+		public List< ShopifyOrder > Orders { get; private set; }
 
 		public int Count
 		{

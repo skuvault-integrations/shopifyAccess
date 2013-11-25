@@ -2,6 +2,7 @@
 {
 	internal class ShopifyOrderCommandEndpointName
 	{
+		public static readonly ShopifyOrderCommandEndpointName Unknown = new ShopifyOrderCommandEndpointName( string.Empty );
 		public static readonly ShopifyOrderCommandEndpointName OrdersDateFrom = new ShopifyOrderCommandEndpointName( "created_at_min" );
 		public static readonly ShopifyOrderCommandEndpointName OrdersDateTo = new ShopifyOrderCommandEndpointName( "created_at_max" );
 		public static readonly ShopifyOrderCommandEndpointName FulfillmentStatus = new ShopifyOrderCommandEndpointName( "fulfillment_status" );

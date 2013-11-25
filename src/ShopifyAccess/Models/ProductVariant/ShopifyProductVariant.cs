@@ -13,6 +13,9 @@ namespace ShopifyAccess.Models.ProductVariant
 
 		[ DataMember( Name = "inventory_management" ) ]
 		public InventoryManagement InventoryManagement { get; set; }
+
+		[ DataMember( Name = "sku" ) ]
+		public string Sku { get; set; }
 	}
 
 	public enum InventoryManagement
