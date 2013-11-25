@@ -32,7 +32,7 @@ namespace ShopifyAccess
 			var endpoint = EndpointsBuilder.CreateOrdersEndpoint( dateFrom, dateTo );
 			var ordersCount = this.GetOrdersCount( endpoint );
 
-			if( ordersCount > RequestMaxLimit )
+			if( ordersCount < RequestMaxLimit )
 				orders = this.CollectOrdersFromSinglePage( endpoint );
 			else
 				orders = this.CollectOrdersFromAllPages( endpoint, ordersCount );
@@ -46,7 +46,7 @@ namespace ShopifyAccess
 			var endpoint = EndpointsBuilder.CreateOrdersEndpoint( dateFrom, dateTo );
 			var ordersCount = await this.GetOrdersCountAsync( endpoint );
 
-			if( ordersCount > RequestMaxLimit )
+			if( ordersCount < RequestMaxLimit )
 				orders = await this.CollectOrdersFromSinglePageAsync( endpoint );
 			else
 				orders = await this.CollectOrdersFromAllPagesAsync( endpoint, ordersCount );
