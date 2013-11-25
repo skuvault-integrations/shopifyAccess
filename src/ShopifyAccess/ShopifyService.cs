@@ -323,6 +323,9 @@ namespace ShopifyAccess
 			var jsonContent = new { variant }.ToJson();
 
 			this._webRequestServices.PutData( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent );
+
+			//API requirement
+			Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
 		}
 
 		private async Task UpdateProductVariantQuantityAsync( ShopifyProductVariant variant )
@@ -331,6 +334,9 @@ namespace ShopifyAccess
 			var jsonContent = new { variant }.ToJson();
 
 			await this._webRequestServices.PutDataAsync( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent );
+
+			//API requirement
+			Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
 		}
 		#endregion
 

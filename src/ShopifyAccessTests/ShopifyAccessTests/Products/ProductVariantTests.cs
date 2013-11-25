@@ -1,10 +1,12 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using LINQtoCSV;
 using NUnit.Framework;
 using ShopifyAccess;
 using ShopifyAccess.Models.Configuration.Command;
+using ShopifyAccess.Models.ProductVariant;
 
 namespace ShopifyAccessTests.Products
 {
@@ -44,13 +46,13 @@ namespace ShopifyAccessTests.Products
 			products.Products.Count.Should().BeGreaterThan( 0 );
 		}
 
-		//[ Test ]
-		//public void ProductVariantQuantityUpdated()
-		//{
-		//	var config = new ShopifyCommandConfig( ShopName, AccessToken );
-		//	var service = this.ShopifyFactory.CreateService( config );
-		//	var variantToUpdate = new ShopifyProductVariant { Id = VariantId, Quantity = 100, InventoryManagement = InventoryManagement.Shopify };
-		//	service.UpdateProductVariantQuantity( variantToUpdate );
-		//}
+		[ Test ]
+		public void ProductVariantQuantityUpdated()
+		{
+			var service = this.ShopifyFactory.CreateService( this.Config );
+
+			var variantToUpdate = new ShopifyProductVariant { Id = 418577445, Quantity = 21, InventoryManagement = InventoryManagement.Shopify };
+			service.UpdateProductVariants( new List< ShopifyProductVariant > { variantToUpdate } );
+		}
 	}
 }
