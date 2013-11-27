@@ -149,7 +149,7 @@ namespace ShopifyAccess.Services
 		#region Logging
 		private void LogUpdateInfo( string endpoint, HttpStatusCode statusCode )
 		{
-			this.Log().Info( "PUT/POST call for the endpoint '{0}' has been completed with code '{1}'.", endpoint, statusCode );
+			this.Log().Trace( "PUT/POST call for the endpoint '{0}' has been completed with code '{1}'.", endpoint, statusCode );
 		}
 		#endregion
 	}
