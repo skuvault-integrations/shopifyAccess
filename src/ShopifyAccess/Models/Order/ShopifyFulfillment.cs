@@ -7,14 +7,37 @@
 		public ShopifyOrderFulfillmentStatus Status { get; set; }
 	}
 
+	// ReSharper disable InconsistentNaming
 	public enum ShopifyOrderFulfillmentStatus
 	{
-		// ReSharper disable InconsistentNaming
 		Undefined,
 		shipped,
 		partial,
 		unshipped,
 		any
-		// ReSharper restore InconsistentNaming
 	}
+
+	public enum ShopifyOrderStatus
+	{
+		Undefined,
+		open,
+		closed,
+		cancelled,
+		any
+	}
+
+	public enum ShopifyOrderFinancialStatus
+	{
+		Undefined,
+		authorized,
+		pending,
+		paid,
+		partially_paid,
+		abandoned,
+		refunded,
+		voided,
+		any
+	}
+
+	// ReSharper restore InconsistentNaming
 }

@@ -26,35 +26,7 @@ namespace ShopifyAccess
 		}
 
 		#region GetOrders
-		public ShopifyOrders GetOrders( DateTime dateFrom, DateTime dateTo )
-		{
-			ShopifyOrders orders;
-			var endpoint = EndpointsBuilder.CreateOrdersEndpoint( dateFrom, dateTo );
-			var ordersCount = this.GetOrdersCount( endpoint );
-
-			if( ordersCount < RequestMaxLimit )
-				orders = this.CollectOrdersFromSinglePage( endpoint );
-			else
-				orders = this.CollectOrdersFromAllPages( endpoint, ordersCount );
-
-			return orders;
-		}
-
-		public async Task< ShopifyOrders > GetOrdersAsync( DateTime dateFrom, DateTime dateTo )
-		{
-			ShopifyOrders orders;
-			var endpoint = EndpointsBuilder.CreateOrdersEndpoint( dateFrom, dateTo );
-			var ordersCount = await this.GetOrdersCountAsync( endpoint );
-
-			if( ordersCount < RequestMaxLimit )
-				orders = await this.CollectOrdersFromSinglePageAsync( endpoint );
-			else
-				orders = await this.CollectOrdersFromAllPagesAsync( endpoint, ordersCount );
-
-			return orders;
-		}
-
-		public ShopifyOrders GetOrders( ShopifyOrderFulfillmentStatus status, DateTime dateFrom, DateTime dateTo )
+		public ShopifyOrders GetOrders( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo )
 		{
 			ShopifyOrders orders;
 			var endpoint = EndpointsBuilder.CreateOrdersEndpoint( status, dateFrom, dateTo );
@@ -68,7 +40,7 @@ namespace ShopifyAccess
 			return orders;
 		}
 
-		public async Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderFulfillmentStatus status, DateTime dateFrom, DateTime dateTo )
+		public async Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo )
 		{
 			ShopifyOrders orders;
 			var endpoint = EndpointsBuilder.CreateOrdersEndpoint( status, dateFrom, dateTo );

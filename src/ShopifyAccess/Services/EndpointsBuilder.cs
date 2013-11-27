@@ -9,20 +9,14 @@ namespace ShopifyAccess.Services
 	{
 		public static readonly string EmptyEndpoint = string.Empty;
 
-		public static string CreateOrdersEndpoint( DateTime startDate, DateTime endDate )
+		public static string CreateOrdersEndpoint( ShopifyOrderStatus status, DateTime startDate, DateTime endDate )
 		{
-			var endpoint = string.Format( "?{0}={1}&{2}={3}",
+			var endpoint = string.Format( "?{0}={1}&{2}={3}&{4}={5}&{6}={7}&{8}={9}",
+				ShopifyOrderCommandEndpointName.OrderStatus.Name, status,
 				ShopifyOrderCommandEndpointName.OrdersDateFrom.Name, startDate.ToString( "o" ),
-				ShopifyOrderCommandEndpointName.OrdersDateTo.Name, endDate.ToString( "o" ) );
-			return endpoint;
-		}
-
-		public static string CreateOrdersEndpoint( ShopifyOrderFulfillmentStatus status, DateTime startDate, DateTime endDate )
-		{
-			var endpoint = string.Format( "?{0}={1}&{2}={3}&{4}={5}",
-				ShopifyOrderCommandEndpointName.FulfillmentStatus.Name, status,
-				ShopifyOrderCommandEndpointName.OrdersDateFrom.Name, startDate.ToString( "o" ),
-				ShopifyOrderCommandEndpointName.OrdersDateTo.Name, endDate.ToString( "o" ) );
+				ShopifyOrderCommandEndpointName.OrdersDateTo.Name, endDate.ToString( "o" ),
+				ShopifyOrderCommandEndpointName.OrdersDateUpdatedFrom.Name, startDate.ToString( "o" ),
+				ShopifyOrderCommandEndpointName.OrdersDateUpdatedTo.Name, endDate.ToString( "o" ) );
 			return endpoint;
 		}
 
