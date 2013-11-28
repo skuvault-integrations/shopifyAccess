@@ -58,7 +58,7 @@ namespace ShopifyAccess.Services
 
 			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
 			using( var response = ( HttpWebResponse )request.GetResponse() )
-				this.LogUpdateInfo( endpoint, response.StatusCode );
+				this.LogUpdateInfo( endpoint, response.StatusCode, jsonContent );
 		}
 
 		public async Task PutDataAsync( ShopifyCommand command, string endpoint, string jsonContent )
@@ -67,7 +67,7 @@ namespace ShopifyAccess.Services
 
 			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
 			using( var response = await request.GetResponseAsync() )
-				this.LogUpdateInfo( endpoint, ( ( HttpWebResponse )response ).StatusCode );
+				this.LogUpdateInfo( endpoint, ( ( HttpWebResponse )response ).StatusCode, jsonContent );
 		}
 
 		public string RequestPermanentToken( string code )
@@ -147,9 +147,9 @@ namespace ShopifyAccess.Services
 		#endregion
 
 		#region Logging
-		private void LogUpdateInfo( string endpoint, HttpStatusCode statusCode )
+		private void LogUpdateInfo( string endpoint, HttpStatusCode statusCode, string jsonContent )
 		{
-			this.Log().Trace( "PUT/POST call for the endpoint '{0}' has been completed with code '{1}'.", endpoint, statusCode );
+			this.Log().Trace( "PUT/POST call for the endpoint '{0}' has been completed with code '{1}'.\n{2}", endpoint, statusCode, jsonContent );
 		}
 		#endregion
 	}
