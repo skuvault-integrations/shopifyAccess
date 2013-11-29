@@ -61,11 +61,11 @@ namespace ShopifyAccess
 
 			for( var i = 0; i < pagesCount; i++ )
 			{
-				var endpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
+				var compositeEndpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
 
 				ActionPolicies.ShopifySubmitPolicy.Do( () =>
 					{
-						var ordersWithinPage = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, endpoint );
+						var ordersWithinPage = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, compositeEndpoint );
 						orders.Orders.AddRange( ordersWithinPage.Orders );
 
 						//API requirement
@@ -83,11 +83,11 @@ namespace ShopifyAccess
 
 			for( var i = 0; i < pagesCount; i++ )
 			{
-				var endpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
+				var compositeEndpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
 
 				await ActionPolicies.QueryAsync.Do( async () =>
 					{
-						var ordersWithinPage = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, endpoint );
+						var ordersWithinPage = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, compositeEndpoint );
 						orders.Orders.AddRange( ordersWithinPage.Orders );
 
 						//API requirement
@@ -101,11 +101,11 @@ namespace ShopifyAccess
 		private ShopifyOrders CollectOrdersFromSinglePage( string mainEndpoint )
 		{
 			ShopifyOrders orders = null;
-			var endpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
+			var compositeEndpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
 
 			ActionPolicies.ShopifySubmitPolicy.Do( () =>
 				{
-					orders = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, endpoint );
+					orders = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, compositeEndpoint );
 
 					//API requirement
 					Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
@@ -117,11 +117,11 @@ namespace ShopifyAccess
 		private async Task< ShopifyOrders > CollectOrdersFromSinglePageAsync( string mainEndpoint )
 		{
 			ShopifyOrders orders = null;
-			var endpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
+			var compositeEndpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
 
 			await ActionPolicies.QueryAsync.Do( async () =>
 				{
-					orders = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, endpoint );
+					orders = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, compositeEndpoint );
 
 					//API requirement
 					Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
