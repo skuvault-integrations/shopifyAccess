@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using CuttingEdge.Conditions;
+using ServiceStack.Text;
 using ShopifyAccess.Misc;
 using ShopifyAccess.Models.Configuration.Command;
 using ShopifyAccess.Models.Order;
 using ShopifyAccess.Models.Product;
 using ShopifyAccess.Models.ProductVariant;
 using ShopifyAccess.Services;
-using ServiceStack.Text;
 
 namespace ShopifyAccess
 {
 	public class ShopifyService : IShopifyService
 	{
 		private readonly WebRequestServices _webRequestServices;
+		private readonly TimeSpan DefaultApiDelay = TimeSpan.FromSeconds( 0.6 );
 		private const int RequestMaxLimit = 250;
 
 		public ShopifyService( ShopifyCommandConfig config )
@@ -64,13 +64,13 @@ namespace ShopifyAccess
 				var compositeEndpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
 
 				ActionPolicies.ShopifySubmitPolicy.Do( () =>
-					{
+				{
 						var ordersWithinPage = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, compositeEndpoint );
-						orders.Orders.AddRange( ordersWithinPage.Orders );
+					orders.Orders.AddRange( ordersWithinPage.Orders );
 
-						//API requirement
-						Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
-					} );
+					//API requirement
+					this.CreateApiDelay().Wait();
+				} );
 			}
 
 			return orders;
@@ -86,13 +86,13 @@ namespace ShopifyAccess
 				var compositeEndpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
 
 				await ActionPolicies.QueryAsync.Do( async () =>
-					{
+				{
 						var ordersWithinPage = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, compositeEndpoint );
-						orders.Orders.AddRange( ordersWithinPage.Orders );
+					orders.Orders.AddRange( ordersWithinPage.Orders );
 
-						//API requirement
-						Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
-					} );
+					//API requirement
+					await this.CreateApiDelay();
+				} );
 			}
 
 			return orders;
@@ -104,12 +104,12 @@ namespace ShopifyAccess
 			var compositeEndpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
 
 			ActionPolicies.ShopifySubmitPolicy.Do( () =>
-				{
+			{
 					orders = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, compositeEndpoint );
 
-					//API requirement
-					Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
-				} );
+				//API requirement
+				this.CreateApiDelay().Wait();
+			} );
 
 			return orders;
 		}
@@ -120,12 +120,12 @@ namespace ShopifyAccess
 			var compositeEndpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
 
 			await ActionPolicies.QueryAsync.Do( async () =>
-				{
+			{
 					orders = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, compositeEndpoint );
 
-					//API requirement
-					Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
-				} );
+				//API requirement
+				await this.CreateApiDelay();
+			} );
 
 			return orders;
 		}
@@ -134,9 +134,9 @@ namespace ShopifyAccess
 		{
 			var count = 0;
 			ActionPolicies.ShopifySubmitPolicy.Do( () =>
-				{
-					count = this._webRequestServices.GetResponse< OrdersCount >( ShopifyCommand.GetOrdersCount, endpoint ).Count;
-				} );
+			{
+				count = this._webRequestServices.GetResponse< OrdersCount >( ShopifyCommand.GetOrdersCount, endpoint ).Count;
+			} );
 			return count;
 		}
 
@@ -144,9 +144,9 @@ namespace ShopifyAccess
 		{
 			var count = 0;
 			await ActionPolicies.QueryAsync.Do( async () =>
-				{
-					count = ( await this._webRequestServices.GetResponseAsync< OrdersCount >( ShopifyCommand.GetOrdersCount, endpoint ) ).Count;
-				} );
+			{
+				count = ( await this._webRequestServices.GetResponseAsync< OrdersCount >( ShopifyCommand.GetOrdersCount, endpoint ) ).Count;
+			} );
 			return count;
 		}
 		#endregion
@@ -182,9 +182,9 @@ namespace ShopifyAccess
 		{
 			var count = 0;
 			ActionPolicies.ShopifySubmitPolicy.Do( () =>
-				{
-					count = this._webRequestServices.GetResponse< ProductsCount >( ShopifyCommand.GetProductsCount, EndpointsBuilder.EmptyEndpoint ).Count;
-				} );
+			{
+				count = this._webRequestServices.GetResponse< ProductsCount >( ShopifyCommand.GetProductsCount, EndpointsBuilder.EmptyEndpoint ).Count;
+			} );
 			return count;
 		}
 
@@ -192,9 +192,9 @@ namespace ShopifyAccess
 		{
 			var count = 0;
 			await ActionPolicies.QueryAsync.Do( async () =>
-				{
-					count = ( await this._webRequestServices.GetResponseAsync< ProductsCount >( ShopifyCommand.GetProductsCount, EndpointsBuilder.EmptyEndpoint ) ).Count;
-				} );
+			{
+				count = ( await this._webRequestServices.GetResponseAsync< ProductsCount >( ShopifyCommand.GetProductsCount, EndpointsBuilder.EmptyEndpoint ) ).Count;
+			} );
 			return count;
 		}
 
@@ -208,13 +208,13 @@ namespace ShopifyAccess
 				var endpoint = EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) );
 
 				ActionPolicies.ShopifySubmitPolicy.Do( () =>
-					{
-						var productsWithinPage = this._webRequestServices.GetResponse< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
-						products.Products.AddRange( productsWithinPage.Products );
+				{
+					var productsWithinPage = this._webRequestServices.GetResponse< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
+					products.Products.AddRange( productsWithinPage.Products );
 
-						//API requirement
-						Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
-					} );
+					//API requirement
+					this.CreateApiDelay().Wait();
+				} );
 			}
 
 			return products;
@@ -230,13 +230,13 @@ namespace ShopifyAccess
 				var endpoint = EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) );
 
 				await ActionPolicies.QueryAsync.Do( async () =>
-					{
-						var productsWithinPage = await this._webRequestServices.GetResponseAsync< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
-						products.Products.AddRange( productsWithinPage.Products );
+				{
+					var productsWithinPage = await this._webRequestServices.GetResponseAsync< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
+					products.Products.AddRange( productsWithinPage.Products );
 
-						//API requirement
-						Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
-					} );
+					//API requirement
+					await this.CreateApiDelay();
+				} );
 			}
 
 			return products;
@@ -248,12 +248,12 @@ namespace ShopifyAccess
 			var endpoint = EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
 
 			ActionPolicies.ShopifySubmitPolicy.Do( () =>
-				{
-					products = this._webRequestServices.GetResponse< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
+			{
+				products = this._webRequestServices.GetResponse< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
 
-					//API requirement
-					Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
-				} );
+				//API requirement
+				this.CreateApiDelay().Wait();
+			} );
 
 			return products;
 		}
@@ -264,12 +264,12 @@ namespace ShopifyAccess
 			var endpoint = EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
 
 			await ActionPolicies.QueryAsync.Do( async () =>
-				{
-					products = await this._webRequestServices.GetResponseAsync< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
+			{
+				products = await this._webRequestServices.GetResponseAsync< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
 
-					//API requirement
-					Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
-				} );
+				//API requirement
+				await this.CreateApiDelay();
+			} );
 
 			return products;
 		}
@@ -279,13 +279,17 @@ namespace ShopifyAccess
 		public void UpdateProductVariants( IEnumerable< ShopifyProductVariant > variants )
 		{
 			foreach( var variant in variants )
+			{
 				ActionPolicies.ShopifySubmitPolicy.Do( () => this.UpdateProductVariantQuantity( variant ) );
+			}
 		}
 
 		public async Task UpdateProductVariantsAsync( IEnumerable< ShopifyProductVariant > variants )
 		{
 			foreach( var variant in variants )
+			{
 				await ActionPolicies.QueryAsync.Do( async () => await this.UpdateProductVariantQuantityAsync( variant ) );
+			}
 		}
 
 		private void UpdateProductVariantQuantity( ShopifyProductVariant variant )
@@ -297,7 +301,7 @@ namespace ShopifyAccess
 			this._webRequestServices.PutData( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent );
 
 			//API requirement
-			Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
+			this.CreateApiDelay().Wait();
 		}
 
 		private async Task UpdateProductVariantQuantityAsync( ShopifyProductVariant variant )
@@ -308,7 +312,7 @@ namespace ShopifyAccess
 			await this._webRequestServices.PutDataAsync( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent );
 
 			//API requirement
-			Thread.Sleep( TimeSpan.FromSeconds( 0.6 ) );
+			await this.CreateApiDelay();
 		}
 		#endregion
 
@@ -319,5 +323,10 @@ namespace ShopifyAccess
 			return result;
 		}
 		#endregion
+
+		private Task CreateApiDelay()
+		{
+			return Task.Delay( this.DefaultApiDelay );
+		}
 	}
 }

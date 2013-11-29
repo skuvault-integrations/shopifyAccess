@@ -16,7 +16,7 @@ namespace ShopifyAccess.Models.Configuration.Authorization
 			: base( shopName )
 		{
 			Condition.Requires( apiKey, "apiKey" ).IsNotNullOrWhiteSpace();
-			Condition.Requires( apiKey, "apiKey" ).IsNotNullOrWhiteSpace();
+			Condition.Requires( secret, "secret" ).IsNotNullOrWhiteSpace();
 
 			this.ApiKey = apiKey;
 			this.Secret = secret;
