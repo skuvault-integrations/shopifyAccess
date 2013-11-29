@@ -26,7 +26,7 @@ namespace ShopifyAccess.Services
 			return endpoint;
 		}
 
-		public static string CreateGetFirstPageEndpoint( ShopifyCommandEndpointConfig config )
+		public static string CreateGetSinglePageEndpoint( ShopifyCommandEndpointConfig config )
 		{
 			var endpoint = string.Format( "?{0}={1}",
 				ShopifyCommandEndpointName.Limit.Name, config.Limit

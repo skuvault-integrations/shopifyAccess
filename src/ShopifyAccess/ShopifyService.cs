@@ -61,7 +61,7 @@ namespace ShopifyAccess
 
 			for( var i = 0; i < pagesCount; i++ )
 			{
-				var endpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetFirstPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
+				var endpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
 
 				ActionPolicies.ShopifySubmitPolicy.Do( () =>
 					{
@@ -83,7 +83,7 @@ namespace ShopifyAccess
 
 			for( var i = 0; i < pagesCount; i++ )
 			{
-				var endpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetFirstPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
+				var endpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
 
 				await ActionPolicies.QueryAsync.Do( async () =>
 					{
@@ -101,7 +101,7 @@ namespace ShopifyAccess
 		private ShopifyOrders CollectOrdersFromSinglePage( string mainEndpoint )
 		{
 			ShopifyOrders orders = null;
-			var endpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetFirstPageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
+			var endpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
 
 			ActionPolicies.ShopifySubmitPolicy.Do( () =>
 				{
@@ -117,7 +117,7 @@ namespace ShopifyAccess
 		private async Task< ShopifyOrders > CollectOrdersFromSinglePageAsync( string mainEndpoint )
 		{
 			ShopifyOrders orders = null;
-			var endpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetFirstPageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
+			var endpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
 
 			await ActionPolicies.QueryAsync.Do( async () =>
 				{
@@ -205,7 +205,7 @@ namespace ShopifyAccess
 
 			for( var i = 0; i < pagesCount; i++ )
 			{
-				var endpoint = EndpointsBuilder.CreateGetFirstPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) );
+				var endpoint = EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) );
 
 				ActionPolicies.ShopifySubmitPolicy.Do( () =>
 					{
@@ -227,7 +227,7 @@ namespace ShopifyAccess
 
 			for( var i = 0; i < pagesCount; i++ )
 			{
-				var endpoint = EndpointsBuilder.CreateGetFirstPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) );
+				var endpoint = EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) );
 
 				await ActionPolicies.QueryAsync.Do( async () =>
 					{
@@ -245,7 +245,7 @@ namespace ShopifyAccess
 		private ShopifyProducts CollectProductsFromSinglePage()
 		{
 			ShopifyProducts products = null;
-			var endpoint = EndpointsBuilder.CreateGetFirstPageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
+			var endpoint = EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
 
 			ActionPolicies.ShopifySubmitPolicy.Do( () =>
 				{
@@ -261,7 +261,7 @@ namespace ShopifyAccess
 		private async Task< ShopifyProducts > CollectProductsFromSinglePageAsync()
 		{
 			ShopifyProducts products = null;
-			var endpoint = EndpointsBuilder.CreateGetFirstPageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
+			var endpoint = EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
 
 			await ActionPolicies.QueryAsync.Do( async () =>
 				{
