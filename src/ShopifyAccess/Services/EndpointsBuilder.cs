@@ -13,10 +13,10 @@ namespace ShopifyAccess.Services
 		{
 			var endpoint = string.Format( "?{0}={1}&{2}={3}&{4}={5}&{6}={7}&{8}={9}",
 				ShopifyOrderCommandEndpointName.OrderStatus.Name, status,
-				ShopifyOrderCommandEndpointName.OrdersDateFrom.Name, startDate.ToString( "o" ),
-				ShopifyOrderCommandEndpointName.OrdersDateTo.Name, endDate.ToString( "o" ),
-				ShopifyOrderCommandEndpointName.OrdersDateUpdatedFrom.Name, startDate.ToString( "o" ),
-				ShopifyOrderCommandEndpointName.OrdersDateUpdatedTo.Name, endDate.ToString( "o" ) );
+				ShopifyOrderCommandEndpointName.OrdersDateFrom.Name, DateTime.SpecifyKind( startDate, DateTimeKind.Utc ).ToString( "o" ),
+				ShopifyOrderCommandEndpointName.OrdersDateTo.Name, DateTime.SpecifyKind( endDate, DateTimeKind.Utc ).ToString( "o" ),
+				ShopifyOrderCommandEndpointName.OrdersDateUpdatedFrom.Name, DateTime.SpecifyKind( startDate, DateTimeKind.Utc ).ToString( "o" ),
+				ShopifyOrderCommandEndpointName.OrdersDateUpdatedTo.Name, DateTime.SpecifyKind( endDate, DateTimeKind.Utc ).ToString( "o" ) );
 			return endpoint;
 		}
 
