@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
+using ShopifyAccess.Models.ProductVariant;
 
 namespace ShopifyAccess.Models.Product
 {
@@ -12,6 +14,20 @@ namespace ShopifyAccess.Models.Product
 		public ShopifyProducts()
 		{
 			this.Products = new List< ShopifyProduct >();
+		}
+	}
+
+	public static class ShopifyProductsExtensions
+	{
+		public static IDictionary< string, ShopifyProductVariant > ToDictionary( this ShopifyProducts shopifyInventory )
+		{
+			var inventory = new Dictionary< string, ShopifyProductVariant >();
+			foreach( var product in shopifyInventory.Products )
+			{
+				foreach( var variant in product.Variants.Where( variant => !inventory.ContainsKey( variant.Sku ) ) )
+					inventory.Add( variant.Sku, variant );
+			}
+			return inventory;
 		}
 	}
 }
