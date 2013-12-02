@@ -8,7 +8,7 @@ namespace ShopifyAccess.Models.Order
 		[ DataMember( Name = "id" ) ]
 		public string Id { get; set; }
 
-		[ DataMember( Name = "id" ) ]
+		[ DataMember( Name = "sku" ) ]
 		public string Sku { get; set; }
 
 		[ DataMember( Name = "quantity" ) ]
