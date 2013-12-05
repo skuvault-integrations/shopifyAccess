@@ -24,8 +24,14 @@ namespace ShopifyAccess.Models.Product
 			var inventory = new Dictionary< string, ShopifyProductVariant >();
 			foreach( var product in shopifyInventory.Products )
 			{
-				foreach( var variant in product.Variants.Where( variant => !inventory.ContainsKey( variant.Sku ) ) )
-					inventory.Add( variant.Sku, variant );
+				foreach( var variant in product.Variants )
+				{
+					if( variant == null || variant.Sku == null )
+						continue;
+
+					if( !inventory.ContainsKey( variant.Sku ) )
+						inventory.Add( variant.Sku, variant );
+				}
 			}
 			return inventory;
 		}
