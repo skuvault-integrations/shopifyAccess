@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
 using ShopifyAccess.Models.ProductVariant;
 
@@ -24,6 +23,9 @@ namespace ShopifyAccess.Models.Product
 			var inventory = new Dictionary< string, ShopifyProductVariant >();
 			foreach( var product in shopifyInventory.Products )
 			{
+				if( product.Variants == null )
+					continue;
+
 				foreach( var variant in product.Variants )
 				{
 					if( variant == null || variant.Sku == null )
