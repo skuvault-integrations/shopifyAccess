@@ -12,7 +12,7 @@ using ShopifyAccess.Services;
 
 namespace ShopifyAccess
 {
-	public class ShopifyService : IShopifyService
+	public sealed class ShopifyService : IShopifyService
 	{
 		private readonly WebRequestServices _webRequestServices;
 		private readonly TimeSpan DefaultApiDelay = TimeSpan.FromSeconds( 0.6 );
@@ -322,11 +322,11 @@ namespace ShopifyAccess
 			var result = ( int )Math.Ceiling( ( double )productsCount / RequestMaxLimit );
 			return result;
 		}
-		#endregion
 
 		private Task CreateApiDelay()
 		{
 			return Task.Delay( this.DefaultApiDelay );
 		}
+		#endregion
 	}
 }
