@@ -18,18 +18,23 @@ Thumbs.db
 *.ilk
 *.log
 [Bb]in
+[Cc]sx
 [Dd]ebug*/
 *.lib
 *.sbr
 obj/
-[Rr]elease*/
+[Rr]elease
 _ReSharper*/
+_TeamCity*/
 [Tt]est[Rr]esult*
 *.ReSharper
 *.docstates
+_rltm*
 
 #Ignore common build files
-build
+build/*
 log
-/src/TeapplixAccessTests/Files/teapplix_test_credentials.csv
-/src/ShopifyAccessTests/ShopifyAccessTests/Files/ShopifyCredentials.csv
+deployment
+
+#Exceptions
+!ReleaseNotes/

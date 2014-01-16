@@ -27,6 +27,7 @@ param
 )
 
 $project_name = "ShopifyAccess"
+$project_short_name = "Shopify"
 
 # Folder structure:
 # \build - Contains all code during the build process
@@ -43,7 +44,7 @@ $release_dir = "$BuildRoot\release"
 $archive_dir = "$release_dir\archive"
 
 $src_dir = "$BuildRoot\src"
-$solution_file = "$src_dir\ShopifyAccess.sln"
+$solution_file = "$src_dir\$project_name\$project_name.csproj"
 	
 # Use MSBuild.
 use Framework\v4.0.30319 MSBuild
@@ -64,13 +65,13 @@ task Build {
 }
 
 task Package  {
-	New-Item $build_output_dir\ShopifyAccess\lib\net45 -itemType directory -force | Out-Null
-	Copy-Item $build_artifacts_dir\ShopifyAccess.??? $build_output_dir\ShopifyAccess\lib\net45 -PassThru |% { Write-Host "Copied " $_.FullName }
+	New-Item $build_output_dir\$project_name\lib\net45 -itemType directory -force | Out-Null
+	Copy-Item $build_artifacts_dir\$project_name.??? $build_output_dir\$project_name\lib\net45 -PassThru |% { Write-Host "Copied " $_.FullName }
 }
 
 # Set $script:Version = assembly version
 task Version {
-	assert (( Get-Item $build_artifacts_dir\ShopifyAccess.dll ).VersionInfo.FileVersion -match '^(\d+\.\d+\.\d+)')
+	assert (( Get-Item $build_artifacts_dir\$project_name.dll ).VersionInfo.FileVersion -match '^(\d+\.\d+\.\d+)')
 	$script:Version = $matches[1]
 }
 
@@ -82,49 +83,52 @@ task Archive {
 
 task Zip Version, {
 	$release_zip_file = "$release_dir\$project_name.$Version.zip"
+	$7z = Get-ChildItem -recurse $src_dir\packages -include 7za.exe | Sort-Object LastWriteTime -descending | Select-Object -First 1
 	
 	Write-Host "Zipping release to: " $release_zip_file
 	
-	exec { & 7za.exe a $release_zip_file $build_output_dir\ShopifyAccess\lib\net45\* -mx9 }
+	exec { & $7z a $release_zip_file $build_output_dir\$project_name\lib\net45\* -mx9 }
 }
 
 task NuGet Package, Version, {
 
-	Write-Host ================= Preparing ShopifyAccess Nuget package =================
-	$text = "Shopify webservices API wrapper."
+	Write-Host ================= Preparing $project_name Nuget package =================
+	$text = "$project_short_name webservices API wrapper."
 	# nuspec
-	Set-Content $build_output_dir\ShopifyAccess\ShopifyAccess.nuspec @"
+	Set-Content $build_output_dir\$project_name\$project_name.nuspec @"
 <?xml version="1.0"?>
 <package>
 	<metadata>
-		<id>ShopifyAccess</id>
-		<version>$Version-alpha1</version>
+		<id>$project_name</id>
+		<version>$Version</version>
 		<authors>Slav Ivanyuk</authors>
 		<owners>Slav Ivanyuk</owners>
-		<projectUrl>https://github.com/agileHarbor/ShopifyAccess</projectUrl>
-		<licenseUrl>https://raw.github.com/agileHarbor/ShopifyAccess/master/License.txt</licenseUrl>
+		<projectUrl>https://github.com/agileharbor/$project_name</projectUrl>
+		<licenseUrl>https://raw.github.com/agileharbor/$project_name/master/License.txt</licenseUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<copyright>Copyright (C) Agile Harbor, LLC 2013</copyright>
+		<copyright>Copyright (C) Agile Harbor, LLC 2014</copyright>
 		<summary>$text</summary>
 		<description>$text</description>
-		<tags>Shopify</tags>
+		<tags>$project_short_name</tags>
 		<dependencies> 
 			<group targetFramework="net45">
-				<dependency id="Netco" version="1.3.0" />
+				<dependency id="Netco" version="1.3.1" />
 				<dependency id="CuttingEdge.Conditions" version="1.2.0.0" />
-				<dependency id="ServiceStack.Text" version="3.9.56" />
+				<dependency id="ServiceStack.Text" version="4.0.7" />
 			</group>
 		</dependencies>
 	</metadata>
 </package>
 "@
 	# pack
-	exec { NuGet pack $build_output_dir\ShopifyAccess\ShopifyAccess.nuspec -Output $build_dir }
+	$nuget = "$($src_dir)\.nuget\NuGet"
 	
-	$pushShopifyAccess = Read-Host 'Push ShopifyAccess ' $Version ' to NuGet? (Y/N)'
-	Write-Host $pushShopifyAccess
-	if( $pushShopifyAccess -eq "y" -or $pushShopifyAccess -eq "Y" )	{
-		Get-ChildItem $build_dir\*.nupkg |% { exec { NuGet push  $_.FullName }}
+	exec { & $nuget pack $build_output_dir\$project_name\$project_name.nuspec -Output $build_dir }
+	
+	$push_project = Read-Host 'Push $project_name ' $Version ' to NuGet? (Y/N)'
+	Write-Host $push_project
+	if( $push_project -eq "y" -or $push_project -eq "Y" )	{
+		Get-ChildItem $build_dir\*.nupkg |% { exec { & $nuget push  $_.FullName }}
 	}
 }
 
