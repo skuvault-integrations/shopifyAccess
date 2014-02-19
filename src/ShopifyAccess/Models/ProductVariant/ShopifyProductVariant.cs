@@ -20,7 +20,6 @@ namespace ShopifyAccess.Models.ProductVariant
 
 	public enum InventoryManagement
 	{
-		Undefined,
 		Blank,
 		Shopify
 	}

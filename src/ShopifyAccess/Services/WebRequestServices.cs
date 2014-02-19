@@ -4,7 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using CuttingEdge.Conditions;
 using Netco.Logging;
-using ServiceStack.Text;
+using ServiceStack;
 using ShopifyAccess.Models.Configuration.Authorization;
 using ShopifyAccess.Models.Configuration.Command;
 

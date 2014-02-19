@@ -51,7 +51,7 @@ namespace ShopifyAccessTests.Products
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
 
-			var variantToUpdate = new ShopifyProductVariant { Id = 418577445, Quantity = 21, InventoryManagement = InventoryManagement.Shopify };
+			var variantToUpdate = new ShopifyProductVariant { Id = 418588461, Quantity = 1, InventoryManagement = InventoryManagement.Shopify };
 			service.UpdateProductVariants( new List< ShopifyProductVariant > { variantToUpdate } );
 		}
 	}

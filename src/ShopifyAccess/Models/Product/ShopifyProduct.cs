@@ -11,6 +11,6 @@ namespace ShopifyAccess.Models.Product
 		public long Id { get; set; }
 
 		[ DataMember( Name = "variants" ) ]
-		public IList< ShopifyProductVariant > Variants { get; set; }
+		public List< ShopifyProductVariant > Variants { get; set; }
 	}
 }

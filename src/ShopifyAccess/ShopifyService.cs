@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CuttingEdge.Conditions;
-using ServiceStack.Text;
+using ServiceStack;
 using ShopifyAccess.Misc;
 using ShopifyAccess.Models.Configuration.Command;
 using ShopifyAccess.Models.Order;
@@ -162,6 +162,8 @@ namespace ShopifyAccess
 			else
 				products = this.CollectProductsFromSinglePage();
 
+			this.RemoveUntrackedProductVariants( products );
+
 			return products;
 		}
 
@@ -174,6 +176,8 @@ namespace ShopifyAccess
 				products = await this.CollectProductsFromAllPagesAsync( productsCount );
 			else
 				products = await this.CollectProductsFromSinglePageAsync();
+
+			this.RemoveUntrackedProductVariants( products );
 
 			return products;
 		}
@@ -272,6 +276,14 @@ namespace ShopifyAccess
 				} );
 
 			return products;
+		}
+
+		private void RemoveUntrackedProductVariants( ShopifyProducts products )
+		{
+			foreach( var product in products.Products )
+			{
+				product.Variants.RemoveAll( v => v.InventoryManagement == InventoryManagement.Blank );
+			}
 		}
 		#endregion
 
