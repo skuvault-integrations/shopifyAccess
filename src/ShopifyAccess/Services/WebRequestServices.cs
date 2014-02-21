@@ -57,7 +57,7 @@ namespace ShopifyAccess.Services
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
 			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
-			this.Log().Trace( "[shopify] PUT Params. Endpoint: {0}. Data: {1}", endpoint, jsonContent );
+			this.Log().Trace( "[shopify] PUT Params. ShopName: {0}. Data: {1}", this._commandConfig.ShopName, jsonContent );
 			using( var response = ( HttpWebResponse )request.GetResponse() )
 				this.LogUpdateInfo( endpoint, response.StatusCode, jsonContent );
 		}
@@ -67,7 +67,7 @@ namespace ShopifyAccess.Services
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
 			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
-			this.Log().Trace( "[shopify] PUT Params. Endpoint: {0}. Data: {1}", endpoint, jsonContent );
+			this.Log().Trace( "[shopify] PUT Params. ShopName: {0}. Data: {1}", this._commandConfig.ShopName, jsonContent );
 			using( var response = await request.GetResponseAsync() )
 				this.LogUpdateInfo( endpoint, ( ( HttpWebResponse )response ).StatusCode, jsonContent );
 		}
