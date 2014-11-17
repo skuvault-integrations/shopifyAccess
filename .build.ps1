@@ -1,33 +1,9 @@
-<#
-.Synopsis
-	Build script (https://github.com/nightroman/Invoke-Build)
-
-.Description
-	How to use this script and build the module:
-
-	Get the utility script Invoke-Build.ps1:
-	https://github.com/nightroman/Invoke-Build
-
-	Copy it to the path. Set location to this directory. Build:
-	PS> Invoke-Build Build
-
-	This command builds the module and installs it to the $ModuleRoot which is
-	the working location of the module. The build fails if the module is
-	currently in use. Ensure it is not and then repeat.
-
-	The build task Help fails if the help builder Helps is not installed.
-	Ignore this or better get and use the script (it is really easy):
-	https://github.com/nightroman/Helps
-#>
-
 param
 (
-	$Configuration = 'Release',
-	$logfile = $null
 )
 
-$project_name = "ShopifyAccess"
 $project_short_name = "Shopify"
+$project_name = "$($project_short_name)Access"
 
 # Folder structure:
 # \build - Contains all code during the build process
@@ -37,20 +13,19 @@ $project_short_name = "Shopify"
 # \release\archive - Contains files archived from the previous builds
 # \src - Contains all source code
 $build_dir = "$BuildRoot\build"
-$log_dir = "$BuildRoot\log"
 $build_artifacts_dir = "$build_dir\artifacts"
 $build_output_dir = "$build_dir\output"
 $release_dir = "$BuildRoot\release"
 $archive_dir = "$release_dir\archive"
 
 $src_dir = "$BuildRoot\src"
-$solution_file = "$src_dir\$project_name\$project_name.csproj"
+$solution_file = "$src_dir\$($project_name).sln"
 	
 # Use MSBuild.
 use Framework\v4.0.30319 MSBuild
 
 task Clean { 
-	exec { MSBuild "$solution_file" /t:Clean /p:Configuration=$configuration /v:quiet } 
+	exec { MSBuild "$solution_file" /t:Clean /p:Configuration=Release /p:Platform="Any CPU" /v:quiet } 
 	Remove-Item -force -recurse $build_dir -ErrorAction SilentlyContinue | Out-Null
 }
 
@@ -61,7 +36,7 @@ task Init Clean, {
 }
 
 task Build {
-	exec { MSBuild "$solution_file" /t:Build /p:Configuration=$configuration /v:minimal /p:OutDir="$build_artifacts_dir\" }
+	exec { MSBuild "$solution_file" /t:Build /p:Configuration=Release /p:Platform="Any CPU" /v:minimal /p:OutDir="$build_artifacts_dir\" }
 }
 
 task Package  {
@@ -101,12 +76,12 @@ task NuGet Package, Version, {
 	<metadata>
 		<id>$project_name</id>
 		<version>$Version</version>
-		<authors>Slav Ivanyuk</authors>
-		<owners>Slav Ivanyuk</owners>
+		<authors>Agile Harbor</authors>
+		<owners>Agile Harbor</owners>
 		<projectUrl>https://github.com/agileharbor/$project_name</projectUrl>
 		<licenseUrl>https://raw.github.com/agileharbor/$project_name/master/License.txt</licenseUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<copyright>Copyright (C) Agile Harbor, LLC 2014</copyright>
+		<copyright>Copyright (C) Agile Harbor, LLC</copyright>
 		<summary>$text</summary>
 		<description>$text</description>
 		<tags>$project_short_name</tags>
