@@ -29,12 +29,11 @@ namespace ShopifyAccessTests.Orders
 				this.Config = new ShopifyCommandConfig( testConfig.ShopName, testConfig.AccessToken );
 		}
 
-
 		[ Test ]
 		public void OrdersFilteredFulfillmentStatusDateLoaded()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var orders = service.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow );
+			var orders = service.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -10 ), DateTime.UtcNow );
 
 			orders.Count.Should().Be( 1 );
 		}
