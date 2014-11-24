@@ -34,18 +34,23 @@ namespace ShopifyAccess.Models.Order
 		[ DataMember( Name = "closed_at" ) ]
 		public DateTime? ClosedAt{ get; set; }
 
+		[ DataMember( Name = "cancelled_at" ) ]
+		public DateTime? CancelledAt{ get; set; }
+
 		[ DataMember( Name = "financial_status" ) ]
 		public ShopifyFinancialStatus FinancialStatus{ get; set; }
-
-		[ DataMember( Name = "status" ) ]
-		public OrderStatusEnum OrderStatus{ get; set; }
 
 		[ DataMember( Name = "fulfillment_status" ) ]
 		public FulfillmentStatusEnum FulfillmentStatus{ get; set; }
 
 		public bool IsShipped
 		{
-			get { return ClosedAt.HasValue; }
+			get { return this.ClosedAt.HasValue; }
+		}
+
+		public bool IsCancelled
+		{
+			get { return this.CancelledAt.HasValue; }
 		}
 	}
 
@@ -63,23 +68,12 @@ namespace ShopifyAccess.Models.Order
 		// ReSharper restore InconsistentNaming
 	}
 
-	public enum OrderStatusEnum
-	{
-		// ReSharper disable InconsistentNaming
-		Undefined,
-		open,
-		closed,
-		cancelled
-		// ReSharper restore InconsistentNaming
-	}
-
 	public enum FulfillmentStatusEnum
 	{
 		// ReSharper disable InconsistentNaming
 		Undefined,
-		shipped,
-		partial,
-		unshipped
+		fulfilled,
+		partial
 		// ReSharper restore InconsistentNaming
 	}
 }
