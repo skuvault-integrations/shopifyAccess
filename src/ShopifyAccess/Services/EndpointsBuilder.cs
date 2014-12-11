@@ -17,8 +17,8 @@ namespace ShopifyAccess.Services
 				ShopifyOrderCommandEndpointName.OrdersDateTo.Name, DateTime.SpecifyKind( endDate, DateTimeKind.Utc ).ToString( "o" ),
 				ShopifyOrderCommandEndpointName.OrdersDateUpdatedFrom.Name, DateTime.SpecifyKind( startDate, DateTimeKind.Utc ).ToString( "o" ),
 				ShopifyOrderCommandEndpointName.OrdersDateUpdatedTo.Name, DateTime.SpecifyKind( endDate, DateTimeKind.Utc ).ToString( "o" ),
-				ShopifyOrderCommandEndpointName.OrderFinancialStatus, ShopifyOrderFinancialStatus.any,
-				ShopifyOrderCommandEndpointName.OrderFulfillmentStatus, ShopifyOrderFulfillmentStatus.any );
+				ShopifyOrderCommandEndpointName.OrderFinancialStatus.Name, ShopifyOrderFinancialStatus.any,
+				ShopifyOrderCommandEndpointName.OrderFulfillmentStatus.Name, ShopifyOrderFulfillmentStatus.any );
 			return endpoint;
 		}
 
