@@ -11,12 +11,14 @@ namespace ShopifyAccess.Services
 
 		public static string CreateOrdersEndpoint( ShopifyOrderStatus status, DateTime startDate, DateTime endDate )
 		{
-			var endpoint = string.Format( "?{0}={1}&{2}={3}&{4}={5}&{6}={7}&{8}={9}",
+			var endpoint = string.Format( "?{0}={1}&{2}={3}&{4}={5}&{6}={7}&{8}={9}&{10}={11}&{12}={13}",
 				ShopifyOrderCommandEndpointName.OrderStatus.Name, status,
 				ShopifyOrderCommandEndpointName.OrdersDateFrom.Name, DateTime.SpecifyKind( startDate, DateTimeKind.Utc ).ToString( "o" ),
 				ShopifyOrderCommandEndpointName.OrdersDateTo.Name, DateTime.SpecifyKind( endDate, DateTimeKind.Utc ).ToString( "o" ),
 				ShopifyOrderCommandEndpointName.OrdersDateUpdatedFrom.Name, DateTime.SpecifyKind( startDate, DateTimeKind.Utc ).ToString( "o" ),
-				ShopifyOrderCommandEndpointName.OrdersDateUpdatedTo.Name, DateTime.SpecifyKind( endDate, DateTimeKind.Utc ).ToString( "o" ) );
+				ShopifyOrderCommandEndpointName.OrdersDateUpdatedTo.Name, DateTime.SpecifyKind( endDate, DateTimeKind.Utc ).ToString( "o" ),
+				ShopifyOrderCommandEndpointName.OrderFinancialStatus, ShopifyOrderFinancialStatus.any,
+				ShopifyOrderCommandEndpointName.OrderFulfillmentStatus, ShopifyOrderFulfillmentStatus.any );
 			return endpoint;
 		}
 
