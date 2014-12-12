@@ -18,5 +18,10 @@ namespace ShopifyAccess.Models.Order
 		{
 			this.Orders = new List< ShopifyOrder >();
 		}
+
+		public ShopifyOrders( List< ShopifyOrder > orders )
+		{
+			this.Orders = orders;
+		}
 	}
 }

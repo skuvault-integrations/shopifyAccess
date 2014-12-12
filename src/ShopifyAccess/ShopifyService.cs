@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CuttingEdge.Conditions;
 using ServiceStack;
@@ -29,13 +30,15 @@ namespace ShopifyAccess
 		public ShopifyOrders GetOrders( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo )
 		{
 			ShopifyOrders orders;
-			var endpoint = EndpointsBuilder.CreateOrdersEndpoint( status, dateFrom, dateTo );
-			var ordersCount = this.GetOrdersCount( endpoint );
+			var newOrdersEndpoint = EndpointsBuilder.CreateNewOrdersEndpoint( status, dateFrom, dateTo );
+			var updatedOrdersEndpoint = EndpointsBuilder.CreateUpdatedOrdersEndpoint( status, dateFrom, dateTo );
+
+			var ordersCount = this.GetOrdersCount( newOrdersEndpoint, updatedOrdersEndpoint );
 
 			if( ordersCount > RequestMaxLimit )
-				orders = this.CollectOrdersFromSinglePage( endpoint );
+				orders = this.CollectOrdersFromSinglePage( newOrdersEndpoint, updatedOrdersEndpoint );
 			else
-				orders = this.CollectOrdersFromAllPages( endpoint, ordersCount );
+				orders = this.CollectOrdersFromAllPages( newOrdersEndpoint, updatedOrdersEndpoint, ordersCount );
 
 			return orders;
 		}
@@ -43,30 +46,36 @@ namespace ShopifyAccess
 		public async Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo )
 		{
 			ShopifyOrders orders;
-			var endpoint = EndpointsBuilder.CreateOrdersEndpoint( status, dateFrom, dateTo );
-			var ordersCount = await this.GetOrdersCountAsync( endpoint );
+			var newOrdersEndpoint = EndpointsBuilder.CreateNewOrdersEndpoint( status, dateFrom, dateTo );
+			var updatedOrdersEndpoint = EndpointsBuilder.CreateUpdatedOrdersEndpoint( status, dateFrom, dateTo );
+
+			var ordersCount = await this.GetOrdersCountAsync( newOrdersEndpoint, updatedOrdersEndpoint );
 
 			if( ordersCount > RequestMaxLimit )
-				orders = await this.CollectOrdersFromSinglePageAsync( endpoint );
+				orders = await this.CollectOrdersFromSinglePageAsync( newOrdersEndpoint, updatedOrdersEndpoint );
 			else
-				orders = await this.CollectOrdersFromAllPagesAsync( endpoint, ordersCount );
+				orders = await this.CollectOrdersFromAllPagesAsync( newOrdersEndpoint, updatedOrdersEndpoint, ordersCount );
 
 			return orders;
 		}
 
-		private ShopifyOrders CollectOrdersFromAllPages( string mainEndpoint, int ordersCount )
+		private ShopifyOrders CollectOrdersFromAllPages( string mainNewOrdersEndpoint, string mainUpdatedOrdersEndpoint, int ordersCount )
 		{
 			var pagesCount = this.CalculatePagesCount( ordersCount );
 			var orders = new ShopifyOrders();
 
 			for( var i = 0; i < pagesCount; i++ )
 			{
-				var compositeEndpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
+				var compositeNewOrdersEndpoint = mainNewOrdersEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
+				var compositeUpdatedOrdersEndpoint = mainUpdatedOrdersEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
 
 				ActionPolicies.ShopifySubmitPolicy.Do( () =>
 				{
-					var ordersWithinPage = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, compositeEndpoint );
-					orders.Orders.AddRange( ordersWithinPage.Orders );
+					var newOrdersWithinPage = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, compositeNewOrdersEndpoint );
+					var updatedOrdersWithinPage = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint );
+					var allOrders = newOrdersWithinPage.Orders.Concat( updatedOrdersWithinPage.Orders );
+
+					orders.Orders.AddRange( allOrders );
 
 					//API requirement
 					this.CreateApiDelay().Wait();
@@ -76,19 +85,23 @@ namespace ShopifyAccess
 			return orders;
 		}
 
-		private async Task< ShopifyOrders > CollectOrdersFromAllPagesAsync( string mainEndpoint, int ordersCount )
+		private async Task< ShopifyOrders > CollectOrdersFromAllPagesAsync( string mainNewOrdersEndpoint, string mainUpdatedOrdersEndpoint, int ordersCount )
 		{
 			var pagesCount = this.CalculatePagesCount( ordersCount );
 			var orders = new ShopifyOrders();
 
 			for( var i = 0; i < pagesCount; i++ )
 			{
-				var compositeEndpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
+				var compositeNewOrdersEndpoint = mainNewOrdersEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
+				var compositeUpdatedOrdersEndpoint = mainUpdatedOrdersEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
 
 				await ActionPolicies.QueryAsync.Do( async () =>
 				{
-					var ordersWithinPage = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, compositeEndpoint );
-					orders.Orders.AddRange( ordersWithinPage.Orders );
+					var newOrdersWithinPage = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, compositeNewOrdersEndpoint );
+					var updatedOrdersWithinPage = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint );
+					var allOrders = newOrdersWithinPage.Orders.Concat( updatedOrdersWithinPage.Orders );
+
+					orders.Orders.AddRange( allOrders );
 
 					//API requirement
 					await this.CreateApiDelay();
@@ -98,14 +111,18 @@ namespace ShopifyAccess
 			return orders;
 		}
 
-		private ShopifyOrders CollectOrdersFromSinglePage( string mainEndpoint )
+		private ShopifyOrders CollectOrdersFromSinglePage( string mainNewOrdersEndpoint, string mainUpdatedOrdersEndpoint )
 		{
 			ShopifyOrders orders = null;
-			var compositeEndpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
+			var compositeNewOrdersEndpoint = mainNewOrdersEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
+			var compositeUpdatedOrdersEndpoint = mainUpdatedOrdersEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
 
 			ActionPolicies.ShopifySubmitPolicy.Do( () =>
 			{
-				orders = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, compositeEndpoint );
+				var newOrders = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, compositeNewOrdersEndpoint );
+				var updatedOrders = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint );
+
+				orders = new ShopifyOrders( newOrders.Orders.Concat( updatedOrders.Orders ).ToList() );
 
 				//API requirement
 				this.CreateApiDelay().Wait();
@@ -114,14 +131,18 @@ namespace ShopifyAccess
 			return orders;
 		}
 
-		private async Task< ShopifyOrders > CollectOrdersFromSinglePageAsync( string mainEndpoint )
+		private async Task< ShopifyOrders > CollectOrdersFromSinglePageAsync( string mainNewOrdersEndpoint, string mainUpdatedOrdersEndpoint )
 		{
 			ShopifyOrders orders = null;
-			var compositeEndpoint = mainEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
+			var compositeNewOrdersEndpoint = mainNewOrdersEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
+			var compositeUpdatedOrdersEndpoint = mainUpdatedOrdersEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
 
 			await ActionPolicies.QueryAsync.Do( async () =>
 			{
-				orders = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, compositeEndpoint );
+				var newOrders = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, compositeNewOrdersEndpoint );
+				var updatedOrders = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint );
+
+				orders = new ShopifyOrders( newOrders.Orders.Concat( updatedOrders.Orders ).ToList() );
 
 				//API requirement
 				await this.CreateApiDelay();
@@ -130,22 +151,28 @@ namespace ShopifyAccess
 			return orders;
 		}
 
-		private int GetOrdersCount( string endpoint )
+		private int GetOrdersCount( string newOrdersEndpoint, string updatedOrdersEndpoint )
 		{
 			var count = 0;
 			ActionPolicies.ShopifySubmitPolicy.Do( () =>
 			{
-				count = this._webRequestServices.GetResponse< OrdersCount >( ShopifyCommand.GetOrdersCount, endpoint ).Count;
+				var newOrdersCount = this._webRequestServices.GetResponse< OrdersCount >( ShopifyCommand.GetOrdersCount, newOrdersEndpoint ).Count;
+				var updatedOrdersCount = this._webRequestServices.GetResponse< OrdersCount >( ShopifyCommand.GetOrdersCount, updatedOrdersEndpoint ).Count;
+
+				count = newOrdersCount + updatedOrdersCount;
 			} );
 			return count;
 		}
 
-		private async Task< int > GetOrdersCountAsync( string endpoint )
+		private async Task< int > GetOrdersCountAsync( string newOrdersEndpoint, string updatedOrdersEndpoint )
 		{
 			var count = 0;
 			await ActionPolicies.QueryAsync.Do( async () =>
 			{
-				count = ( await this._webRequestServices.GetResponseAsync< OrdersCount >( ShopifyCommand.GetOrdersCount, endpoint ) ).Count;
+				var newOrdersCount = ( await this._webRequestServices.GetResponseAsync< OrdersCount >( ShopifyCommand.GetOrdersCount, newOrdersEndpoint ) ).Count;
+				var updatedOrdersCount = ( await this._webRequestServices.GetResponseAsync< OrdersCount >( ShopifyCommand.GetOrdersCount, updatedOrdersEndpoint ) ).Count;
+
+				count = newOrdersCount + updatedOrdersCount;
 			} );
 			return count;
 		}

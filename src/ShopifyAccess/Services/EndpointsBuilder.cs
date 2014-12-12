@@ -9,16 +9,22 @@ namespace ShopifyAccess.Services
 	{
 		public static readonly string EmptyEndpoint = string.Empty;
 
-		public static string CreateOrdersEndpoint( ShopifyOrderStatus status, DateTime startDate, DateTime endDate )
+		public static string CreateNewOrdersEndpoint( ShopifyOrderStatus status, DateTime startDate, DateTime endDate )
 		{
-			var endpoint = string.Format( "?{0}={1}&{2}={3}&{4}={5}&{6}={7}&{8}={9}&{10}={11}&{12}={13}",
+			var endpoint = string.Format( "?{0}={1}&{2}={3}&{4}={5}",
 				ShopifyOrderCommandEndpointName.OrderStatus.Name, status,
 				ShopifyOrderCommandEndpointName.OrdersDateFrom.Name, DateTime.SpecifyKind( startDate, DateTimeKind.Utc ).ToString( "o" ),
-				ShopifyOrderCommandEndpointName.OrdersDateTo.Name, DateTime.SpecifyKind( endDate, DateTimeKind.Utc ).ToString( "o" ),
+				ShopifyOrderCommandEndpointName.OrdersDateTo.Name, DateTime.SpecifyKind( endDate, DateTimeKind.Utc ).ToString( "o" )
+				);
+			return endpoint;
+		}
+
+		public static string CreateUpdatedOrdersEndpoint( ShopifyOrderStatus status, DateTime startDate, DateTime endDate )
+		{
+			var endpoint = string.Format( "?{0}={1}&{2}={3}&{4}={5}",
+				ShopifyOrderCommandEndpointName.OrderStatus.Name, status,
 				ShopifyOrderCommandEndpointName.OrdersDateUpdatedFrom.Name, DateTime.SpecifyKind( startDate, DateTimeKind.Utc ).ToString( "o" ),
-				ShopifyOrderCommandEndpointName.OrdersDateUpdatedTo.Name, DateTime.SpecifyKind( endDate, DateTimeKind.Utc ).ToString( "o" ),
-				ShopifyOrderCommandEndpointName.OrderFinancialStatus.Name, ShopifyOrderFinancialStatus.any,
-				ShopifyOrderCommandEndpointName.OrderFulfillmentStatus.Name, ShopifyOrderFulfillmentStatus.any );
+				ShopifyOrderCommandEndpointName.OrdersDateUpdatedTo.Name, DateTime.SpecifyKind( endDate, DateTimeKind.Utc ).ToString( "o" ));
 			return endpoint;
 		}
 
