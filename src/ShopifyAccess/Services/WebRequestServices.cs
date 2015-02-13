@@ -3,8 +3,8 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using CuttingEdge.Conditions;
-using Netco.Logging;
 using ServiceStack;
+using ShopifyAccess.Misc;
 using ShopifyAccess.Models.Configuration.Authorization;
 using ShopifyAccess.Models.Configuration.Command;
 
@@ -57,7 +57,7 @@ namespace ShopifyAccess.Services
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
 			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
-			this.Log().Trace( "[shopify] PUT Params. ShopName: {0}. Data: {1}", this._commandConfig.ShopName, jsonContent );
+			ShopifyLogger.Log.Trace( "[shopify] PUT Params. ShopName: {0}. Data: {1}", this._commandConfig.ShopName, jsonContent );
 			using( var response = ( HttpWebResponse )request.GetResponse() )
 				this.LogUpdateInfo( endpoint, response.StatusCode, jsonContent );
 		}
@@ -67,7 +67,7 @@ namespace ShopifyAccess.Services
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
 			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
-			this.Log().Trace( "[shopify] PUT Params. ShopName: {0}. Data: {1}", this._commandConfig.ShopName, jsonContent );
+			ShopifyLogger.Log.Trace( "[shopify] PUT Params. ShopName: {0}. Data: {1}", this._commandConfig.ShopName, jsonContent );
 			using( var response = await request.GetResponseAsync() )
 				this.LogUpdateInfo( endpoint, ( ( HttpWebResponse )response ).StatusCode, jsonContent );
 		}
@@ -95,7 +95,7 @@ namespace ShopifyAccess.Services
 				var reader = new StreamReader( stream );
 				var jsonResponse = reader.ReadToEnd();
 
-				this.Log().Trace( "[shopify]\tResponse\t{0} - {1}", response.ResponseUri, jsonResponse );
+				ShopifyLogger.Log.Trace( "[shopify]\tResponse\t{0} - {1}", response.ResponseUri, jsonResponse );
 
 				if( !String.IsNullOrEmpty( jsonResponse ) )
 					result = jsonResponse.FromJson< T >();
@@ -153,7 +153,7 @@ namespace ShopifyAccess.Services
 		#region Logging
 		private void LogUpdateInfo( string endpoint, HttpStatusCode statusCode, string jsonContent )
 		{
-			this.Log().Trace( "[shopify]\tPUT/POST call for the endpoint '{0}' has been completed with code '{1}'.\n{2}", endpoint, statusCode, jsonContent );
+			ShopifyLogger.Log.Trace( "[shopify]\tPUT/POST call for the endpoint '{0}' has been completed with code '{1}'.\n{2}", endpoint, statusCode, jsonContent );
 		}
 		#endregion
 	}
