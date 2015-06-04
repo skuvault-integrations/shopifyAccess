@@ -6,6 +6,7 @@ using LINQtoCSV;
 using NUnit.Framework;
 using ShopifyAccess;
 using ShopifyAccess.Models.Configuration.Command;
+using ShopifyAccess.Models.Product;
 using ShopifyAccess.Models.ProductVariant;
 
 namespace ShopifyAccessTests.Products
@@ -53,6 +54,21 @@ namespace ShopifyAccessTests.Products
 
 			var variantToUpdate = new ShopifyProductVariant { Id = 337095344, Quantity = 2, InventoryManagement = InventoryManagement.Shopify };
 			service.UpdateProductVariants( new List< ShopifyProductVariant > { variantToUpdate } );
+		}
+
+		[ Test ]
+		public void GetAndUpdateProduct()
+		{
+			var service = this.ShopifyFactory.CreateService( this.Config );
+			var products = service.GetProducts().ToDictionary();
+			ShopifyProductVariant variant;
+			if( products.TryGetValue( "dkTestSku", out variant ) )
+				variant.Quantity = 7;
+
+			service.UpdateProductVariants( products.Values );
+			var updatedProducts = service.GetProducts().ToDictionary();
+			
+			products.Should().Equal( updatedProducts );
 		}
 	}
 }
