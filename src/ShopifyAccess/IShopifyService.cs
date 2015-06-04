@@ -41,11 +41,11 @@ namespace ShopifyAccess
 		/// <summary>
 		/// Update variants (inventory items)
 		/// </summary>
-		void UpdateProductVariants( IEnumerable< ShopifyProductVariant > variants );
+		void UpdateProductVariants( IEnumerable< ShopifyProductVariantForUpdate > variants );
 
 		/// <summary>
 		/// Update variants (inventory items) async
 		/// </summary>
-		Task UpdateProductVariantsAsync( IEnumerable< ShopifyProductVariant > variants );
+		Task UpdateProductVariantsAsync( IEnumerable< ShopifyProductVariantForUpdate > variants );
 	}
 }

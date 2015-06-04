@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -52,8 +53,8 @@ namespace ShopifyAccessTests.Products
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
 
-			var variantToUpdate = new ShopifyProductVariant { Id = 337095344, Quantity = 2, InventoryManagement = InventoryManagement.Shopify };
-			service.UpdateProductVariants( new List< ShopifyProductVariant > { variantToUpdate } );
+			var variantToUpdate = new ShopifyProductVariantForUpdate { Id = 337095344, Quantity = 2 };
+			service.UpdateProductVariants( new List< ShopifyProductVariantForUpdate > { variantToUpdate } );
 		}
 
 		[ Test ]
@@ -61,11 +62,26 @@ namespace ShopifyAccessTests.Products
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
 			var products = service.GetProducts().ToDictionary();
-			ShopifyProductVariant variant;
-			if( products.TryGetValue( "dkTestSku", out variant ) )
-				variant.Quantity = 7;
+			
+			var productsForUpdate = new List< ShopifyProductVariantForUpdate>();
+			foreach( var product in products )
+			{
+				var productForUpdate = new ShopifyProductVariantForUpdate
+				{
+					Id = product.Value.Id,
+					OldQuantity = product.Value.OldQuantity,
+					Quantity = product.Value.Quantity
+				};
+				if( product.Key.Equals( "dkTestSku", StringComparison.InvariantCultureIgnoreCase ) )
+				{
+					productForUpdate.OldQuantity = product.Value.Quantity;
+					productForUpdate.Quantity = product.Value.Quantity = product.Value.OldQuantity = -9;
+					productsForUpdate.Add( productForUpdate );
+				}
+				
+			}
 
-			service.UpdateProductVariants( products.Values );
+			service.UpdateProductVariants( productsForUpdate );
 			var updatedProducts = service.GetProducts().ToDictionary();
 			
 			products.Should().Equal( updatedProducts );

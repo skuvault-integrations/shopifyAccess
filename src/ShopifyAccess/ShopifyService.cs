@@ -196,7 +196,7 @@ namespace ShopifyAccess
 		#endregion
 
 		#region Update variants
-		public void UpdateProductVariants( IEnumerable< ShopifyProductVariant > variants )
+		public void UpdateProductVariants( IEnumerable< ShopifyProductVariantForUpdate > variants )
 		{
 			foreach( var variant in variants )
 			{
@@ -204,7 +204,7 @@ namespace ShopifyAccess
 			}
 		}
 
-		public async Task UpdateProductVariantsAsync( IEnumerable< ShopifyProductVariant > variants )
+		public async Task UpdateProductVariantsAsync( IEnumerable< ShopifyProductVariantForUpdate > variants )
 		{
 			foreach( var variant in variants )
 			{
@@ -212,7 +212,7 @@ namespace ShopifyAccess
 			}
 		}
 
-		private void UpdateProductVariantQuantity( ShopifyProductVariant variant )
+		private void UpdateProductVariantQuantity( ShopifyProductVariantForUpdate variant )
 		{
 			var endpoint = EndpointsBuilder.CreateProductVariantUpdateEndpoint( variant.Id );
 			//just simpliest way to serialize with the root name.
@@ -224,7 +224,7 @@ namespace ShopifyAccess
 			this.CreateApiDelay().Wait();
 		}
 
-		private async Task UpdateProductVariantQuantityAsync( ShopifyProductVariant variant )
+		private async Task UpdateProductVariantQuantityAsync( ShopifyProductVariantForUpdate variant )
 		{
 			var endpoint = EndpointsBuilder.CreateProductVariantUpdateEndpoint( variant.Id );
 			var jsonContent = new { variant }.ToJson();

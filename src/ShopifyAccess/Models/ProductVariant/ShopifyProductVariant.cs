@@ -12,6 +12,9 @@ namespace ShopifyAccess.Models.ProductVariant
 		[ DataMember( Name = "inventory_quantity" ) ]
 		public int Quantity{ get; set; }
 
+		[ DataMember( Name = "old_inventory_quantity" ) ]
+		public int OldQuantity{ get; set; }
+
 		[ DataMember( Name = "inventory_management" ) ]
 		public InventoryManagement InventoryManagement{ get; set; }
 
