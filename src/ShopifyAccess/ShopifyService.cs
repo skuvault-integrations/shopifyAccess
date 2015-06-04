@@ -112,14 +112,8 @@ namespace ShopifyAccess
 		#region Products
 		public ShopifyProducts GetProducts()
 		{
-			ShopifyProducts products;
 			var productsCount = this.GetProductsCount();
-
-			if( productsCount > RequestMaxLimit )
-				products = this.CollectProductsFromAllPages( productsCount );
-			else
-				products = this.CollectProductsFromSinglePage();
-
+			var products = this.CollectProductsFromAllPages( productsCount );
 			this.RemoveUntrackedProductVariants( products );
 
 			return products;
@@ -127,14 +121,8 @@ namespace ShopifyAccess
 
 		public async Task< ShopifyProducts > GetProductsAsync()
 		{
-			ShopifyProducts products;
 			var productsCount = await this.GetProductsCountAsync();
-
-			if( productsCount > RequestMaxLimit )
-				products = await this.CollectProductsFromAllPagesAsync( productsCount );
-			else
-				products = await this.CollectProductsFromSinglePageAsync();
-
+			var products = await this.CollectProductsFromAllPagesAsync( productsCount );
 			this.RemoveUntrackedProductVariants( products );
 
 			return products;
@@ -142,21 +130,15 @@ namespace ShopifyAccess
 
 		private int GetProductsCount()
 		{
-			var count = 0;
-			ActionPolicies.ShopifySubmitPolicy.Do( () =>
-			{
-				count = this._webRequestServices.GetResponse< ProductsCount >( ShopifyCommand.GetProductsCount, EndpointsBuilder.EmptyEndpoint ).Count;
-			} );
+			var count = ActionPolicies.ShopifySubmitPolicy.Get( () =>
+				this._webRequestServices.GetResponse< ProductsCount >( ShopifyCommand.GetProductsCount, EndpointsBuilder.EmptyEndpoint ).Count );
 			return count;
 		}
 
 		private async Task< int > GetProductsCountAsync()
 		{
-			var count = 0;
-			await ActionPolicies.QueryAsync.Do( async () =>
-			{
-				count = ( await this._webRequestServices.GetResponseAsync< ProductsCount >( ShopifyCommand.GetProductsCount, EndpointsBuilder.EmptyEndpoint ) ).Count;
-			} );
+			var count = await ActionPolicies.QueryAsync.Get( async () =>
+				( await this._webRequestServices.GetResponseAsync< ProductsCount >( ShopifyCommand.GetProductsCount, EndpointsBuilder.EmptyEndpoint ) ).Count );
 			return count;
 		}
 
@@ -200,38 +182,6 @@ namespace ShopifyAccess
 					await this.CreateApiDelay();
 				} );
 			}
-
-			return products;
-		}
-
-		private ShopifyProducts CollectProductsFromSinglePage()
-		{
-			ShopifyProducts products = null;
-			var endpoint = EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
-
-			ActionPolicies.ShopifySubmitPolicy.Do( () =>
-			{
-				products = this._webRequestServices.GetResponse< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
-
-				//API requirement
-				this.CreateApiDelay().Wait();
-			} );
-
-			return products;
-		}
-
-		private async Task< ShopifyProducts > CollectProductsFromSinglePageAsync()
-		{
-			ShopifyProducts products = null;
-			var endpoint = EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
-
-			await ActionPolicies.QueryAsync.Do( async () =>
-			{
-				products = await this._webRequestServices.GetResponseAsync< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
-
-				//API requirement
-				await this.CreateApiDelay();
-			} );
 
 			return products;
 		}
