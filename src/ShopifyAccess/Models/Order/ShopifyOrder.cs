@@ -43,6 +43,12 @@ namespace ShopifyAccess.Models.Order
 		[ DataMember( Name = "fulfillment_status" ) ]
 		public FulfillmentStatusEnum FulfillmentStatus{ get; set; }
 
+        [DataMember(Name = "source_name")]
+        public string SourceName { get; set; }
+
+        [DataMember(Name = "location_id")]
+        public string LocationId { get; set; }
+
 		public bool IsShipped
 		{
 			get { return this.ClosedAt.HasValue; }
