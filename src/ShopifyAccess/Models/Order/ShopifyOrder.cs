@@ -44,7 +44,7 @@ namespace ShopifyAccess.Models.Order
 		public FulfillmentStatusEnum FulfillmentStatus{ get; set; }
 
         [DataMember(Name = "source_name")]
-        public string SourceName { get; set; }
+        public ShopifySourceNameEnum SourceName { get; set; }
 
         [DataMember(Name = "location_id")]
         public string LocationId { get; set; }
@@ -82,4 +82,13 @@ namespace ShopifyAccess.Models.Order
 		partial
 		// ReSharper restore InconsistentNaming
 	}
+
+    public enum ShopifySourceNameEnum
+    {
+        Undefined,
+        web,
+        pos,
+        iphone,
+        android
+    }
 }
