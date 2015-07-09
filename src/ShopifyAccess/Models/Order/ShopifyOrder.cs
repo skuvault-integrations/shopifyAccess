@@ -43,11 +43,11 @@ namespace ShopifyAccess.Models.Order
 		[ DataMember( Name = "fulfillment_status" ) ]
 		public FulfillmentStatusEnum FulfillmentStatus{ get; set; }
 
-        [DataMember(Name = "source_name")]
-        public ShopifySourceNameEnum SourceName { get; set; }
+		[ DataMember( Name = "source_name" ) ]
+		public ShopifySourceNameEnum SourceName{ get; set; }
 
-        [DataMember(Name = "location_id")]
-        public string LocationId { get; set; }
+		[ DataMember( Name = "location_id" ) ]
+		public string LocationId{ get; set; }
 
 		public bool IsShipped
 		{
@@ -83,12 +83,12 @@ namespace ShopifyAccess.Models.Order
 		// ReSharper restore InconsistentNaming
 	}
 
-    public enum ShopifySourceNameEnum
-    {
-        Undefined,
-        web,
-        pos,
-        iphone,
-        android
-    }
+	public enum ShopifySourceNameEnum
+	{
+		Undefined,
+		web,
+		pos,
+		iphone,
+		android
+	}
 }
