@@ -49,6 +49,9 @@ namespace ShopifyAccess.Models.Order
 		[ DataMember( Name = "location_id" ) ]
 		public string LocationId{ get; set; }
 
+		[DataMember(Name = "name")]
+		public int Name { get; set; }
+
 		public bool IsShipped
 		{
 			get { return this.ClosedAt.HasValue; }
