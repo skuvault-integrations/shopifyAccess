@@ -50,7 +50,7 @@ namespace ShopifyAccess.Models.Order
 		public string LocationId{ get; set; }
 
 		[ DataMember( Name = "name" ) ]
-		public int Name{ get; set; }
+		public string Name{ get; set; }
 
 		public bool IsShipped
 		{
