@@ -10,12 +10,13 @@
 		public static readonly ShopifyCommand GetProductsCount = new ShopifyCommand( "/admin/products/count.json" );
 		public static readonly ShopifyCommand GetOrdersCount = new ShopifyCommand( "/admin/orders/count.json" );
 		public static readonly ShopifyCommand GetOrders = new ShopifyCommand( "/admin/orders.json" );
+		public static readonly ShopifyCommand GetLocations = new ShopifyCommand( "/admin/locations.json" );
 
 		private ShopifyCommand( string command )
 		{
 			this.Command = command;
 		}
 
-		public string Command { get; private set; }
+		public string Command{ get; private set; }
 	}
 }

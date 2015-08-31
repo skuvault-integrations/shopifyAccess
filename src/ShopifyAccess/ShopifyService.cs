@@ -5,6 +5,7 @@ using CuttingEdge.Conditions;
 using ServiceStack;
 using ShopifyAccess.Misc;
 using ShopifyAccess.Models.Configuration.Command;
+using ShopifyAccess.Models.Location;
 using ShopifyAccess.Models.Order;
 using ShopifyAccess.Models.Product;
 using ShopifyAccess.Models.ProductVariant;
@@ -42,6 +43,18 @@ namespace ShopifyAccess
 			var ordersCount = await this.GetOrdersCountAsync( updatedOrdersEndpoint );
 			var orders = await this.CollectOrdersFromAllPagesAsync( updatedOrdersEndpoint, ordersCount );
 			return orders;
+		}
+
+		public ShopifyLocations GetLocations()
+		{
+			var locations = ActionPolicies.ShopifySubmitPolicy.Get( () => this._webRequestServices.GetResponse< ShopifyLocations >( ShopifyCommand.GetLocations, "" ) );
+			return locations;
+		}
+
+		public async Task< ShopifyLocations > GetLocationsAsync()
+		{
+			var locations = await ActionPolicies.QueryAsync.Get( async () => ( await this._webRequestServices.GetResponseAsync< ShopifyLocations >( ShopifyCommand.GetLocations, "" ) ) );
+			return locations;
 		}
 
 		private ShopifyOrders CollectOrdersFromAllPages( string mainUpdatedOrdersEndpoint, int ordersCount )

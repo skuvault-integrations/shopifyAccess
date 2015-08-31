@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ShopifyAccess.Models.Location;
 using ShopifyAccess.Models.Order;
 using ShopifyAccess.Models.Product;
 using ShopifyAccess.Models.ProductVariant;
@@ -25,6 +26,18 @@ namespace ShopifyAccess
 		/// <param name="dateTo">created_at_max. Show orders created before date (format: 2008-01-01 03:00)</param>
 		/// <param name="status">fulfillment_status. Shipped,partial, unshipped or any</param>
 		Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo );
+
+		/// <summary>
+		/// get locations
+		/// </summary>
+		/// <returns></returns>
+		ShopifyLocations GetLocations();
+
+		/// <summary>
+		/// get locations async
+		/// </summary>
+		/// <returns></returns>
+		Task< ShopifyLocations > GetLocationsAsync();
 
 		/// <summary>
 		/// Get all existing products

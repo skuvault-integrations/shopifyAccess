@@ -72,6 +72,8 @@
     <Compile Include="Models\Configuration\Command\ShopifyCommandEndpointName.cs" />
     <Compile Include="Models\Configuration\ShopifyConfigBase.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyCommand.cs" />
+    <Compile Include="Models\Location\ShopifyLocation.cs" />
+    <Compile Include="Models\Location\ShopifyLocations.cs" />
     <Compile Include="Models\Order\OrdersCount.cs" />
     <Compile Include="Models\Order\ShopifyBillingAddress.cs" />
     <Compile Include="Models\Order\ShopifyFulfillment.cs" />
