@@ -43,5 +43,23 @@ namespace ShopifyAccessTests.Users
 
 			users.Users.Count.Should().BeGreaterThan( 0 );
 		}
+
+		[ Test ]
+		public void DoesShopifyPlusCustomer()
+		{
+			var service = this.ShopifyFactory.CreateService( this.Config );
+			var result = service.DoesShopifyPlusCustomer();
+
+			result.Should().Be( false );
+		}
+
+		[ Test ]
+		public async Task DoesShopifyPlusCustomerAsync()
+		{
+			var service = this.ShopifyFactory.CreateService( this.Config );
+			var result = await service.DoesShopifyPlusCustomerAsync();
+
+			result.Should().Be( false );
+		}
 	}
 }

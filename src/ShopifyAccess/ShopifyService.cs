@@ -262,6 +262,32 @@ namespace ShopifyAccess
 			var users = await ActionPolicies.ShopifyGetPolicyAsync.Get( async () => await this._webRequestServices.GetResponseAsync< ShopifyUsers >( ShopifyCommand.GetUsers, "" ) );
 			return users;
 		}
+
+		public bool DoesShopifyPlusCustomer()
+		{
+			try
+			{
+				this._webRequestServices.GetResponse< ShopifyUsers >( ShopifyCommand.GetUsers, "" );
+				return true;
+			}
+			catch( Exception )
+			{
+				return false;
+			}
+		}
+
+		public async Task< bool > DoesShopifyPlusCustomerAsync()
+		{
+			try
+			{
+				await this._webRequestServices.GetResponseAsync< ShopifyUsers >( ShopifyCommand.GetUsers, "" );
+				return true;
+			}
+			catch( Exception )
+			{
+				return false;
+			}
+		}
 		#endregion
 
 		#region Misc

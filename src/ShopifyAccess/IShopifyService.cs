@@ -73,5 +73,17 @@ namespace ShopifyAccess
 		/// </summary>
 		/// <returns></returns>
 		Task< ShopifyUsers > GetUsersAsync();
+
+		/// <summary>
+		/// Does shopify plus customer
+		/// </summary>
+		/// <returns></returns>
+		bool DoesShopifyPlusCustomer();
+
+		/// <summary>
+		/// Does shopify plus customer async
+		/// </summary>
+		/// <returns></returns>
+		Task< bool > DoesShopifyPlusCustomerAsync();
 	}
 }
