@@ -37,7 +37,7 @@ namespace ShopifyAccess.Services
 			T result;
 			var request = this.CreateServiceGetRequest( command, endpoint );
 			using( var response = request.GetResponse() )
-				result = ParseResponse< T >( response );
+				result = this.ParseResponse< T >( response );
 
 			return result;
 		}
@@ -47,7 +47,7 @@ namespace ShopifyAccess.Services
 			T result;
 			var request = this.CreateServiceGetRequest( command, endpoint );
 			using( var response = await request.GetResponseAsync() )
-				result = ParseResponse< T >( response );
+				result = this.ParseResponse< T >( response );
 
 			return result;
 		}

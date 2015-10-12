@@ -5,6 +5,7 @@ using ShopifyAccess.Models.Location;
 using ShopifyAccess.Models.Order;
 using ShopifyAccess.Models.Product;
 using ShopifyAccess.Models.ProductVariant;
+using ShopifyAccess.Models.User;
 
 namespace ShopifyAccess
 {
@@ -60,5 +61,17 @@ namespace ShopifyAccess
 		/// Update variants (inventory items) async
 		/// </summary>
 		Task UpdateProductVariantsAsync( IEnumerable< ShopifyProductVariantForUpdate > variants );
+
+		/// <summary>
+		/// Get all users
+		/// </summary>
+		/// <returns></returns>
+		ShopifyUsers GetUsers();
+
+		/// <summary>
+		/// Get all users async
+		/// </summary>
+		/// <returns></returns>
+		Task< ShopifyUsers > GetUsersAsync();
 	}
 }

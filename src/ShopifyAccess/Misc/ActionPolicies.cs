@@ -7,36 +7,33 @@ namespace ShopifyAccess.Misc
 {
 	public static class ActionPolicies
 	{
-		public static ActionPolicy ShopifyGetPolicy
-		{
-			get { return _shopifyGetPolicy; }
-		}
+#if DEBUG
+		private const int RetryCount = 1;
+#else
+		private const int RetryCount = 50;
+#endif
 
-		private static readonly ActionPolicy _shopifyGetPolicy = ActionPolicy.Handle< Exception >().Retry( 50, ( ex, i ) =>
+		public static readonly ActionPolicy ShopifyGetPolicy = ActionPolicy.Handle< Exception >().Retry( RetryCount, ( ex, i ) =>
 		{
 			ShopifyLogger.Log.Trace( ex, "Retrying Shopify API get call for the {0} time", i );
 			SystemUtil.Sleep( TimeSpan.FromSeconds( 0.6 ) );
 		} );
 
-		public static ActionPolicy ShopifySubmitPolicy
+		public static readonly ActionPolicyAsync ShopifyGetPolicyAsync = ActionPolicyAsync.Handle< Exception >().RetryAsync( RetryCount, async ( ex, i ) =>
 		{
-			get { return _shopifySumbitPolicy; }
-		}
+			ShopifyLogger.Log.Trace( ex, "Retrying Shopify API get call for the {0} time", i );
+			await Task.Delay( TimeSpan.FromSeconds( 0.6 ) );
+		} );
 
-		private static readonly ActionPolicy _shopifySumbitPolicy = ActionPolicy.Handle< Exception >().Retry( 50, ( ex, i ) =>
+		public static readonly ActionPolicy ShopifySubmitPolicy = ActionPolicy.Handle< Exception >().Retry( RetryCount, ( ex, i ) =>
 		{
 			ShopifyLogger.Log.Trace( ex, "Retrying Shopify API submit call for the {0} time", i );
 			SystemUtil.Sleep( TimeSpan.FromSeconds( 0.6 ) );
 		} );
 
-		public static ActionPolicyAsync QueryAsync
+		public static readonly ActionPolicyAsync ShopifySubmitPolicyAsync = ActionPolicyAsync.Handle< Exception >().RetryAsync( RetryCount, async ( ex, i ) =>
 		{
-			get { return _queryAsync; }
-		}
-
-		private static readonly ActionPolicyAsync _queryAsync = ActionPolicyAsync.Handle< Exception >().RetryAsync( 50, async ( ex, i ) =>
-		{
-			ShopifyLogger.Log.Trace( ex, "Retrying Shopify API get call for the {0} time", i );
+			ShopifyLogger.Log.Trace( ex, "Retrying Shopify API submit call for the {0} time", i );
 			await Task.Delay( TimeSpan.FromSeconds( 0.6 ) );
 		} );
 	}

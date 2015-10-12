@@ -9,6 +9,7 @@ using ShopifyAccess.Models.Location;
 using ShopifyAccess.Models.Order;
 using ShopifyAccess.Models.Product;
 using ShopifyAccess.Models.ProductVariant;
+using ShopifyAccess.Models.User;
 using ShopifyAccess.Services;
 
 namespace ShopifyAccess
@@ -47,13 +48,13 @@ namespace ShopifyAccess
 
 		public ShopifyLocations GetLocations()
 		{
-			var locations = ActionPolicies.ShopifySubmitPolicy.Get( () => this._webRequestServices.GetResponse< ShopifyLocations >( ShopifyCommand.GetLocations, "" ) );
+			var locations = ActionPolicies.ShopifyGetPolicy.Get( () => this._webRequestServices.GetResponse< ShopifyLocations >( ShopifyCommand.GetLocations, "" ) );
 			return locations;
 		}
 
 		public async Task< ShopifyLocations > GetLocationsAsync()
 		{
-			var locations = await ActionPolicies.QueryAsync.Get( async () => ( await this._webRequestServices.GetResponseAsync< ShopifyLocations >( ShopifyCommand.GetLocations, "" ) ) );
+			var locations = await ActionPolicies.ShopifyGetPolicyAsync.Get( async () => ( await this._webRequestServices.GetResponseAsync< ShopifyLocations >( ShopifyCommand.GetLocations, "" ) ) );
 			return locations;
 		}
 
@@ -66,7 +67,7 @@ namespace ShopifyAccess
 			{
 				var compositeUpdatedOrdersEndpoint = mainUpdatedOrdersEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
 
-				ActionPolicies.ShopifySubmitPolicy.Do( () =>
+				ActionPolicies.ShopifyGetPolicy.Do( () =>
 				{
 					var updatedOrdersWithinPage = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint );
 					orders.Orders.AddRange( updatedOrdersWithinPage.Orders );
@@ -88,7 +89,7 @@ namespace ShopifyAccess
 			{
 				var compositeUpdatedOrdersEndpoint = mainUpdatedOrdersEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) ) );
 
-				await ActionPolicies.QueryAsync.Do( async () =>
+				await ActionPolicies.ShopifyGetPolicyAsync.Do( async () =>
 				{
 					var updatedOrdersWithinPage = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint );
 					orders.Orders.AddRange( updatedOrdersWithinPage.Orders );
@@ -103,9 +104,9 @@ namespace ShopifyAccess
 
 		private int GetOrdersCount( string updatedOrdersEndpoint )
 		{
-			var count = ActionPolicies.ShopifySubmitPolicy.Get( () =>
+			var count = ActionPolicies.ShopifyGetPolicy.Get( () =>
 			{
-				var updatedOrdersCount = this._webRequestServices.GetResponse< OrdersCount >( ShopifyCommand.GetOrdersCount, updatedOrdersEndpoint ).Count;
+				var updatedOrdersCount = this._webRequestServices.GetResponse< OrdersCount >( ShopifyCommand.GetUsers, updatedOrdersEndpoint ).Count;
 				return updatedOrdersCount;
 			} );
 			return count;
@@ -113,7 +114,7 @@ namespace ShopifyAccess
 
 		private async Task< int > GetOrdersCountAsync( string updatedOrdersEndpoint )
 		{
-			var count = await ActionPolicies.QueryAsync.Get( async () =>
+			var count = await ActionPolicies.ShopifyGetPolicyAsync.Get( async () =>
 			{
 				var updatedOrdersCount = ( await this._webRequestServices.GetResponseAsync< OrdersCount >( ShopifyCommand.GetOrdersCount, updatedOrdersEndpoint ) ).Count;
 				return updatedOrdersCount;
@@ -143,14 +144,14 @@ namespace ShopifyAccess
 
 		private int GetProductsCount()
 		{
-			var count = ActionPolicies.ShopifySubmitPolicy.Get( () =>
+			var count = ActionPolicies.ShopifyGetPolicy.Get( () =>
 				this._webRequestServices.GetResponse< ProductsCount >( ShopifyCommand.GetProductsCount, EndpointsBuilder.EmptyEndpoint ).Count );
 			return count;
 		}
 
 		private async Task< int > GetProductsCountAsync()
 		{
-			var count = await ActionPolicies.QueryAsync.Get( async () =>
+			var count = await ActionPolicies.ShopifyGetPolicyAsync.Get( async () =>
 				( await this._webRequestServices.GetResponseAsync< ProductsCount >( ShopifyCommand.GetProductsCount, EndpointsBuilder.EmptyEndpoint ) ).Count );
 			return count;
 		}
@@ -164,7 +165,7 @@ namespace ShopifyAccess
 			{
 				var endpoint = EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) );
 
-				ActionPolicies.ShopifySubmitPolicy.Do( () =>
+				ActionPolicies.ShopifyGetPolicy.Do( () =>
 				{
 					var productsWithinPage = this._webRequestServices.GetResponse< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
 					products.Products.AddRange( productsWithinPage.Products );
@@ -186,7 +187,7 @@ namespace ShopifyAccess
 			{
 				var endpoint = EndpointsBuilder.CreateGetNextPageEndpoint( new ShopifyCommandEndpointConfig( i + 1, RequestMaxLimit ) );
 
-				await ActionPolicies.QueryAsync.Do( async () =>
+				await ActionPolicies.ShopifyGetPolicyAsync.Do( async () =>
 				{
 					var productsWithinPage = await this._webRequestServices.GetResponseAsync< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint );
 					products.Products.AddRange( productsWithinPage.Products );
@@ -221,7 +222,7 @@ namespace ShopifyAccess
 		{
 			foreach( var variant in variants )
 			{
-				await ActionPolicies.QueryAsync.Do( async () => await this.UpdateProductVariantQuantityAsync( variant ) );
+				await ActionPolicies.ShopifySubmitPolicyAsync.Do( async () => await this.UpdateProductVariantQuantityAsync( variant ) );
 			}
 		}
 
@@ -246,6 +247,20 @@ namespace ShopifyAccess
 
 			//API requirement
 			await this.CreateApiDelay();
+		}
+		#endregion
+
+		#region Users
+		public ShopifyUsers GetUsers()
+		{
+			var users = ActionPolicies.ShopifyGetPolicy.Get( () => this._webRequestServices.GetResponse< ShopifyUsers >( ShopifyCommand.GetUsers, "" ) );
+			return users;
+		}
+
+		public async Task< ShopifyUsers > GetUsersAsync()
+		{
+			var users = await ActionPolicies.ShopifyGetPolicyAsync.Get( async () => await this._webRequestServices.GetResponseAsync< ShopifyUsers >( ShopifyCommand.GetUsers, "" ) );
+			return users;
 		}
 		#endregion
 

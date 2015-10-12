@@ -89,6 +89,8 @@
     <Compile Include="Models\Product\ProductsCount.cs" />
     <Compile Include="Models\Product\ShopifyProduct.cs" />
     <Compile Include="Models\Product\ShopifyProducts.cs" />
+    <Compile Include="Models\User\ShopifyUser.cs" />
+    <Compile Include="Models\User\ShopifyUsers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\EndpointsBuilder.cs" />
     <Compile Include="Services\WebRequestServices.cs" />
