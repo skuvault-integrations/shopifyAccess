@@ -106,7 +106,7 @@ namespace ShopifyAccess
 		{
 			var count = ActionPolicies.ShopifyGetPolicy.Get( () =>
 			{
-				var updatedOrdersCount = this._webRequestServices.GetResponse< OrdersCount >( ShopifyCommand.GetUsers, updatedOrdersEndpoint ).Count;
+				var updatedOrdersCount = this._webRequestServices.GetResponse< OrdersCount >( ShopifyCommand.GetOrdersCount, updatedOrdersEndpoint ).Count;
 				return updatedOrdersCount;
 			} );
 			return count;
@@ -275,7 +275,7 @@ namespace ShopifyAccess
 			return user.User;
 		}
 
-		public bool DoesShopifyPlusCustomer()
+		public bool DoesShopifyPlusAccount()
 		{
 			try
 			{
@@ -288,7 +288,7 @@ namespace ShopifyAccess
 			}
 		}
 
-		public async Task< bool > DoesShopifyPlusCustomerAsync()
+		public async Task< bool > DoesShopifyPlusAccountAsync()
 		{
 			try
 			{

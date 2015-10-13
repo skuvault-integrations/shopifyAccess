@@ -90,12 +90,12 @@ namespace ShopifyAccess
 		/// Does shopify plus customer
 		/// </summary>
 		/// <returns></returns>
-		bool DoesShopifyPlusCustomer();
+		bool DoesShopifyPlusAccount();
 
 		/// <summary>
 		/// Does shopify plus customer async
 		/// </summary>
 		/// <returns></returns>
-		Task< bool > DoesShopifyPlusCustomerAsync();
+		Task< bool > DoesShopifyPlusAccountAsync();
 	}
 }

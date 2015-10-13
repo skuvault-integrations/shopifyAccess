@@ -63,19 +63,19 @@ namespace ShopifyAccessTests.Users
 		}
 
 		[ Test ]
-		public void DoesShopifyPlusCustomer()
+		public void DoesShopifyPlusAccount()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var result = service.DoesShopifyPlusCustomer();
+			var result = service.DoesShopifyPlusAccount();
 
 			result.Should().Be( false );
 		}
 
 		[ Test ]
-		public async Task DoesShopifyPlusCustomerAsync()
+		public async Task DoesShopifyPlusAccountAsync()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var result = await service.DoesShopifyPlusCustomerAsync();
+			var result = await service.DoesShopifyPlusAccountAsync();
 
 			result.Should().Be( false );
 		}
