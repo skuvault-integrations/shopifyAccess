@@ -263,6 +263,18 @@ namespace ShopifyAccess
 			return users;
 		}
 
+		public ShopifyUser GetUser( long id )
+		{
+			var user = ActionPolicies.ShopifyGetPolicy.Get( () => this._webRequestServices.GetResponse< ShopifyUserWrapper >( ShopifyCommand.GetUser, EndpointsBuilder.CreateGetUserEndpoint( id ) ) );
+			return user.User;
+		}
+
+		public async Task< ShopifyUser > GetUserAsync( long id )
+		{
+			var user = await ActionPolicies.ShopifyGetPolicyAsync.Get( async () => await this._webRequestServices.GetResponseAsync< ShopifyUserWrapper >( ShopifyCommand.GetUser, EndpointsBuilder.CreateGetUserEndpoint( id ) ) );
+			return user.User;
+		}
+
 		public bool DoesShopifyPlusCustomer()
 		{
 			try

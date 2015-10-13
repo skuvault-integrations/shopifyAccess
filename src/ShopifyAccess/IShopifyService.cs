@@ -75,6 +75,18 @@ namespace ShopifyAccess
 		Task< ShopifyUsers > GetUsersAsync();
 
 		/// <summary>
+		/// Get user
+		/// </summary>
+		/// <returns></returns>
+		ShopifyUser GetUser( long id );
+
+		/// <summary>
+		/// Get user async
+		/// </summary>
+		/// <returns></returns>
+		Task< ShopifyUser > GetUserAsync( long id );
+
+		/// <summary>
 		/// Does shopify plus customer
 		/// </summary>
 		/// <returns></returns>

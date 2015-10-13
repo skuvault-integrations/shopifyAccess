@@ -51,6 +51,12 @@ namespace ShopifyAccess.Services
 			return endpoint;
 		}
 
+		public static string CreateGetUserEndpoint( long userId )
+		{
+			var endpoint = string.Format( "{0}.json", userId );
+			return endpoint;
+		}
+
 		public static string ConcatEndpoints( this string mainEndpoint, params string[] endpoints )
 		{
 			var result = new StringBuilder( mainEndpoint );

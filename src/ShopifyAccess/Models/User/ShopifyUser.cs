@@ -4,6 +4,13 @@ using System.Runtime.Serialization;
 namespace ShopifyAccess.Models.User
 {
 	[ DataContract ]
+	public class ShopifyUserWrapper
+	{
+		[ DataMember( Name = "user" ) ]
+		public ShopifyUser User{ get; set; }
+	}
+
+	[ DataContract ]
 	public class ShopifyUser
 	{
 		[ DataMember( Name = "id" ) ]

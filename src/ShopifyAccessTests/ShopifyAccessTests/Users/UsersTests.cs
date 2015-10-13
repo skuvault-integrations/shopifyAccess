@@ -25,7 +25,7 @@ namespace ShopifyAccessTests.Users
 			if( testConfig != null )
 				this.Config = new ShopifyCommandConfig( testConfig.ShopName, testConfig.AccessToken );
 		}
-
+		
 		[ Test ]
 		public void GetUsers()
 		{
@@ -42,6 +42,24 @@ namespace ShopifyAccessTests.Users
 			var users = await service.GetUsersAsync();
 
 			users.Users.Count.Should().BeGreaterThan( 0 );
+		}
+
+		[ Test ]
+		public void GetUser()
+		{
+			var service = this.ShopifyFactory.CreateService( this.Config );
+			var user = service.GetUser( 6250887 );
+
+			user.Should().NotBeNull();
+		}
+
+		[ Test ]
+		public async Task GetUserAsync()
+		{
+			var service = this.ShopifyFactory.CreateService( this.Config );
+			var user = await service.GetUserAsync( 6250887 );
+
+			user.Should().NotBeNull();
 		}
 
 		[ Test ]

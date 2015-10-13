@@ -12,6 +12,7 @@
 		public static readonly ShopifyCommand GetOrders = new ShopifyCommand( "/admin/orders.json" );
 		public static readonly ShopifyCommand GetLocations = new ShopifyCommand( "/admin/locations.json" );
 		public static readonly ShopifyCommand GetUsers = new ShopifyCommand( "/admin/users.json" );
+		public static readonly ShopifyCommand GetUser = new ShopifyCommand( "/admin/users/" );
 
 		private ShopifyCommand( string command )
 		{
