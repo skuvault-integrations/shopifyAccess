@@ -91,8 +91,8 @@ namespace ShopifyAccess.Services
 			var result = default( T );
 
 			using( var stream = response.GetResponseStream() )
+			using (var reader = new StreamReader(stream))
 			{
-				var reader = new StreamReader( stream );
 				var jsonResponse = reader.ReadToEnd();
 
 				ShopifyLogger.Log.Trace( "[shopify]\tResponse\t{0} - {1}", response.ResponseUri, jsonResponse );
@@ -134,7 +134,7 @@ namespace ShopifyAccess.Services
 				using( var writer = new StreamWriter( request.GetRequestStream() ) )
 					writer.Write( content );
 			}
-
+			
 			return request;
 		}
 
@@ -145,7 +145,7 @@ namespace ShopifyAccess.Services
 
 			request.Method = WebRequestMethods.Http.Get;
 			request.Headers.Add( "X-Shopify-Access-Token", this._commandConfig.AccessToken );
-
+			
 			return request;
 		}
 		#endregion
