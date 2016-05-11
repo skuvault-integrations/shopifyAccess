@@ -79,6 +79,7 @@
     <Compile Include="Models\Order\ShopifyFulfillment.cs" />
     <Compile Include="Models\Order\ShopifyCustomer.cs" />
     <Compile Include="Models\Order\ShopifyOrder.cs" />
+    <Compile Include="Models\Order\ShopifyOrderShippingLine.cs" />
     <Compile Include="Models\Order\ShopifyOrderItem.cs" />
     <Compile Include="Models\Configuration\Authorization\ShopifyScopeName.cs" />
     <Compile Include="Models\Configuration\Authorization\TokenRequestResult.cs" />

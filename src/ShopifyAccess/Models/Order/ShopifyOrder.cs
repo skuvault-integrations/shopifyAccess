@@ -52,6 +52,9 @@ namespace ShopifyAccess.Models.Order
 		[ DataMember( Name = "name" ) ]
 		public string Name{ get; set; }
 
+		[ DataMember( Name = "shipping_lines" ) ]
+		public IList< ShopifyOrderShippingLine > ShippingLines{ get; set; }
+
 		public bool IsShipped
 		{
 			get { return this.ClosedAt.HasValue; }
