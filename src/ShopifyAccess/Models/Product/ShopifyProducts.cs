@@ -38,7 +38,7 @@ namespace ShopifyAccess.Models.Product
 			return inventory;
 		}
 
-		private static List< ShopifyProductVariant > ToListVariants( this ShopifyProducts shopifyInventory )
+		public static List< ShopifyProductVariant > ToListVariants( this ShopifyProducts shopifyInventory )
 		{
 			var variants = new List< ShopifyProductVariant >();
 			foreach( var product in shopifyInventory.Products )
