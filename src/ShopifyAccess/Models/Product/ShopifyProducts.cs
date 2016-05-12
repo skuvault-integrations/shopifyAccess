@@ -37,5 +37,24 @@ namespace ShopifyAccess.Models.Product
 			}
 			return inventory;
 		}
+
+		private static List< ShopifyProductVariant > ToListVariants( this ShopifyProducts shopifyInventory )
+		{
+			var variants = new List< ShopifyProductVariant >();
+			foreach( var product in shopifyInventory.Products )
+			{
+				if( product.Variants != null )
+				{
+					foreach( var variant in product.Variants )
+					{
+						if( variant == null || string.IsNullOrEmpty( variant.Sku ) )
+							continue;
+						
+						variants.Add( variant );
+					}
+				}
+			}
+			return variants;
+		}
 	}
 }
