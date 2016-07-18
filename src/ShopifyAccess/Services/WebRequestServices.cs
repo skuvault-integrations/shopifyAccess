@@ -49,6 +49,7 @@ namespace ShopifyAccess.Services
 			using( var response = await request.GetResponseAsync() )
 				result = this.ParseResponse< T >( response );
 
+            
 			return result;
 		}
 
@@ -140,12 +141,16 @@ namespace ShopifyAccess.Services
 
 		private HttpWebRequest CreateServiceGetRequest( ShopifyCommand command, string endpoint )
 		{
+			ServicePointManager.DefaultConnectionLimit = 1000;
 			var uri = new Uri( string.Concat( this._commandConfig.Host, command.Command, endpoint ) );
 			var request = ( HttpWebRequest )WebRequest.Create( uri );
 
 			request.Method = WebRequestMethods.Http.Get;
 			request.Headers.Add( "X-Shopify-Access-Token", this._commandConfig.AccessToken );
-			
+			request.Timeout = 20000;
+			request.KeepAlive = false;
+			request.ProtocolVersion = HttpVersion.Version10;
+			request.ServicePoint.Expect100Continue = false;
 			return request;
 		}
 		#endregion
