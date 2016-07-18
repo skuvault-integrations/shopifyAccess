@@ -141,8 +141,10 @@ namespace ShopifyAccess.Services
 
 		private HttpWebRequest CreateServiceGetRequest( ShopifyCommand command, string endpoint )
 		{
-			ServicePointManager.DefaultConnectionLimit = 1000;
 			var uri = new Uri( string.Concat( this._commandConfig.Host, command.Command, endpoint ) );
+			var servicePoint = ServicePointManager.FindServicePoint( new Uri(this._commandConfig.Host) );
+			servicePoint.ConnectionLimit = 1000;
+
 			var request = ( HttpWebRequest )WebRequest.Create( uri );
 
 			request.Method = WebRequestMethods.Http.Get;
