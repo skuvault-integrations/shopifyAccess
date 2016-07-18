@@ -147,7 +147,7 @@ namespace ShopifyAccess.Services
 
 			request.Method = WebRequestMethods.Http.Get;
 			request.Headers.Add( "X-Shopify-Access-Token", this._commandConfig.AccessToken );
-			request.Timeout = 20000;
+			request.Timeout = 200000;
 			request.KeepAlive = false;
 			request.ProtocolVersion = HttpVersion.Version10;
 			request.ServicePoint.Expect100Continue = false;
