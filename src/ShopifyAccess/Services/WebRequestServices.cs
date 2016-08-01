@@ -144,15 +144,16 @@ namespace ShopifyAccess.Services
 			var uri = new Uri( string.Concat( this._commandConfig.Host, command.Command, endpoint ) );
 			var servicePoint = ServicePointManager.FindServicePoint( new Uri(this._commandConfig.Host) );
 			servicePoint.ConnectionLimit = 1000;
-
+			
 			var request = ( HttpWebRequest )WebRequest.Create( uri );
 
 			request.Method = WebRequestMethods.Http.Get;
 			request.Headers.Add( "X-Shopify-Access-Token", this._commandConfig.AccessToken );
-			request.Timeout = 200000;
+			request.Timeout = 60 * 1000 * 10;
 			request.KeepAlive = false;
 			request.ProtocolVersion = HttpVersion.Version10;
 			request.ServicePoint.Expect100Continue = false;
+
 			return request;
 		}
 		#endregion
