@@ -24,7 +24,12 @@ namespace ShopifyAccess.Models
 
 		public override string ToString()
 		{
-			return this.Value;
+			return GetTag() + this.Value;
+		}
+
+		public static string GetTag()
+		{
+			return "Mark-";
 		}
 
 		public override int GetHashCode()
@@ -62,9 +67,19 @@ namespace ShopifyAccess.Models
 			return string.IsNullOrWhiteSpace( source?.Value );
 		}
 
-		public static string ToStringSafe( this Mark source )
+		public static Mark CreateNewIfBlank( this Mark source )
+		{
+			return string.IsNullOrWhiteSpace( source?.Value ) ? Mark.Create : source;
+		}
+
+		public static string ToJsonObjectSafe( this Mark source )
 		{
 			return IsBlank( source ) ? PredefinedValues.EmptyJsonObject : source.ToString();
+		}
+
+		public static string ToStringSafe( this Mark source )
+		{
+			return IsBlank( source ) ? Mark.GetTag() : source.ToString();
 		}
 	}
 

@@ -31,41 +31,36 @@ namespace ShopifyAccess
 		#region GetOrders
 		public ShopifyOrders GetOrders( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo, Mark mark = null )
 		{
-			mark = mark ?? Mark.Create;
 			var updatedOrdersEndpoint = EndpointsBuilder.CreateUpdatedOrdersEndpoint( status, dateFrom, dateTo );
 
-			var ordersCount = this.GetOrdersCount( updatedOrdersEndpoint, mark );
-			var orders = this.CollectOrdersFromAllPages( updatedOrdersEndpoint, ordersCount, mark );
+			var ordersCount = this.GetOrdersCount( updatedOrdersEndpoint, mark.CreateNewIfBlank() );
+			var orders = this.CollectOrdersFromAllPages( updatedOrdersEndpoint, ordersCount, mark.CreateNewIfBlank() );
 			return orders;
 		}
 
 		public async Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo, Mark mark = null )
 		{
-			mark = mark ?? Mark.Create;
 			var updatedOrdersEndpoint = EndpointsBuilder.CreateUpdatedOrdersEndpoint( status, dateFrom, dateTo );
 
-			var ordersCount = await this.GetOrdersCountAsync( updatedOrdersEndpoint );
-			var orders = await this.CollectOrdersFromAllPagesAsync( updatedOrdersEndpoint, ordersCount );
+			var ordersCount = await this.GetOrdersCountAsync( updatedOrdersEndpoint, mark.CreateNewIfBlank() );
+			var orders = await this.CollectOrdersFromAllPagesAsync( updatedOrdersEndpoint, ordersCount, mark.CreateNewIfBlank() );
 			return orders;
 		}
 
 		public ShopifyLocations GetLocations( Mark mark = null )
 		{
-			mark = mark ?? Mark.Create;
-			var locations = ActionPolicies.ShopifyGetPolicy.Get( () => this._webRequestServices.GetResponse< ShopifyLocations >( ShopifyCommand.GetLocations, "", mark ) );
+			var locations = ActionPolicies.ShopifyGetPolicy.Get( () => this._webRequestServices.GetResponse< ShopifyLocations >( ShopifyCommand.GetLocations, "", mark.CreateNewIfBlank() ) );
 			return locations;
 		}
 
 		public async Task< ShopifyLocations > GetLocationsAsync( Mark mark = null )
 		{
-			mark = mark ?? Mark.Create;
-			var locations = await ActionPolicies.ShopifyGetPolicyAsync.Get( async () => ( await this._webRequestServices.GetResponseAsync< ShopifyLocations >( ShopifyCommand.GetLocations, "", mark ) ) );
+			var locations = await ActionPolicies.ShopifyGetPolicyAsync.Get( async () => ( await this._webRequestServices.GetResponseAsync< ShopifyLocations >( ShopifyCommand.GetLocations, "", mark.CreateNewIfBlank() ) ) );
 			return locations;
 		}
 
 		private ShopifyOrders CollectOrdersFromAllPages( string mainUpdatedOrdersEndpoint, int ordersCount, Mark mark = null )
 		{
-			mark = mark ?? Mark.Create;
 			var pagesCount = this.CalculatePagesCount( ordersCount );
 			var orders = new ShopifyOrders();
 
@@ -75,7 +70,7 @@ namespace ShopifyAccess
 
 				ActionPolicies.ShopifyGetPolicy.Do( () =>
 				{
-					var updatedOrdersWithinPage = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint, mark );
+					var updatedOrdersWithinPage = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint, mark.CreateNewIfBlank() );
 					orders.Orders.AddRange( updatedOrdersWithinPage.Orders );
 
 					//API requirement
@@ -88,7 +83,6 @@ namespace ShopifyAccess
 
 		private async Task< ShopifyOrders > CollectOrdersFromAllPagesAsync( string mainUpdatedOrdersEndpoint, int ordersCount, Mark mark = null )
 		{
-			mark = mark ?? Mark.Create;
 			var pagesCount = this.CalculatePagesCount( ordersCount );
 			var orders = new ShopifyOrders();
 
@@ -98,7 +92,7 @@ namespace ShopifyAccess
 
 				await ActionPolicies.ShopifyGetPolicyAsync.Do( async () =>
 				{
-					var updatedOrdersWithinPage = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint, mark );
+					var updatedOrdersWithinPage = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint, mark.CreateNewIfBlank() );
 					orders.Orders.AddRange( updatedOrdersWithinPage.Orders );
 
 					//API requirement
@@ -111,10 +105,9 @@ namespace ShopifyAccess
 
 		private int GetOrdersCount( string updatedOrdersEndpoint, Mark mark = null )
 		{
-			mark = mark ?? Mark.Create;
 			var count = ActionPolicies.ShopifyGetPolicy.Get( () =>
 			{
-				var updatedOrdersCount = this._webRequestServices.GetResponse< OrdersCount >( ShopifyCommand.GetOrdersCount, updatedOrdersEndpoint, mark ).Count;
+				var updatedOrdersCount = this._webRequestServices.GetResponse< OrdersCount >( ShopifyCommand.GetOrdersCount, updatedOrdersEndpoint, mark.CreateNewIfBlank() ).Count;
 				return updatedOrdersCount;
 			} );
 			return count;
@@ -122,10 +115,9 @@ namespace ShopifyAccess
 
 		private async Task< int > GetOrdersCountAsync( string updatedOrdersEndpoint, Mark mark = null )
 		{
-			mark = mark ?? Mark.Create;
 			var count = await ActionPolicies.ShopifyGetPolicyAsync.Get( async () =>
 			{
-				var updatedOrdersCount = ( await this._webRequestServices.GetResponseAsync< OrdersCount >( ShopifyCommand.GetOrdersCount, updatedOrdersEndpoint, mark ) ).Count;
+				var updatedOrdersCount = ( await this._webRequestServices.GetResponseAsync< OrdersCount >( ShopifyCommand.GetOrdersCount, updatedOrdersEndpoint, mark.CreateNewIfBlank() ) ).Count;
 				return updatedOrdersCount;
 			} );
 			return count;
@@ -135,8 +127,8 @@ namespace ShopifyAccess
 		#region Products
 		public ShopifyProducts GetProducts( Mark mark = null )
 		{
-			var productsCount = this.GetProductsCount( mark );
-			var products = this.CollectProductsFromAllPages( productsCount, mark );
+			var productsCount = this.GetProductsCount( mark.CreateNewIfBlank() );
+			var products = this.CollectProductsFromAllPages( productsCount, mark.CreateNewIfBlank() );
 			this.RemoveUntrackedProductVariants( products );
 
 			return products;
@@ -144,7 +136,7 @@ namespace ShopifyAccess
 
 		public async Task< ShopifyProducts > GetProductsAsync( Mark mark = null )
 		{
-			var productsCount = await this.GetProductsCountAsync( mark );
+			var productsCount = await this.GetProductsCountAsync( mark.CreateNewIfBlank() );
 			var products = await this.CollectProductsFromAllPagesAsync( productsCount );
 			this.RemoveUntrackedProductVariants( products );
 
@@ -154,14 +146,14 @@ namespace ShopifyAccess
 		private int GetProductsCount( Mark mark = null )
 		{
 			var count = ActionPolicies.ShopifyGetPolicy.Get( () =>
-				this._webRequestServices.GetResponse< ProductsCount >( ShopifyCommand.GetProductsCount, EndpointsBuilder.EmptyEndpoint, mark ).Count );
+				this._webRequestServices.GetResponse< ProductsCount >( ShopifyCommand.GetProductsCount, EndpointsBuilder.EmptyEndpoint, mark.CreateNewIfBlank() ).Count );
 			return count;
 		}
 
 		private async Task< int > GetProductsCountAsync( Mark mark = null )
 		{
 			var count = await ActionPolicies.ShopifyGetPolicyAsync.Get( async () =>
-				( await this._webRequestServices.GetResponseAsync< ProductsCount >( ShopifyCommand.GetProductsCount, EndpointsBuilder.EmptyEndpoint, mark ) ).Count );
+				( await this._webRequestServices.GetResponseAsync< ProductsCount >( ShopifyCommand.GetProductsCount, EndpointsBuilder.EmptyEndpoint, mark.CreateNewIfBlank() ) ).Count );
 			return count;
 		}
 
@@ -176,7 +168,7 @@ namespace ShopifyAccess
 
 				ActionPolicies.ShopifyGetPolicy.Do( () =>
 				{
-					var productsWithinPage = this._webRequestServices.GetResponse< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint, mark );
+					var productsWithinPage = this._webRequestServices.GetResponse< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint, mark.CreateNewIfBlank() );
 					products.Products.AddRange( productsWithinPage.Products );
 
 					//API requirement
@@ -221,18 +213,17 @@ namespace ShopifyAccess
 		#region Update variants
 		public void UpdateProductVariants( IEnumerable< ShopifyProductVariantForUpdate > variants, Mark mark = null )
 		{
-			mark = mark ?? Mark.Create;
 			foreach( var variant in variants )
 			{
-				ActionPolicies.ShopifySubmitPolicy.Do( () => this.UpdateProductVariantQuantity( variant, mark ) );
+				ActionPolicies.ShopifySubmitPolicy.Do( () => this.UpdateProductVariantQuantity( variant, mark.CreateNewIfBlank() ) );
 			}
 		}
 
-		public async Task UpdateProductVariantsAsync( IEnumerable< ShopifyProductVariantForUpdate > variants, Mark mark = null)
+		public async Task UpdateProductVariantsAsync( IEnumerable< ShopifyProductVariantForUpdate > variants, Mark mark = null )
 		{
 			foreach( var variant in variants )
 			{
-				await ActionPolicies.ShopifySubmitPolicyAsync.Do( async () => await this.UpdateProductVariantQuantityAsync( variant, mark ?? Mark.Create) );
+				await ActionPolicies.ShopifySubmitPolicyAsync.Do( async () => await this.UpdateProductVariantQuantityAsync( variant, mark.CreateNewIfBlank() ) );
 			}
 		}
 
@@ -242,7 +233,7 @@ namespace ShopifyAccess
 			//just simpliest way to serialize with the root name.
 			var jsonContent = new { variant }.ToJson();
 
-			this._webRequestServices.PutData( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent, mark ?? Mark.Create );
+			this._webRequestServices.PutData( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent, mark.CreateNewIfBlank() );
 
 			//API requirement
 			this.CreateApiDelay().Wait();
@@ -253,7 +244,7 @@ namespace ShopifyAccess
 			var endpoint = EndpointsBuilder.CreateProductVariantUpdateEndpoint( variant.Id );
 			var jsonContent = new { variant }.ToJson();
 
-			await this._webRequestServices.PutDataAsync( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent, mark ?? Mark.Create );
+			await this._webRequestServices.PutDataAsync( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent, mark.CreateNewIfBlank() );
 
 			//API requirement
 			await this.CreateApiDelay();
@@ -263,25 +254,25 @@ namespace ShopifyAccess
 		#region Users
 		public ShopifyUsers GetUsers( Mark mark = null )
 		{
-			var users = ActionPolicies.ShopifyGetPolicy.Get( () => this._webRequestServices.GetResponse< ShopifyUsers >( ShopifyCommand.GetUsers, "", mark ?? Mark.Create ) );
+			var users = ActionPolicies.ShopifyGetPolicy.Get( () => this._webRequestServices.GetResponse< ShopifyUsers >( ShopifyCommand.GetUsers, "", mark.CreateNewIfBlank() ) );
 			return users;
 		}
 
 		public async Task< ShopifyUsers > GetUsersAsync( Mark mark = null )
 		{
-			var users = await ActionPolicies.ShopifyGetPolicyAsync.Get( async () => await this._webRequestServices.GetResponseAsync< ShopifyUsers >( ShopifyCommand.GetUsers, "", mark ?? Mark.Create ) );
+			var users = await ActionPolicies.ShopifyGetPolicyAsync.Get( async () => await this._webRequestServices.GetResponseAsync< ShopifyUsers >( ShopifyCommand.GetUsers, "", mark.CreateNewIfBlank() ) );
 			return users;
 		}
 
 		public ShopifyUser GetUser( long id, Mark mark = null )
 		{
-			var user = ActionPolicies.ShopifyGetPolicy.Get( () => this._webRequestServices.GetResponse< ShopifyUserWrapper >( ShopifyCommand.GetUser, EndpointsBuilder.CreateGetUserEndpoint( id ), mark ?? Mark.Create ) );
+			var user = ActionPolicies.ShopifyGetPolicy.Get( () => this._webRequestServices.GetResponse< ShopifyUserWrapper >( ShopifyCommand.GetUser, EndpointsBuilder.CreateGetUserEndpoint( id ), mark.CreateNewIfBlank() ) );
 			return user.User;
 		}
 
 		public async Task< ShopifyUser > GetUserAsync( long id, Mark mark = null )
 		{
-			var user = await ActionPolicies.ShopifyGetPolicyAsync.Get( async () => await this._webRequestServices.GetResponseAsync< ShopifyUserWrapper >( ShopifyCommand.GetUser, EndpointsBuilder.CreateGetUserEndpoint( id ), mark ?? Mark.Create ) );
+			var user = await ActionPolicies.ShopifyGetPolicyAsync.Get( async () => await this._webRequestServices.GetResponseAsync< ShopifyUserWrapper >( ShopifyCommand.GetUser, EndpointsBuilder.CreateGetUserEndpoint( id ), mark.CreateNewIfBlank() ) );
 			return user.User;
 		}
 
@@ -289,7 +280,7 @@ namespace ShopifyAccess
 		{
 			try
 			{
-				this._webRequestServices.GetResponse< ShopifyUsers >( ShopifyCommand.GetUsers, "", mark ?? Mark.Create );
+				this._webRequestServices.GetResponse< ShopifyUsers >( ShopifyCommand.GetUsers, "", mark.CreateNewIfBlank() );
 				return true;
 			}
 			catch( Exception )
@@ -302,7 +293,7 @@ namespace ShopifyAccess
 		{
 			try
 			{
-				await this._webRequestServices.GetResponseAsync< ShopifyUsers >( ShopifyCommand.GetUsers, "", mark ?? Mark.Create );
+				await this._webRequestServices.GetResponseAsync< ShopifyUsers >( ShopifyCommand.GetUsers, "", mark.CreateNewIfBlank() );
 				return true;
 			}
 			catch( Exception )

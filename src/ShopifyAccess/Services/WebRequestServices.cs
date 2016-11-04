@@ -35,35 +35,32 @@ namespace ShopifyAccess.Services
 		#region Requests handling
 		public T GetResponse< T >( ShopifyCommand command, string endpoint, Mark mark = null )
 		{
-			mark = mark ?? Mark.Create;
 			T result;
 			var request = this.CreateServiceGetRequest( command, endpoint );
 			using( var response = request.GetResponse() )
-				result = this.ParseResponse< T >( response, mark );
+				result = this.ParseResponse< T >( response, mark.CreateNewIfBlank() );
 
 			return result;
 		}
 
 		public async Task< T > GetResponseAsync< T >( ShopifyCommand command, string endpoint, Mark mark = null )
 		{
-			mark = mark ?? Mark.Create;
 			T result;
 			var request = this.CreateServiceGetRequest( command, endpoint );
 			using( var response = await request.GetResponseAsync() )
-				result = this.ParseResponse< T >( response, mark );
+				result = this.ParseResponse< T >( response, mark.CreateNewIfBlank() );
 
 			return result;
 		}
 
 		public void PutData( ShopifyCommand command, string endpoint, string jsonContent, Mark mark = null )
 		{
-			mark = mark ?? Mark.Create;
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
 			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
 			ShopifyLogger.Log.Trace( "[shopify] PUT Params. ShopName: {0}. Data: {1}", this._commandConfig.ShopName, jsonContent );
 			using( var response = ( HttpWebResponse )request.GetResponse() )
-				this.LogUpdateInfo( endpoint, response.StatusCode, jsonContent, mark );
+				this.LogUpdateInfo( endpoint, response.StatusCode, jsonContent, mark.CreateNewIfBlank() );
 		}
 
 		public async Task PutDataAsync( ShopifyCommand command, string endpoint, string jsonContent, Mark mark = null )
@@ -73,7 +70,7 @@ namespace ShopifyAccess.Services
 			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
 			ShopifyLogger.Log.Trace( "[shopify] PUT Params. ShopName: {0}. Data: {1}", this._commandConfig.ShopName, jsonContent );
 			using( var response = await request.GetResponseAsync() )
-				this.LogUpdateInfo( endpoint, ( ( HttpWebResponse )response ).StatusCode, jsonContent, mark ?? Mark.Create );
+				this.LogUpdateInfo( endpoint, ( ( HttpWebResponse )response ).StatusCode, jsonContent, mark.CreateNewIfBlank() );
 		}
 
 		public string RequestPermanentToken( string code, Mark mark = null )
@@ -85,7 +82,7 @@ namespace ShopifyAccess.Services
 			var request = this.CreateServicePostRequest( tokenRequestUrl, tokenRequestPostContent );
 
 			using( var response = request.GetResponse() )
-				result = this.ParseResponse< TokenRequestResult >( response, mark ?? Mark.Create ).Token;
+				result = this.ParseResponse< TokenRequestResult >( response, mark.CreateNewIfBlank() ).Token;
 
 			return result;
 		}
@@ -99,7 +96,7 @@ namespace ShopifyAccess.Services
 			{
 				var jsonResponse = reader.ReadToEnd();
 
-				ShopifyLogger.Log.Trace( $"[shopify][{mark}]\tResponse\t{0} - {1}", response.ResponseUri, jsonResponse );
+				ShopifyLogger.Log.Trace( $"[shopify][{mark.ToStringSafe()}]\tResponse\t{0} - {1}", response.ResponseUri, jsonResponse );
 
 				if( !String.IsNullOrEmpty( jsonResponse ) )
 					result = jsonResponse.FromJson< T >();
@@ -164,8 +161,8 @@ namespace ShopifyAccess.Services
 		#region Logging
 		private void LogUpdateInfo( string endpoint, HttpStatusCode statusCode, string jsonContent, Mark mark = null )
 		{
-			mark = mark ?? Mark.Create;
-			ShopifyLogger.Log.Trace( $"[shopify][{mark}]\tPUT/POST call for the endpoint '{0}' has been completed with code '{1}'.\n{2}", endpoint, statusCode, jsonContent );
+			;
+			ShopifyLogger.Log.Trace( $"[shopify][{mark.ToStringSafe()}]\tPUT/POST call for the endpoint '{0}' has been completed with code '{1}'.\n{2}", endpoint, statusCode, jsonContent );
 		}
 		#endregion
 	}
