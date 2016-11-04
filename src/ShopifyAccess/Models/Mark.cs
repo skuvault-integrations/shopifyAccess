@@ -68,12 +68,12 @@ namespace ShopifyAccess.Models
 	{
 		public static bool IsBlank( this Mark source )
 		{
-			return string.IsNullOrWhiteSpace( source?.Value );
+			return source == null || string.IsNullOrWhiteSpace( source.Value );
 		}
 
 		public static Mark CreateNewIfBlank( this Mark source )
 		{
-			return string.IsNullOrWhiteSpace( source?.Value ) ? Mark.Create : source;
+			return source == null || string.IsNullOrWhiteSpace( source.Value ) ? Mark.Create : source;
 		}
 
 		public static string ToJsonObjectSafe( this Mark source )
