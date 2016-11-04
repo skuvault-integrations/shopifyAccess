@@ -96,7 +96,7 @@ namespace ShopifyAccess.Services
 			{
 				var jsonResponse = reader.ReadToEnd();
 
-				ShopifyLogger.Log.Trace( $"[shopify][{mark.ToStringSafe()}]\tResponse\t{0} - {1}", response.ResponseUri, jsonResponse );
+				ShopifyLogger.Log.Trace( "[shopify][{2}]\tResponse\t{0} - {1}", response.ResponseUri, jsonResponse, mark.ToStringSafe() );
 
 				if( !String.IsNullOrEmpty( jsonResponse ) )
 					result = jsonResponse.FromJson< T >();
@@ -162,7 +162,7 @@ namespace ShopifyAccess.Services
 		private void LogUpdateInfo( string endpoint, HttpStatusCode statusCode, string jsonContent, Mark mark = null )
 		{
 			;
-			ShopifyLogger.Log.Trace( $"[shopify][{mark.ToStringSafe()}]\tPUT/POST call for the endpoint '{0}' has been completed with code '{1}'.\n{2}", endpoint, statusCode, jsonContent );
+			ShopifyLogger.Log.Trace( "[shopify][{3}]\tPUT/POST call for the endpoint '{0}' has been completed with code '{1}'.\n{2}", endpoint, statusCode, jsonContent, mark.ToStringSafe() );
 		}
 		#endregion
 	}

@@ -5,7 +5,11 @@ namespace ShopifyAccess.Models
 	public class Mark
 	{
 		public string Value{ get; private set; }
-		public static Mark Create{ get; } = new Mark( Guid.NewGuid().ToString() );
+
+		public static Mark Create
+		{
+			get { return new Mark( Guid.NewGuid().ToString() ); }
+		}
 
 		public static Mark Blank()
 		{
@@ -85,6 +89,6 @@ namespace ShopifyAccess.Models
 
 	public static class PredefinedValues
 	{
-		public static string EmptyJsonObject{ get; } = "{}";
+		public const string EmptyJsonObject = "{}";
 	}
 }
