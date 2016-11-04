@@ -5,13 +5,14 @@ namespace ShopifyAccess.Models
 	public class Mark
 	{
 		public string Value{ get; private set; }
+		public static Mark Create{ get; } = new Mark( Guid.NewGuid().ToString() );
 
 		public static Mark Blank()
 		{
 			return new Mark( string.Empty );
 		}
 
-		public static Mark CreateNew()
+		private static Mark CreateNew()
 		{
 			return new Mark( Guid.NewGuid().ToString() );
 		}

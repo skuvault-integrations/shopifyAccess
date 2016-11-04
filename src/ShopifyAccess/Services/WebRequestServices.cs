@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CuttingEdge.Conditions;
 using ServiceStack;
 using ShopifyAccess.Misc;
+using ShopifyAccess.Models;
 using ShopifyAccess.Models.Configuration.Authorization;
 using ShopifyAccess.Models.Configuration.Command;
 
@@ -32,48 +33,50 @@ namespace ShopifyAccess.Services
 		#endregion
 
 		#region Requests handling
-		public T GetResponse< T >( ShopifyCommand command, string endpoint )
+		public T GetResponse< T >( ShopifyCommand command, string endpoint, Mark mark = null )
 		{
+			mark = mark ?? Mark.Create;
 			T result;
 			var request = this.CreateServiceGetRequest( command, endpoint );
 			using( var response = request.GetResponse() )
-				result = this.ParseResponse< T >( response );
+				result = this.ParseResponse< T >( response, mark );
 
 			return result;
 		}
 
-		public async Task< T > GetResponseAsync< T >( ShopifyCommand command, string endpoint )
+		public async Task< T > GetResponseAsync< T >( ShopifyCommand command, string endpoint, Mark mark = null )
 		{
+			mark = mark ?? Mark.Create;
 			T result;
 			var request = this.CreateServiceGetRequest( command, endpoint );
 			using( var response = await request.GetResponseAsync() )
-				result = this.ParseResponse< T >( response );
+				result = this.ParseResponse< T >( response, mark );
 
-            
 			return result;
 		}
 
-		public void PutData( ShopifyCommand command, string endpoint, string jsonContent )
+		public void PutData( ShopifyCommand command, string endpoint, string jsonContent, Mark mark = null )
 		{
+			mark = mark ?? Mark.Create;
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
 			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
 			ShopifyLogger.Log.Trace( "[shopify] PUT Params. ShopName: {0}. Data: {1}", this._commandConfig.ShopName, jsonContent );
 			using( var response = ( HttpWebResponse )request.GetResponse() )
-				this.LogUpdateInfo( endpoint, response.StatusCode, jsonContent );
+				this.LogUpdateInfo( endpoint, response.StatusCode, jsonContent, mark );
 		}
 
-		public async Task PutDataAsync( ShopifyCommand command, string endpoint, string jsonContent )
+		public async Task PutDataAsync( ShopifyCommand command, string endpoint, string jsonContent, Mark mark = null )
 		{
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
 			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
 			ShopifyLogger.Log.Trace( "[shopify] PUT Params. ShopName: {0}. Data: {1}", this._commandConfig.ShopName, jsonContent );
 			using( var response = await request.GetResponseAsync() )
-				this.LogUpdateInfo( endpoint, ( ( HttpWebResponse )response ).StatusCode, jsonContent );
+				this.LogUpdateInfo( endpoint, ( ( HttpWebResponse )response ).StatusCode, jsonContent, mark ?? Mark.Create );
 		}
 
-		public string RequestPermanentToken( string code )
+		public string RequestPermanentToken( string code, Mark mark = null )
 		{
 			string result;
 			var command = ShopifyCommand.GetAccessToken;
@@ -82,21 +85,21 @@ namespace ShopifyAccess.Services
 			var request = this.CreateServicePostRequest( tokenRequestUrl, tokenRequestPostContent );
 
 			using( var response = request.GetResponse() )
-				result = this.ParseResponse< TokenRequestResult >( response ).Token;
+				result = this.ParseResponse< TokenRequestResult >( response, mark ?? Mark.Create ).Token;
 
 			return result;
 		}
 
-		private T ParseResponse< T >( WebResponse response )
+		private T ParseResponse< T >( WebResponse response, Mark mark = null )
 		{
-			var result = default( T );
+			var result = default(T);
 
 			using( var stream = response.GetResponseStream() )
-			using (var reader = new StreamReader(stream))
+			using( var reader = new StreamReader( stream ) )
 			{
 				var jsonResponse = reader.ReadToEnd();
 
-				ShopifyLogger.Log.Trace( "[shopify]\tResponse\t{0} - {1}", response.ResponseUri, jsonResponse );
+				ShopifyLogger.Log.Trace( $"[shopify][{mark}]\tResponse\t{0} - {1}", response.ResponseUri, jsonResponse );
 
 				if( !String.IsNullOrEmpty( jsonResponse ) )
 					result = jsonResponse.FromJson< T >();
@@ -135,16 +138,16 @@ namespace ShopifyAccess.Services
 				using( var writer = new StreamWriter( request.GetRequestStream() ) )
 					writer.Write( content );
 			}
-			
+
 			return request;
 		}
 
 		private HttpWebRequest CreateServiceGetRequest( ShopifyCommand command, string endpoint )
 		{
 			var uri = new Uri( string.Concat( this._commandConfig.Host, command.Command, endpoint ) );
-			var servicePoint = ServicePointManager.FindServicePoint( new Uri(this._commandConfig.Host) );
+			var servicePoint = ServicePointManager.FindServicePoint( new Uri( this._commandConfig.Host ) );
 			servicePoint.ConnectionLimit = 1000;
-			
+
 			var request = ( HttpWebRequest )WebRequest.Create( uri );
 
 			request.Method = WebRequestMethods.Http.Get;
@@ -159,9 +162,10 @@ namespace ShopifyAccess.Services
 		#endregion
 
 		#region Logging
-		private void LogUpdateInfo( string endpoint, HttpStatusCode statusCode, string jsonContent )
+		private void LogUpdateInfo( string endpoint, HttpStatusCode statusCode, string jsonContent, Mark mark = null )
 		{
-			ShopifyLogger.Log.Trace( "[shopify]\tPUT/POST call for the endpoint '{0}' has been completed with code '{1}'.\n{2}", endpoint, statusCode, jsonContent );
+			mark = mark ?? Mark.Create;
+			ShopifyLogger.Log.Trace( $"[shopify][{mark}]\tPUT/POST call for the endpoint '{0}' has been completed with code '{1}'.\n{2}", endpoint, statusCode, jsonContent );
 		}
 		#endregion
 	}
