@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Netco.ActionPolicyServices;
 using Netco.Utils;
+using ShopifyAccess.Models;
 
 namespace ShopifyAccess.Misc
 {
@@ -13,28 +15,40 @@ namespace ShopifyAccess.Misc
 		private const int RetryCount = 50;
 #endif
 
-		public static readonly ActionPolicy ShopifyGetPolicy = ActionPolicy.Handle< Exception >().Retry( RetryCount, ( ex, i ) =>
+		public static ActionPolicy CreateShopifyGetPolicy( Mark mark, string shop, [ CallerMemberName ] string callerName = "" )
 		{
-			ShopifyLogger.Log.Trace( ex, "Retrying Shopify API get call for the {0} time", i );
-			SystemUtil.Sleep( TimeSpan.FromSeconds( 0.6 ) );
-		} );
+			return ActionPolicy.Handle< Exception >().Retry( RetryCount, ( ex, i ) =>
+			{
+				ShopifyLogger.Log.Trace( ex, "Retrying Shopify API get call for the {0} time. Mark:{1}, Shop:{2}, Caller:{3}.", i, mark.ToStringSafe(), shop, callerName );
+				SystemUtil.Sleep( TimeSpan.FromSeconds( 0.6 ) );
+			} );
+		}
 
-		public static readonly ActionPolicyAsync ShopifyGetPolicyAsync = ActionPolicyAsync.Handle< Exception >().RetryAsync( RetryCount, async ( ex, i ) =>
+		public static ActionPolicyAsync CreateShopifyGetPolicyAsync( Mark mark, string shop, [ CallerMemberName ] string callerName = "" )
 		{
-			ShopifyLogger.Log.Trace( ex, "Retrying Shopify API get call for the {0} time", i );
-			await Task.Delay( TimeSpan.FromSeconds( 0.6 ) );
-		} );
+			return ActionPolicyAsync.Handle< Exception >().RetryAsync( RetryCount, async ( ex, i ) =>
+			{
+				ShopifyLogger.Log.Trace( ex, "Retrying Shopify API get call for the {0} time. Mark:{1}, Shop:{2}, Caller:{3}.", i, mark.ToStringSafe(), shop, callerName );
+				await Task.Delay( TimeSpan.FromSeconds( 0.6 ) );
+			} );
+		}
 
-		public static readonly ActionPolicy ShopifySubmitPolicy = ActionPolicy.Handle< Exception >().Retry( RetryCount, ( ex, i ) =>
+		public static ActionPolicy CreateSubmitPolicy( Mark mark, string shop, [ CallerMemberName ] string callerName = "" )
 		{
-			ShopifyLogger.Log.Trace( ex, "Retrying Shopify API submit call for the {0} time", i );
-			SystemUtil.Sleep( TimeSpan.FromSeconds( 0.6 ) );
-		} );
+			return ActionPolicy.Handle< Exception >().Retry( RetryCount, ( ex, i ) =>
+			{
+				ShopifyLogger.Log.Trace( ex, "Retrying Shopify API submit call for the {0} time. Mark:{1}, Shop:{2}, Caller:{3}.", i, mark.ToStringSafe(), shop, callerName );
+				SystemUtil.Sleep( TimeSpan.FromSeconds( 0.6 ) );
+			} );
+		}
 
-		public static readonly ActionPolicyAsync ShopifySubmitPolicyAsync = ActionPolicyAsync.Handle< Exception >().RetryAsync( RetryCount, async ( ex, i ) =>
+		public static ActionPolicyAsync CreateShopifySubmitPolicyAsync( Mark mark, string shop, [ CallerMemberName ] string callerName = "" )
 		{
-			ShopifyLogger.Log.Trace( ex, "Retrying Shopify API submit call for the {0} time", i );
-			await Task.Delay( TimeSpan.FromSeconds( 0.6 ) );
-		} );
+			return ActionPolicyAsync.Handle< Exception >().RetryAsync( RetryCount, async ( ex, i ) =>
+			{
+				ShopifyLogger.Log.Trace( ex, "Retrying Shopify API submit call for the {0} time. Mark:{1}, Shop:{2}, Caller:{3}.", i, mark.ToStringSafe(), shop, callerName );
+				await Task.Delay( TimeSpan.FromSeconds( 0.6 ) );
+			} );
+		}
 	}
 }

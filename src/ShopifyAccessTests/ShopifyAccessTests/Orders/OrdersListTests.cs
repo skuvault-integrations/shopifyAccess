@@ -4,6 +4,8 @@ using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
 using LINQtoCSV;
+using Netco.Logging;
+using Netco.Logging.NLogIntegration;
 using NUnit.Framework;
 using ShopifyAccess;
 using ShopifyAccess.Models.Configuration.Command;
@@ -21,6 +23,7 @@ namespace ShopifyAccessTests.Orders
 		public void Init()
 		{
 			const string credentialsFilePath = @"..\..\Files\ShopifyCredentials.csv";
+			NetcoLogger.LoggerFactory = new NLogLoggerFactory();
 
 			var cc = new CsvContext();
 			var testConfig = cc.Read< TestCommandConfig >( credentialsFilePath, new CsvFileDescription { FirstLineHasColumnNames = true } ).FirstOrDefault();

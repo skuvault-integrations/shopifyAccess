@@ -37,6 +37,7 @@ namespace ShopifyAccess.Services
 		{
 			T result;
 			var request = this.CreateServiceGetRequest( command, endpoint );
+			ShopifyLogger.Log.Trace( "[shopify][{2}] GET Params. ShopName: {0}. Request: {1}", this._commandConfig.ShopName, request.RequestUri, mark.ToStringSafe() );
 			using( var response = request.GetResponse() )
 				result = this.ParseResponse< T >( response, mark.CreateNewIfBlank() );
 
@@ -47,6 +48,7 @@ namespace ShopifyAccess.Services
 		{
 			T result;
 			var request = this.CreateServiceGetRequest( command, endpoint );
+			ShopifyLogger.Log.Trace( "[shopify][{2}] GET Params. ShopName: {0}. Request: {1}", this._commandConfig.ShopName, request.RequestUri, mark.ToStringSafe() );
 			using( var response = await request.GetResponseAsync() )
 				result = this.ParseResponse< T >( response, mark.CreateNewIfBlank() );
 
@@ -58,7 +60,7 @@ namespace ShopifyAccess.Services
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
 			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
-			ShopifyLogger.Log.Trace( "[shopify] PUT Params. ShopName: {0}. Data: {1}", this._commandConfig.ShopName, jsonContent );
+			ShopifyLogger.Log.Trace( "[shopify][{2}] PUT Params. ShopName: {0}. Data: {1}", this._commandConfig.ShopName, jsonContent, mark.ToStringSafe() );
 			using( var response = ( HttpWebResponse )request.GetResponse() )
 				this.LogUpdateInfo( endpoint, response.StatusCode, jsonContent, mark.CreateNewIfBlank() );
 		}
@@ -68,7 +70,7 @@ namespace ShopifyAccess.Services
 			Condition.Requires( this._commandConfig, "config" ).IsNotNull();
 
 			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
-			ShopifyLogger.Log.Trace( "[shopify] PUT Params. ShopName: {0}. Data: {1}", this._commandConfig.ShopName, jsonContent );
+			ShopifyLogger.Log.Trace( "[shopify][{2}] PUT Params. ShopName: {0}. Data: {1}", this._commandConfig.ShopName, jsonContent, mark.ToStringSafe() );
 			using( var response = await request.GetResponseAsync() )
 				this.LogUpdateInfo( endpoint, ( ( HttpWebResponse )response ).StatusCode, jsonContent, mark.CreateNewIfBlank() );
 		}
@@ -161,7 +163,6 @@ namespace ShopifyAccess.Services
 		#region Logging
 		private void LogUpdateInfo( string endpoint, HttpStatusCode statusCode, string jsonContent, Mark mark = null )
 		{
-			;
 			ShopifyLogger.Log.Trace( "[shopify][{3}]\tPUT/POST call for the endpoint '{0}' has been completed with code '{1}'.\n{2}", endpoint, statusCode, jsonContent, mark.ToStringSafe() );
 		}
 		#endregion
