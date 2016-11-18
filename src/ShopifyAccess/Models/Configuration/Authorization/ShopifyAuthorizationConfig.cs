@@ -52,7 +52,7 @@ namespace ShopifyAccess.Models.Configuration.Authorization
 		public string GetPermanentToken( string code )
 		{
 			var webService = new WebRequestServices( this );
-			return webService.RequestPermanentToken( code );
+			return webService.RequestPermanentToken( code, Mark.Create );
 		}
 
 		private string GetRedirectUrl()
