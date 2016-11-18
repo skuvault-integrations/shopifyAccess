@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using System.Net;
 using FluentAssertions;
 using LINQtoCSV;
@@ -20,8 +21,9 @@ namespace ShopifyAccessTests.Locations
 		[ SetUp ]
 		public void Init()
 		{
+			Directory.SetCurrentDirectory( TestContext.CurrentContext.TestDirectory );
 			const string credentialsFilePath = @"..\..\Files\ShopifyCredentials.csv";
-			NetcoLogger.LoggerFactory = new NLogLoggerFactory();
+			NetcoLogger.LoggerFactory = new ConsoleLoggerFactory();
 
 			var cc = new CsvContext();
 			var testConfig = cc.Read< TestCommandConfig >( credentialsFilePath, new CsvFileDescription { FirstLineHasColumnNames = true } ).FirstOrDefault();

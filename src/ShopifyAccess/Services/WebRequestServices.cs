@@ -69,7 +69,7 @@ namespace ShopifyAccess.Services
 			this.LogUpdateRequest( request.RequestUri, jsonContent, mark );
 
 			using( var response = ( HttpWebResponse )request.GetResponse() )
-				this.LogUpdateResponse( request.RequestUri, response.StatusCode, mark );
+				this.LogUpdateResponse( request.RequestUri, this.GetLimitFromHeader( response ), response.StatusCode, mark );
 		}
 
 		public async Task PutDataAsync( ShopifyCommand command, string endpoint, string jsonContent, Mark mark )
@@ -80,7 +80,7 @@ namespace ShopifyAccess.Services
 			this.LogUpdateRequest( request.RequestUri, jsonContent, mark );
 
 			using( var response = await request.GetResponseAsync() )
-				this.LogUpdateResponse( request.RequestUri, ( ( HttpWebResponse )response ).StatusCode, mark );
+				this.LogUpdateResponse( request.RequestUri, this.GetLimitFromHeader( response ), ( ( HttpWebResponse )response ).StatusCode, mark );
 		}
 
 		public string RequestPermanentToken( string code, Mark mark )
@@ -108,8 +108,7 @@ namespace ShopifyAccess.Services
 			{
 				var jsonResponse = reader.ReadToEnd();
 
-				var limitMass = response.Headers.GetValues( "HTTP_X_SHOPIFY_SHOP_API_CALL_LIMIT" );
-				var limit = limitMass != null && limitMass.Length > 0 ? limitMass[ 0 ] : string.Empty;
+				var limit = this.GetLimitFromHeader( response );
 				this.LogGetResponse( response.ResponseUri, limit, jsonResponse, mark );
 
 				if( !string.IsNullOrEmpty( jsonResponse ) )
@@ -117,6 +116,13 @@ namespace ShopifyAccess.Services
 			}
 
 			return result;
+		}
+
+		private string GetLimitFromHeader( WebResponse response )
+		{
+			var limitMass = response.Headers.GetValues( "HTTP_X_SHOPIFY_SHOP_API_CALL_LIMIT" );
+			var limit = limitMass != null && limitMass.Length > 0 ? limitMass[ 0 ] : string.Empty;
+			return limit;
 		}
 		#endregion
 
@@ -180,7 +186,7 @@ namespace ShopifyAccess.Services
 
 		private void LogGetResponse( Uri requestUri, string limit, string jsonResponse, Mark mark )
 		{
-			ShopifyLogger.Trace( mark, "GET response\tShopName: {0}\tRequest: {1}\tLimit: {2}\tResponse: {3}", this._commandConfig.ShopName, requestUri, limit, jsonResponse );
+			ShopifyLogger.Trace( mark, "GET response\tShopName: {0}\tRequest: {1}\tLimit: '{2}'\tResponse: {3}", this._commandConfig.ShopName, requestUri, limit, jsonResponse );
 		}
 
 		private void LogUpdateRequest( Uri requestUri, string jsonContent, Mark mark )
@@ -188,9 +194,9 @@ namespace ShopifyAccess.Services
 			ShopifyLogger.Trace( mark, "PUT request\tShopName: {0}\tRequest: {1}Data: {2}", this._commandConfig.ShopName, requestUri, jsonContent );
 		}
 
-		private void LogUpdateResponse( Uri requestUri, HttpStatusCode statusCode, Mark mark )
+		private void LogUpdateResponse( Uri requestUri, string limit, HttpStatusCode statusCode, Mark mark )
 		{
-			ShopifyLogger.Trace( mark, "PUT/POST response\tShopName: {0}\tRequest: {1}\tStatusCode: '{2}'", this._commandConfig.ShopName, requestUri, statusCode );
+			ShopifyLogger.Trace( mark, "PUT/POST response\tShopName: {0}\tRequest: {1}\tLimit: '{2}'\tStatusCode: '{3}'", this._commandConfig.ShopName, requestUri, limit, statusCode );
 		}
 		#endregion
 	}

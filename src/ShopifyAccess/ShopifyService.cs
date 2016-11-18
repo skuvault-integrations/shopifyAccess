@@ -18,7 +18,7 @@ namespace ShopifyAccess
 	public sealed class ShopifyService: IShopifyService
 	{
 		private readonly WebRequestServices _webRequestServices;
-		private readonly TimeSpan DefaultApiDelay = TimeSpan.FromSeconds( 0.6 );
+		private readonly TimeSpan DelayProductUpdate = TimeSpan.FromSeconds( 0.3 );
 		private const int RequestMaxLimit = 250;
 		private readonly string _shopName;
 
@@ -80,9 +80,6 @@ namespace ShopifyAccess
 				{
 					var updatedOrdersWithinPage = this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint, mark );
 					orders.Orders.AddRange( updatedOrdersWithinPage.Orders );
-
-					//API requirement
-					this.CreateApiDelay().Wait();
 				} );
 			}
 
@@ -102,9 +99,6 @@ namespace ShopifyAccess
 				{
 					var updatedOrdersWithinPage = await this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint, mark );
 					orders.Orders.AddRange( updatedOrdersWithinPage.Orders );
-
-					//API requirement
-					await this.CreateApiDelay();
 				} );
 			}
 
@@ -182,9 +176,6 @@ namespace ShopifyAccess
 				{
 					var productsWithinPage = this._webRequestServices.GetResponse< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint, mark );
 					products.Products.AddRange( productsWithinPage.Products );
-
-					//API requirement
-					this.CreateApiDelay().Wait();
 				} );
 			}
 
@@ -204,9 +195,6 @@ namespace ShopifyAccess
 				{
 					var productsWithinPage = await this._webRequestServices.GetResponseAsync< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint, mark );
 					products.Products.AddRange( productsWithinPage.Products );
-
-					//API requirement
-					await this.CreateApiDelay();
 				} );
 			}
 
@@ -250,7 +238,7 @@ namespace ShopifyAccess
 			this._webRequestServices.PutData( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent, mark );
 
 			//API requirement
-			this.CreateApiDelay().Wait();
+			Task.Delay( this.DelayProductUpdate ).Wait();
 		}
 
 		private async Task UpdateProductVariantQuantityAsync( ShopifyProductVariantForUpdate variant, Mark mark )
@@ -261,7 +249,7 @@ namespace ShopifyAccess
 			await this._webRequestServices.PutDataAsync( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent, mark );
 
 			//API requirement
-			await this.CreateApiDelay();
+			await Task.Delay( this.DelayProductUpdate );
 		}
 		#endregion
 
@@ -332,11 +320,6 @@ namespace ShopifyAccess
 		{
 			var result = ( int )Math.Ceiling( ( double )productsCount / RequestMaxLimit );
 			return result;
-		}
-
-		private Task CreateApiDelay()
-		{
-			return Task.Delay( this.DefaultApiDelay );
 		}
 		#endregion
 	}
