@@ -1,4 +1,5 @@
 ﻿using System;
+using CuttingEdge.Conditions;
 
 namespace ShopifyAccess.Models
 {
@@ -6,34 +7,26 @@ namespace ShopifyAccess.Models
 	{
 		public string Value{ get; private set; }
 
-		public static Mark Create
-		{
-			get { return new Mark( Guid.NewGuid().ToString() ); }
-		}
-
-		public static Mark Blank()
-		{
-			return new Mark( string.Empty );
-		}
-
-		private static Mark CreateNew()
-		{
-			return new Mark( Guid.NewGuid().ToString() );
-		}
-
 		public Mark( string value )
 		{
+			Condition.Requires( value, "value" ).IsNotNullOrEmpty();
+
 			this.Value = value;
 		}
 
-		public override string ToString()
+		public static Mark Create
 		{
-			return GetTag() + this.Value;
+			get { return new Mark( GetTag() + Guid.NewGuid() ); }
 		}
 
 		public static string GetTag()
 		{
 			return "Mark-";
+		}
+
+		public override string ToString()
+		{
+			return this.Value;
 		}
 
 		public override int GetHashCode()
@@ -66,29 +59,9 @@ namespace ShopifyAccess.Models
 
 	public static class MarkExtensions
 	{
-		public static bool IsBlank( this Mark source )
-		{
-			return source == null || string.IsNullOrWhiteSpace( source.Value );
-		}
-
 		public static Mark CreateNewIfBlank( this Mark source )
 		{
-			return source == null || string.IsNullOrWhiteSpace( source.Value ) ? Mark.Create : source;
+			return source == null ? Mark.Create : source;
 		}
-
-		public static string ToJsonObjectSafe( this Mark source )
-		{
-			return IsBlank( source ) ? PredefinedValues.EmptyJsonObject : source.ToString();
-		}
-
-		public static string ToStringSafe( this Mark source )
-		{
-			return IsBlank( source ) ? Mark.GetTag() : source.ToString();
-		}
-	}
-
-	public static class PredefinedValues
-	{
-		public const string EmptyJsonObject = "{}";
 	}
 }

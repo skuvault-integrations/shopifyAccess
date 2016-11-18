@@ -35,18 +35,22 @@ namespace ShopifyAccess.Services
 		#region Requests handling
 		public T GetResponse< T >( ShopifyCommand command, string endpoint, Mark mark )
 		{
+			Condition.Requires( mark, "mark" ).IsNotNull();
+
 			var request = this.CreateServiceGetRequest( command, endpoint );
 			this.LogGetRequest( request.RequestUri, mark );
 
 			T result;
 			using( var response = request.GetResponse() )
-				result = this.ParseResponse< T >( response, mark.CreateNewIfBlank() );
+				result = this.ParseResponse< T >( response, mark );
 
 			return result;
 		}
 
 		public async Task< T > GetResponseAsync< T >( ShopifyCommand command, string endpoint, Mark mark )
 		{
+			Condition.Requires( mark, "mark" ).IsNotNull();
+
 			var request = this.CreateServiceGetRequest( command, endpoint );
 			this.LogGetRequest( request.RequestUri, mark );
 
@@ -59,6 +63,8 @@ namespace ShopifyAccess.Services
 
 		public void PutData( ShopifyCommand command, string endpoint, string jsonContent, Mark mark )
 		{
+			Condition.Requires( mark, "mark" ).IsNotNull();
+
 			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
 			this.LogUpdateRequest( request.RequestUri, jsonContent, mark );
 
@@ -68,6 +74,8 @@ namespace ShopifyAccess.Services
 
 		public async Task PutDataAsync( ShopifyCommand command, string endpoint, string jsonContent, Mark mark )
 		{
+			Condition.Requires( mark, "mark" ).IsNotNull();
+
 			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
 			this.LogUpdateRequest( request.RequestUri, jsonContent, mark );
 
@@ -77,6 +85,8 @@ namespace ShopifyAccess.Services
 
 		public string RequestPermanentToken( string code, Mark mark )
 		{
+			Condition.Requires( mark, "mark" ).IsNotNull();
+
 			string result;
 			var command = ShopifyCommand.GetAccessToken;
 			var tokenRequestUrl = new Uri( string.Concat( this._authorizationConfig.Host, command.Command ) );

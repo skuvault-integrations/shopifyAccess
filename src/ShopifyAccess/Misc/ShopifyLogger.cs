@@ -1,4 +1,5 @@
-﻿using Netco.Logging;
+﻿using System;
+using Netco.Logging;
 using ShopifyAccess.Models;
 
 namespace ShopifyAccess.Misc
@@ -16,6 +17,12 @@ namespace ShopifyAccess.Misc
 		{
 			var markStr = string.Format( "[{0}]\t", mark );
 			Log.Trace( markStr + format, args );
+		}
+
+		public static void Trace( Exception ex, Mark mark, string format, params object[] args )
+		{
+			var markStr = string.Format( "[{0}]\t", mark );
+			Log.Trace( ex, markStr + format, args );
 		}
 	}
 }
