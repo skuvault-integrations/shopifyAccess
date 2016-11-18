@@ -22,6 +22,7 @@ namespace ShopifyAccess.Services
 			Condition.Requires( config, "config" ).IsNotNull();
 
 			this._authorizationConfig = config;
+			this._commandConfig = new ShopifyCommandConfig( config.ShopName, "authorization" );
 		}
 
 		public WebRequestServices( ShopifyCommandConfig config )
