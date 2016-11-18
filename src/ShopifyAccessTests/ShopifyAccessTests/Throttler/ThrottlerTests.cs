@@ -39,7 +39,7 @@ namespace ShopifyAccessTests.Throttler
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
 
-			var list = new int[ 5 ];
+			var list = new int[ 40 ];
 			await list.DoInBatchAsync( 50, async x =>
 			{
 				var orders = await service.GetOrdersAsync( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -20 ), DateTime.UtcNow );
@@ -47,6 +47,26 @@ namespace ShopifyAccessTests.Throttler
 				var variantToUpdate = new ShopifyProductVariantForUpdate { Id = 3341291969, Quantity = 2 };
 				await service.UpdateProductVariantsAsync( new List< ShopifyProductVariantForUpdate > { variantToUpdate } );
 			} );
+		}
+
+		[ Test ]
+		public void ThrottlerTest()
+		{
+			var service = this.ShopifyFactory.CreateService( this.Config );
+
+			var list = new int[ 40 ];
+			list.DoInBatchAsync( 50, x =>
+			{
+				var task = new Task( () =>
+				{
+					var orders = service.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -20 ), DateTime.UtcNow );
+					var products = service.GetProducts();
+					var variantToUpdate = new ShopifyProductVariantForUpdate { Id = 3341291969, Quantity = 2 };
+					service.UpdateProductVariants( new List< ShopifyProductVariantForUpdate > { variantToUpdate } );
+				} );
+				task.Start();
+				return task;
+			} ).Wait();
 		}
 	}
 }

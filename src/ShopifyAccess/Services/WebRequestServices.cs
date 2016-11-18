@@ -40,11 +40,13 @@ namespace ShopifyAccess.Services
 			var request = this.CreateServiceGetRequest( command, endpoint );
 			this.LogGetRequest( request.RequestUri, mark );
 
-			T result;
-			using( var response = request.GetResponse() )
-				result = this.ParseResponse< T >( response, mark );
-
-			return result;
+			return this.ParseException( mark, () =>
+			{
+				T result;
+				using( var response = request.GetResponse() )
+					result = this.ParseResponse< T >( response, mark );
+				return result;
+			} );
 		}
 
 		public async Task< T > GetResponseAsync< T >( ShopifyCommand command, string endpoint, Mark mark )
@@ -54,11 +56,13 @@ namespace ShopifyAccess.Services
 			var request = this.CreateServiceGetRequest( command, endpoint );
 			this.LogGetRequest( request.RequestUri, mark );
 
-			T result;
-			using( var response = await request.GetResponseAsync() )
-				result = this.ParseResponse< T >( response, mark );
-
-			return result;
+			return await this.ParseExceptionAsync( mark, async () =>
+			{
+				T result;
+				using( var response = await request.GetResponseAsync() )
+					result = this.ParseResponse< T >( response, mark );
+				return result;
+			} );
 		}
 
 		public void PutData( ShopifyCommand command, string endpoint, string jsonContent, Mark mark )
@@ -68,8 +72,12 @@ namespace ShopifyAccess.Services
 			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
 			this.LogUpdateRequest( request.RequestUri, jsonContent, mark );
 
-			using( var response = ( HttpWebResponse )request.GetResponse() )
-				this.LogUpdateResponse( request.RequestUri, this.GetLimitFromHeader( response ), response.StatusCode, mark );
+			this.ParseException( mark, () =>
+			{
+				using( var response = ( HttpWebResponse )request.GetResponse() )
+					this.LogUpdateResponse( request.RequestUri, this.GetLimitFromHeader( response ), response.StatusCode, mark );
+				return true;
+			} );
 		}
 
 		public async Task PutDataAsync( ShopifyCommand command, string endpoint, string jsonContent, Mark mark )
@@ -79,8 +87,12 @@ namespace ShopifyAccess.Services
 			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
 			this.LogUpdateRequest( request.RequestUri, jsonContent, mark );
 
-			using( var response = await request.GetResponseAsync() )
-				this.LogUpdateResponse( request.RequestUri, this.GetLimitFromHeader( response ), ( ( HttpWebResponse )response ).StatusCode, mark );
+			await this.ParseExceptionAsync( mark, async () =>
+			{
+				using( var response = await request.GetResponseAsync() )
+					this.LogUpdateResponse( request.RequestUri, this.GetLimitFromHeader( response ), ( ( HttpWebResponse )response ).StatusCode, mark );
+				return Task.FromResult( true );
+			} );
 		}
 
 		public string RequestPermanentToken( string code, Mark mark )
@@ -98,7 +110,9 @@ namespace ShopifyAccess.Services
 
 			return result;
 		}
+		#endregion
 
+		#region Parsing response
 		private T ParseResponse< T >( WebResponse response, Mark mark )
 		{
 			var result = default(T);
@@ -123,6 +137,50 @@ namespace ShopifyAccess.Services
 			var limitMass = response.Headers.GetValues( "HTTP_X_SHOPIFY_SHOP_API_CALL_LIMIT" );
 			var limit = limitMass != null && limitMass.Length > 0 ? limitMass[ 0 ] : string.Empty;
 			return limit;
+		}
+
+		private T ParseException< T >( Mark mark, Func< T > body )
+		{
+			try
+			{
+				return body();
+			}
+			catch( WebException ex )
+			{
+				throw this.HandleException( ex, mark );
+			}
+		}
+
+		private async Task< T > ParseExceptionAsync< T >( Mark mark, Func< Task< T > > body )
+		{
+			try
+			{
+				return await body();
+			}
+			catch( WebException ex )
+			{
+				throw this.HandleException( ex, mark );
+			}
+		}
+
+		private WebException HandleException( WebException ex, Mark mark )
+		{
+			if( ex.Response == null || ex.Status != WebExceptionStatus.ProtocolError ||
+			    ex.Response.ContentType == null || ex.Response.ContentType.Contains( "text/html" ) )
+			{
+				this.LogException( ex, mark );
+				return ex;
+			}
+
+			var httpResponse = ( HttpWebResponse )ex.Response;
+
+			using( var stream = httpResponse.GetResponseStream() )
+			using( var reader = new StreamReader( stream ) )
+			{
+				var jsonResponse = reader.ReadToEnd();
+				this.LogException( ex, httpResponse, jsonResponse, mark );
+				return ex;
+			}
 		}
 		#endregion
 
@@ -197,6 +255,17 @@ namespace ShopifyAccess.Services
 		private void LogUpdateResponse( Uri requestUri, string limit, HttpStatusCode statusCode, Mark mark )
 		{
 			ShopifyLogger.Trace( mark, "PUT/POST response\tShopName: {0}\tRequest: {1}\tLimit: '{2}'\tStatusCode: '{3}'", this._commandConfig.ShopName, requestUri, limit, statusCode );
+		}
+
+		private void LogException( WebException ex, Mark mark )
+		{
+			ShopifyLogger.Trace( ex, mark, "Failed response\tShopName: {0}\tMessage: {1}\tStatus: {2}", this._commandConfig.ShopName, ex.Message, ex.Status );
+		}
+
+		private void LogException( WebException ex, HttpWebResponse response, string jsonResponse, Mark mark )
+		{
+			ShopifyLogger.Trace( ex, mark, "Failed response\tShopName: {0}\tRequest: {1}\tMessage: {2}\tStatus: {3}\tJsonResponse: {4}",
+				this._commandConfig.ShopName, response.ResponseUri, ex.Message, response.StatusCode, jsonResponse );
 		}
 		#endregion
 	}
