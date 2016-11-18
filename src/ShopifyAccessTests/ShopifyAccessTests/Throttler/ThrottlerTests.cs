@@ -15,7 +15,7 @@ using ShopifyAccess.Models.ProductVariant;
 namespace ShopifyAccessTests.Throttler
 {
 	[ TestFixture ]
-	public class ProductVariantTests
+	public class ThrottlerTests
 	{
 		private readonly IShopifyFactory ShopifyFactory = new ShopifyFactory();
 		private ShopifyCommandConfig Config;
