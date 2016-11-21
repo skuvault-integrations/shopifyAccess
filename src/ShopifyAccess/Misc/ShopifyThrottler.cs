@@ -18,9 +18,8 @@ namespace ShopifyAccess.Misc
 		/// <param name="delayInSecondsBeforeRelease">Delay in seconds before release</param>
 		/// <param name="itemsCountForRelease">Items count for release. Default is 1</param>
 		/// <param name="maxRetryCount">Max Retry Count</param>
-		/// <param name="throttleMessage">Throttle Message</param>
-		public ShopifyThrottler( int maxQuota = 40, int delayInSecondsBeforeRelease = 1, int itemsCountForRelease = 2, int maxRetryCount = 30, string throttleMessage = "Too Many Requests" ):
-			base( maxQuota, el => el / delayInSecondsBeforeRelease * itemsCountForRelease, el => delayInSecondsBeforeRelease - el, maxRetryCount, throttleMessage )
+		public ShopifyThrottler( int maxQuota = 40, int delayInSecondsBeforeRelease = 1, int itemsCountForRelease = 2, int maxRetryCount = 30 ):
+			base( maxQuota, delayInSecondsBeforeRelease, itemsCountForRelease, maxRetryCount, "Too Many Requests" )
 		{
 		}
 	}
@@ -41,9 +40,8 @@ namespace ShopifyAccess.Misc
 		/// <param name="delayInSecondsBeforeRelease">Delay in seconds before release</param>
 		/// <param name="itemsCountForRelease">Items count for release. Default is 1</param>
 		/// <param name="maxRetryCount">Max Retry Count</param>
-		/// <param name="throttleMessage">Throttle Message</param>
-		public ShopifyThrottlerAsync( int maxQuota = 40, int delayInSecondsBeforeRelease = 1, int itemsCountForRelease = 2, int maxRetryCount = 30, string throttleMessage = "Too Many Requests" ):
-			base( maxQuota, el => el / delayInSecondsBeforeRelease * itemsCountForRelease, el => delayInSecondsBeforeRelease - el, maxRetryCount, throttleMessage )
+		public ShopifyThrottlerAsync( int maxQuota = 40, int delayInSecondsBeforeRelease = 1, int itemsCountForRelease = 2, int maxRetryCount = 30 ):
+			base( maxQuota, delayInSecondsBeforeRelease, itemsCountForRelease, maxRetryCount, "Too Many Requests" )
 		{
 		}
 	}
