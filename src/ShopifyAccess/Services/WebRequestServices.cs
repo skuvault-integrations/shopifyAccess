@@ -240,22 +240,22 @@ namespace ShopifyAccess.Services
 		#region Logging
 		private void LogGetRequest( Uri requestUri, Mark mark )
 		{
-			ShopifyLogger.Trace( mark, "GET request\tShopName: {0}\tRequest: {1}", this._commandConfig.ShopName, requestUri );
+			ShopifyLogger.Trace( mark, "GET request\tRequest: {0}", requestUri );
 		}
 
 		private void LogGetResponse( Uri requestUri, string limit, string jsonResponse, Mark mark )
 		{
-			ShopifyLogger.Trace( mark, "GET response\tShopName: {0}\tRequest: {1}\tLimit: '{2}'\tResponse: {3}", this._commandConfig.ShopName, requestUri, limit, jsonResponse );
+			ShopifyLogger.Trace( mark, "GET response\tRequest: {0}\tLimit: {1}\tResponse: {2}", requestUri, limit, jsonResponse );
 		}
 
 		private void LogUpdateRequest( Uri requestUri, string jsonContent, Mark mark )
 		{
-			ShopifyLogger.Trace( mark, "PUT request\tShopName: {0}\tRequest: {1}Data: {2}", this._commandConfig.ShopName, requestUri, jsonContent );
+			ShopifyLogger.Trace( mark, "PUT request\tRequest: {0}\tData: {1}", requestUri, jsonContent );
 		}
 
 		private void LogUpdateResponse( Uri requestUri, string limit, HttpStatusCode statusCode, Mark mark )
 		{
-			ShopifyLogger.Trace( mark, "PUT/POST response\tShopName: {0}\tRequest: {1}\tLimit: '{2}'\tStatusCode: '{3}'", this._commandConfig.ShopName, requestUri, limit, statusCode );
+			ShopifyLogger.Trace( mark, "PUT/POST response\tRequest: {0}\tLimit: {1}\tStatusCode: {2}", requestUri, limit, statusCode );
 		}
 
 		private void LogException( WebException ex, Mark mark )
@@ -265,8 +265,8 @@ namespace ShopifyAccess.Services
 
 		private void LogException( WebException ex, HttpWebResponse response, string jsonResponse, Mark mark )
 		{
-			ShopifyLogger.Trace( ex, mark, "Failed response\tShopName: {0}\tRequest: {1}\tMessage: {2}\tStatus: {3}\tJsonResponse: {4}",
-				this._commandConfig.ShopName, response.ResponseUri, ex.Message, response.StatusCode, jsonResponse );
+			ShopifyLogger.Trace( ex, mark, "Failed response\tRequest: {0}\tMessage: {1}\tStatus: {2}\tJsonResponse: {3}",
+				response.ResponseUri, ex.Message, response.StatusCode, jsonResponse );
 		}
 		#endregion
 	}
