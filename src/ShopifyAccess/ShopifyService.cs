@@ -24,6 +24,10 @@ namespace ShopifyAccess
 		private readonly ShopifyThrottler _throttler = new ShopifyThrottler();
 		private readonly ShopifyThrottlerAsync _throttlerAsync = new ShopifyThrottlerAsync();
 
+		// Separate throttler for updating to save limit for other syncs
+		private readonly ShopifyThrottler _productUpdateThrottler = new ShopifyThrottler( 30 );
+		private readonly ShopifyThrottlerAsync _productUpdateThrottlerAsync = new ShopifyThrottlerAsync( 30 );
+
 		public ShopifyService( ShopifyCommandConfig config )
 		{
 			Condition.Requires( config, "config" ).IsNotNull();
@@ -238,7 +242,7 @@ namespace ShopifyAccess
 			var jsonContent = new { variant }.ToJson();
 
 			ActionPolicies.SubmitPolicy( mark, this._shopName ).Do( () =>
-				this._throttler.Execute( () =>
+				this._productUpdateThrottler.Execute( () =>
 				{
 					this._webRequestServices.PutData( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent, mark );
 					return true;
@@ -251,7 +255,7 @@ namespace ShopifyAccess
 			var jsonContent = new { variant }.ToJson();
 
 			await ActionPolicies.SubmitPolicyAsync( mark, this._shopName ).Do( async () =>
-				await this._throttlerAsync.ExecuteAsync( async () =>
+				await this._productUpdateThrottlerAsync.ExecuteAsync( async () =>
 				{
 					await this._webRequestServices.PutDataAsync( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent, mark );
 					return true;
