@@ -18,7 +18,6 @@ namespace ShopifyAccess
 	public sealed class ShopifyService: IShopifyService
 	{
 		private readonly WebRequestServices _webRequestServices;
-		private readonly TimeSpan DelayProductUpdate = TimeSpan.FromSeconds( 0.3 );
 		private const int RequestMaxLimit = 250;
 		private readonly string _shopName;
 		// One throttler for all requests because used same limit for all API
@@ -220,8 +219,6 @@ namespace ShopifyAccess
 			foreach( var variant in variants )
 			{
 				this.UpdateProductVariantQuantity( variant, mark );
-				//API requirement
-				Task.Delay( this.DelayProductUpdate ).Wait();
 			}
 		}
 
@@ -231,8 +228,6 @@ namespace ShopifyAccess
 			foreach( var variant in variants )
 			{
 				await this.UpdateProductVariantQuantityAsync( variant, mark );
-				//API requirement
-				Task.Delay( this.DelayProductUpdate ).Wait();
 			}
 		}
 
