@@ -16,5 +16,11 @@ namespace ShopifyAccess.Models.Order
 
 		[ DataMember( Name = "price" ) ]
 		public decimal Price { get; set; }
+
+		[ DataMember( Name = "title" ) ]
+		public string Title{ get; set; }
+
+		[ DataMember( Name = "product_exists" ) ]
+		public bool ProductExists{ get; set; }
 	}
 }
