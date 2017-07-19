@@ -22,5 +22,8 @@ namespace ShopifyAccess.Models.Order
 
 		[ DataMember( Name = "product_exists" ) ]
 		public bool ProductExists{ get; set; }
+
+		[ DataMember( Name = "total_discount" ) ]
+		public decimal TotalDiscount{ get; set; }
 	}
 }
