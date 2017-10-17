@@ -8,7 +8,7 @@ namespace ShopifyAccess.Models.Order
 	public class ShopifyOrder
 	{
 		[ DataMember( Name = "id" ) ]
-		public string Id{ get; set; }
+		public long Id{ get; set; }
 
 		[ DataMember( Name = "total_price" ) ]
 		public decimal Total{ get; set; }

@@ -4,7 +4,7 @@
 	{
 		public static readonly ShopifyCommandEndpointName Unknown = new ShopifyCommandEndpointName( string.Empty );
 		public static readonly ShopifyCommandEndpointName Limit = new ShopifyCommandEndpointName( "limit" );
-		public static readonly ShopifyCommandEndpointName Page = new ShopifyCommandEndpointName( "page" );
+		public static readonly ShopifyCommandEndpointName SinceId = new ShopifyCommandEndpointName( "since_id" );
 		public static readonly ShopifyCommandEndpointName Fields = new ShopifyCommandEndpointName( "fields" );
 
 		private ShopifyCommandEndpointName( string name )

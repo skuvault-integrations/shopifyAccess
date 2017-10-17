@@ -4,16 +4,16 @@ namespace ShopifyAccess.Models.Configuration.Command
 {
 	internal class ShopifyCommandEndpointConfig
 	{
-		public int Page { get; private set; }
-		public int Limit { get; private set; }
+		public long SinceId{ get; private set; }
+		public int Limit{ get; private set; }
 
-		public ShopifyCommandEndpointConfig( int page, int limit )
+		public ShopifyCommandEndpointConfig( long sinceId, int limit )
 			: this( limit )
 		{
-			Condition.Requires( page, "page" ).IsGreaterThan( 0 );
+			Condition.Requires( sinceId, "page" ).IsGreaterOrEqual( 0 );
 			Condition.Requires( limit, "limit" ).IsGreaterThan( 0 );
 
-			this.Page = page;
+			this.SinceId = sinceId;
 		}
 
 		public ShopifyCommandEndpointConfig( int limit )

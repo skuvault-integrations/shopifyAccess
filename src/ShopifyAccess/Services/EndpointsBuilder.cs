@@ -42,12 +42,12 @@ namespace ShopifyAccess.Services
 			return endpoint;
 		}
 
-		public static string CreateGetNextPageEndpoint( ShopifyCommandEndpointConfig config )
+		public static string CreateGetNextPageSinceIdEndpoint( ShopifyCommandEndpointConfig config )
 		{
 			var endpoint = string.Format( "?{0}={1}&{2}={3}",
 				ShopifyCommandEndpointName.Limit.Name, config.Limit,
-				ShopifyCommandEndpointName.Page.Name, config.Page
-				);
+				ShopifyCommandEndpointName.SinceId.Name, config.SinceId
+			);
 			return endpoint;
 		}
 
