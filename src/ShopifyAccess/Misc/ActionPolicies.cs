@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Netco.ActionPolicyServices;
@@ -18,7 +19,7 @@ namespace ShopifyAccess.Misc
 
 		public static ActionPolicy GetPolicy( Mark mark, string shop, [ CallerMemberName ] string callerName = "" )
 		{
-			return ActionPolicy.From( ex => !( ex is ThrottlerException ) ).Retry( RetryCount, ( ex, i ) =>
+			return ActionPolicy.From( ex => !( ex is ThrottlerException ) && !isUnauthorizedException( ex ) ).Retry( RetryCount, ( ex, i ) =>
 			{
 				ShopifyLogger.Trace( ex, mark, "ShopName: {0}\tRetrying Shopify API get call for the {1} time. Caller:{2}.", shop, i, callerName );
 				SystemUtil.Sleep( TimeSpan.FromSeconds( 5 + 10 * i ) );
@@ -27,7 +28,7 @@ namespace ShopifyAccess.Misc
 
 		public static ActionPolicyAsync GetPolicyAsync( Mark mark, string shop, [ CallerMemberName ] string callerName = "" )
 		{
-			return ActionPolicyAsync.From( ex => !( ex is ThrottlerException ) ).RetryAsync( RetryCount, async ( ex, i ) =>
+			return ActionPolicyAsync.From( ex => !( ex is ThrottlerException ) && !isUnauthorizedException( ex ) ).RetryAsync( RetryCount, async ( ex, i ) =>
 			{
 				ShopifyLogger.Trace( ex, mark, "ShopName: {0}\tRetrying Shopify API get call for the {1} time. Caller:{2}.", shop, i, callerName );
 				await Task.Delay( TimeSpan.FromSeconds( 5 + 10 * i ) );
@@ -36,7 +37,7 @@ namespace ShopifyAccess.Misc
 
 		public static ActionPolicy SubmitPolicy( Mark mark, string shop, [ CallerMemberName ] string callerName = "" )
 		{
-			return ActionPolicy.From( ex => !( ex is ThrottlerException ) ).Retry( RetryCount, ( ex, i ) =>
+			return ActionPolicy.From( ex => !( ex is ThrottlerException ) && !isUnauthorizedException( ex ) ).Retry( RetryCount, ( ex, i ) =>
 			{
 				ShopifyLogger.Trace( ex, mark, "ShopName: {0}\tRetrying Shopify API submit call for the {1} time. Caller:{2}.", shop, i, callerName );
 				SystemUtil.Sleep( TimeSpan.FromSeconds( 5 + 10 * i ) );
@@ -45,11 +46,27 @@ namespace ShopifyAccess.Misc
 
 		public static ActionPolicyAsync SubmitPolicyAsync( Mark mark, string shop, [ CallerMemberName ] string callerName = "" )
 		{
-			return ActionPolicyAsync.From( ex => !( ex is ThrottlerException ) ).RetryAsync( RetryCount, async ( ex, i ) =>
+			return ActionPolicyAsync.From( ex => !( ex is ThrottlerException ) && !isUnauthorizedException( ex ) ).RetryAsync( RetryCount, async ( ex, i ) =>
 			{
 				ShopifyLogger.Trace( ex, mark, "ShopName: {0}\tRetrying Shopify API submit call for the {1} time. Caller:{2}.", shop, i, callerName );
 				await Task.Delay( TimeSpan.FromSeconds( 5 + 10 * i ) );
 			} );
+		}
+
+		private static bool isUnauthorizedException( Exception ex )
+		{
+			var webEx = ex as WebException;
+			if( webEx == null )
+				return false;
+
+			if( webEx.Status != WebExceptionStatus.ProtocolError )
+				return false;
+
+			var response = webEx.Response as HttpWebResponse;
+			if( response == null )
+				return false;
+
+			return response.StatusCode == HttpStatusCode.Unauthorized;
 		}
 	}
 }
