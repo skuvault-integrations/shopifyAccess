@@ -103,7 +103,7 @@ task NuGet Package, Version, {
 	$push_project = Read-Host "Push $($project_name) " $Version " to NuGet? (Y/N)"
 	Write-Host $push_project
 	if( $push_project -eq "y" -or $push_project -eq "Y" )	{
-		Get-ChildItem $build_dir\*.nupkg |% { exec { & $nuget push  $_.FullName }}
+		Get-ChildItem $build_dir\*.nupkg |% { exec { & $nuget push  $_.FullName -Source nuget.org}}
 	}
 }
 
