@@ -67,26 +67,30 @@ namespace ShopifyAccessTests.Products
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
 			var products = service.GetProducts().ToDictionary();
-			
-			var productsForUpdate = new List< ShopifyProductVariantForUpdate>();
+
+			var productsForUpdate = new List< ShopifyInventoryLevelForUpdate >();
 			foreach( var product in products )
 			{
-				var productForUpdate = new ShopifyProductVariantForUpdate
+				var firstInventoryLevel = product.Value.InventoryLevels.InventoryLevels.FirstOrDefault();
+				if( firstInventoryLevel == null )
+					continue;
+
+				var productForUpdate = new ShopifyInventoryLevelForUpdate
 				{
-					Id = product.Value.Id,
-					OldQuantity = product.Value.OldQuantity,
-					Quantity = product.Value.Quantity
+					InventoryItemId = firstInventoryLevel.InventoryItemId,
+					LocationId = firstInventoryLevel.LocationId,
+					Quantity = firstInventoryLevel.Available
 				};
-				if( product.Key.Equals( "dkTestSku", StringComparison.InvariantCultureIgnoreCase ) )
+
+				if( product.Key.Equals( "T-BLA-S", StringComparison.InvariantCultureIgnoreCase ) )
 				{
-					productForUpdate.OldQuantity = product.Value.Quantity;
-					productForUpdate.Quantity = product.Value.Quantity = product.Value.OldQuantity = -9;
+					productForUpdate.Quantity = 17;
 					productsForUpdate.Add( productForUpdate );
 				}
 				
 			}
 
-			service.UpdateProductVariants( productsForUpdate );
+			service.UpdateInventoryLevels( productsForUpdate );
 			var updatedProducts = service.GetProducts().ToDictionary();
 			
 			products.Should().Equal( updatedProducts );

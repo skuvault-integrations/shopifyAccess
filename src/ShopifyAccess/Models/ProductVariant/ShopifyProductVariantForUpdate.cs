@@ -14,4 +14,16 @@ namespace ShopifyAccess.Models.ProductVariant
 		[ DataMember( Name = "old_inventory_quantity" ) ]
 		public int OldQuantity{ get; set; }
 	}
+
+	public static class ShopifyProductVariantForUpdateExtensions
+	{
+		public static ShopifyInventoryLevelForUpdate ToShopifyProductVariantForUpdate( this ShopifyProductVariantForUpdate obj )
+		{
+			return new ShopifyInventoryLevelForUpdate
+			{
+				InventoryItemId = obj.Id,
+				Quantity = obj.Quantity
+			};
+		}
+	}
 }

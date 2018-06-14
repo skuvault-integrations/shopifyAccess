@@ -10,6 +10,7 @@
 		public static readonly ShopifyScopeName ScriptTags = new ShopifyScopeName( "_script_tags" );
 		public static readonly ShopifyScopeName Fulfillments = new ShopifyScopeName( "_fulfillments" );
 		public static readonly ShopifyScopeName Shipping = new ShopifyScopeName( "_shipping" );
+		public static readonly ShopifyScopeName Inventory = new ShopifyScopeName( "_inventory" );
 
 		private ShopifyScopeName( string name )
 		{

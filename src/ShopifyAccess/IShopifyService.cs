@@ -58,18 +58,32 @@ namespace ShopifyAccess
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns>Products with variants (inventory items)</returns>
 		Task< ShopifyProducts > GetProductsAsync( Mark mark = null );
-
+		
 		/// <summary>
 		/// Update variants (inventory items)
 		/// </summary>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
+		[ Obsolete ]
 		void UpdateProductVariants( IEnumerable< ShopifyProductVariantForUpdate > variants, Mark mark = null );
 
 		/// <summary>
 		/// Update variants (inventory items) async
 		/// </summary>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
+		[ Obsolete ]
 		Task UpdateProductVariantsAsync( IEnumerable< ShopifyProductVariantForUpdate > variants, Mark mark = null );
+
+		/// <summary>
+		///     Update inventory levels (inventory items)
+		/// </summary>
+		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
+		void UpdateInventoryLevels( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, Mark mark = null );
+
+		/// <summary>
+		///     Update inventory levels (inventory items) async
+		/// </summary>
+		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
+		Task UpdateInventoryLevelsAsync( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, Mark mark = null );
 
 		/// <summary>
 		/// Get all users

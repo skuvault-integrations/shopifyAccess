@@ -96,6 +96,44 @@ namespace ShopifyAccess.Services
 			} );
 		}
 
+		public T PostData< T >( ShopifyCommand command, string jsonContent, Mark mark )
+		{
+			Condition.Requires( mark, "mark" ).IsNotNull();
+
+			var url = new Uri( string.Concat( this._commandConfig.Host, command.Command ) );
+
+			var request = this.CreateServicePostRequest( url, this._commandConfig.AccessToken, jsonContent );
+			this.LogUpdateRequest( request.RequestUri, jsonContent, mark );
+
+			T result;
+
+			using( var response = request.GetResponse() )
+			{
+				result = this.ParseResponse< T >( response, mark );
+			}
+
+			return default(T);
+		}
+
+		public async Task< T > PostDataAsync< T >( ShopifyCommand command, string jsonContent, Mark mark )
+		{
+			Condition.Requires( mark, "mark" ).IsNotNull();
+
+			var url = new Uri( string.Concat( this._commandConfig.Host, command.Command ) );
+
+			var request = this.CreateServicePostRequest( url, jsonContent );
+			this.LogUpdateRequest( request.RequestUri, jsonContent, mark );
+
+			T result;
+
+			using( var response = await request.GetResponseAsync() )
+			{
+				result = this.ParseResponse< T >( response, mark );
+			}
+
+			return default(T);
+		}
+
 		public string RequestPermanentToken( string code, Mark mark )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
@@ -214,6 +252,23 @@ namespace ShopifyAccess.Services
 				using( var writer = new StreamWriter( request.GetRequestStream() ) )
 					writer.Write( content );
 			}
+
+			return request;
+		}
+
+		private HttpWebRequest CreateServicePostRequest( Uri uri, string token, string content )
+		{
+			var request = ( HttpWebRequest )WebRequest.Create( uri );
+			request.Method = WebRequestMethods.Http.Post;
+			request.KeepAlive = true;
+			request.ContentType = "application/json";
+			request.Headers.Add( "X-Shopify-Access-Token", token );
+
+			if( !string.IsNullOrEmpty( content ) )
+				using( var writer = new StreamWriter( request.GetRequestStream() ) )
+				{
+					writer.Write( content );
+				}
 
 			return request;
 		}

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CuttingEdge.Conditions;
+using Netco.Extensions;
 using ServiceStack;
 using ShopifyAccess.Misc;
 using ShopifyAccess.Models;
@@ -20,6 +21,7 @@ namespace ShopifyAccess
 	{
 		private readonly WebRequestServices _webRequestServices;
 		private const int RequestMaxLimit = 250;
+		private const int RequestInventoryLevelsMaxLimit = 50;
 		private readonly string _shopName;
 		// One throttler for all requests because used same limit for all API
 		private readonly ShopifyThrottler _throttler = new ShopifyThrottler();
@@ -146,20 +148,36 @@ namespace ShopifyAccess
 
 			var products = this.CollectProductsFromAllPages( mark );
 			this.RemoveUntrackedProductVariants( products );
+			var inventoryLevels = this.CollectInventoryLevelsFromAllPages( mark, products.Products.SelectMany( x => x.Variants.Select( t => t.InventoryItemId ) ).ToArray() );
+
+			foreach( var product in products.Products )
+			foreach( var variant in product.Variants )
+			{
+				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevels.InventoryLevels.Where( x => x.InventoryItemId == variant.InventoryItemId ).ToList() };
+				variant.InventoryLevels = inventoryLevelsForVariant;
+			}
 
 			return products;
 		}
-
+		
 		public async Task< ShopifyProducts > GetProductsAsync( Mark mark = null )
 		{
 			mark = mark.CreateNewIfBlank();
 
 			var products = await this.CollectProductsFromAllPagesAsync( mark );
 			this.RemoveUntrackedProductVariants( products );
+			var inventoryLevels = await this.CollectInventoryLevelsFromAllPagesAsync( mark, products.Products.SelectMany( x => x.Variants.Select( t => t.InventoryItemId ) ).ToArray() );
+
+			foreach( var product in products.Products )
+			foreach( var variant in product.Variants )
+			{
+				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevels.InventoryLevels.Where( x => x.InventoryItemId == variant.InventoryItemId ).ToList() };
+				variant.InventoryLevels = inventoryLevelsForVariant;
+			}
 
 			return products;
 		}
-
+		
 		private int GetProductsCount( Mark mark )
 		{
 			var count = ActionPolicies.GetPolicy( mark, this._shopName ).Get(
@@ -211,7 +229,7 @@ namespace ShopifyAccess
 				var productsWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
 					async () => await this._throttlerAsync.ExecuteAsync(
 						async () => await this._webRequestServices.GetResponseAsync< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint, mark ) ) );
-
+				
 				if( productsWithinPage.Products.Count == 0 )
 					break;
 
@@ -220,6 +238,62 @@ namespace ShopifyAccess
 			}
 
 			return products;
+		}
+
+		private ShopifyInventoryLevels CollectInventoryLevelsFromAllPages( Mark mark, long[] productIds )
+		{
+			var inventoryLevels = new ShopifyInventoryLevels();
+			var partsOfProductIds = productIds.Slice( RequestInventoryLevelsMaxLimit );
+
+			foreach( var ids in partsOfProductIds )
+			{
+				var page = 1;
+				while( true )
+				{
+					var endpoint = EndpointsBuilder.CreateInventoryLevelsIdsEndpoint( ids, page, RequestMaxLimit );
+
+					var productsWithinPage = ActionPolicies.GetPolicy( mark, this._shopName ).Get(
+						() => this._throttler.Execute(
+							() => this._webRequestServices.GetResponse< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark ) ) );
+					
+					inventoryLevels.InventoryLevels.AddRange( productsWithinPage.InventoryLevels );
+
+					if( productsWithinPage.InventoryLevels.Count < RequestMaxLimit )
+						break;
+
+					page++;
+				}
+			}
+
+			return inventoryLevels;
+		}
+
+		private async Task< ShopifyInventoryLevels > CollectInventoryLevelsFromAllPagesAsync( Mark mark, long[] productIds )
+		{
+			var inventoryLevels = new ShopifyInventoryLevels();
+			var partsOfProductIds = productIds.Slice( RequestInventoryLevelsMaxLimit );
+
+			foreach( var ids in partsOfProductIds )
+			{
+				var page = 1;
+				while( true )
+				{
+					var endpoint = EndpointsBuilder.CreateInventoryLevelsIdsEndpoint( ids, page, RequestMaxLimit );
+
+					var productsWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
+						async () => await this._throttlerAsync.ExecuteAsync(
+							async () => await this._webRequestServices.GetResponseAsync< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark ) ) );
+					
+					inventoryLevels.InventoryLevels.AddRange( productsWithinPage.InventoryLevels );
+
+					if( productsWithinPage.InventoryLevels.Count < RequestMaxLimit )
+						break;
+
+					page++;
+				}
+			}
+
+			return inventoryLevels;
 		}
 
 		private void RemoveUntrackedProductVariants( ShopifyProducts products )
@@ -232,6 +306,7 @@ namespace ShopifyAccess
 		#endregion
 
 		#region Update variants
+		[ Obsolete ]
 		public void UpdateProductVariants( IEnumerable< ShopifyProductVariantForUpdate > variants, Mark mark = null )
 		{
 			mark = mark.CreateNewIfBlank();
@@ -241,6 +316,7 @@ namespace ShopifyAccess
 			}
 		}
 
+		[ Obsolete ]
 		public async Task UpdateProductVariantsAsync( IEnumerable< ShopifyProductVariantForUpdate > variants, Mark mark = null )
 		{
 			mark = mark.CreateNewIfBlank();
@@ -273,6 +349,46 @@ namespace ShopifyAccess
 				await this._productUpdateThrottlerAsync.ExecuteAsync( async () =>
 				{
 					await this._webRequestServices.PutDataAsync( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent, mark );
+					return true;
+				} ) );
+		}
+		
+		public void UpdateInventoryLevels( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, Mark mark = null )
+		{
+			mark = mark.CreateNewIfBlank();
+			foreach( var inventoryLevel in inventoryLevels )
+				this.UpdateInventoryLevelQuantity( inventoryLevel, mark );
+		}
+		
+		public async Task UpdateInventoryLevelsAsync( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, Mark mark = null )
+		{
+			mark = mark.CreateNewIfBlank();
+			foreach( var inventoryLevel in inventoryLevels )
+				await this.UpdateInventoryLevelQuantityAsync( inventoryLevel, mark );
+		}
+
+		private void UpdateInventoryLevelQuantity( ShopifyInventoryLevelForUpdate variant, Mark mark )
+		{
+			//just simpliest way to serialize with the root name.
+			var jsonContent = variant.ToJson();
+
+			ActionPolicies.SubmitPolicy( mark, this._shopName ).Do( () =>
+				this._productUpdateThrottler.Execute( () =>
+				{
+					this._webRequestServices.PostData< ShopifyInventoryLevelForUpdateResponse >( ShopifyCommand.UpdateInventoryLevels, jsonContent, mark );
+					return true;
+				} ) );
+		}
+
+		private async Task UpdateInventoryLevelQuantityAsync( ShopifyInventoryLevelForUpdate variant, Mark mark )
+		{
+			//just simpliest way to serialize with the root name.
+			var jsonContent = variant.ToJson();
+
+			await ActionPolicies.SubmitPolicyAsync( mark, this._shopName ).Do( async () =>
+				await this._productUpdateThrottlerAsync.ExecuteAsync( async () =>
+				{
+					await this._webRequestServices.PostDataAsync< ShopifyInventoryLevelForUpdateResponse >( ShopifyCommand.UpdateInventoryLevels, jsonContent, mark );
 					return true;
 				} ) );
 		}

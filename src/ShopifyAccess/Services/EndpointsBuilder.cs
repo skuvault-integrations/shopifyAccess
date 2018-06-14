@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using ShopifyAccess.Models.Configuration.Command;
 using ShopifyAccess.Models.Order;
@@ -48,6 +49,13 @@ namespace ShopifyAccess.Services
 				ShopifyCommandEndpointName.Limit.Name, config.Limit,
 				ShopifyCommandEndpointName.SinceId.Name, config.SinceId
 			);
+			return endpoint;
+		}
+
+		public static string CreateInventoryLevelsIdsEndpoint( long[] ids, int page, int limit )
+		{
+			// INFO : limit should be 250. Page start from 1. Max of inventory_item_ids is 50.
+			var endpoint = string.Format( "?inventory_item_ids={0}&page={1}&limit={2}", string.Join( ",", ids.Select( x => x ) ), page, limit );
 			return endpoint;
 		}
 

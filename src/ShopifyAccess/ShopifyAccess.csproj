@@ -89,9 +89,11 @@
     <Compile Include="Models\Order\ShopifyOrders.cs" />
     <Compile Include="Models\Order\ShopifyShippingAddress.cs" />
     <Compile Include="Models\ProductVariant\ShopifyProductVariant.cs" />
+    <Compile Include="Models\ProductVariant\ShopifyInventoryLevelForUpdate.cs" />
     <Compile Include="Models\ProductVariant\ShopifyProductVariantForUpdate.cs" />
     <Compile Include="Models\Product\ProductsCount.cs" />
     <Compile Include="Models\Product\ShopifyProduct.cs" />
+    <Compile Include="Models\Product\ShopifyInventoryLevels.cs" />
     <Compile Include="Models\Product\ShopifyProducts.cs" />
     <Compile Include="Models\User\ShopifyUser.cs" />
     <Compile Include="Models\User\ShopifyUsers.cs" />
