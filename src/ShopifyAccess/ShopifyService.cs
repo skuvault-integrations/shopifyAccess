@@ -306,7 +306,6 @@ namespace ShopifyAccess
 		#endregion
 
 		#region Update variants
-		[ Obsolete ]
 		public void UpdateProductVariants( IEnumerable< ShopifyProductVariantForUpdate > variants, Mark mark = null )
 		{
 			mark = mark.CreateNewIfBlank();
@@ -315,8 +314,7 @@ namespace ShopifyAccess
 				this.UpdateProductVariantQuantity( variant, mark );
 			}
 		}
-
-		[ Obsolete ]
+		
 		public async Task UpdateProductVariantsAsync( IEnumerable< ShopifyProductVariantForUpdate > variants, Mark mark = null )
 		{
 			mark = mark.CreateNewIfBlank();

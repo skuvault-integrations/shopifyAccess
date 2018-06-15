@@ -24,15 +24,15 @@ namespace ShopifyAccessTests.Products
 		[ SetUp ]
 		public void Init()
 		{
-			Directory.SetCurrentDirectory( TestContext.CurrentContext.TestDirectory );
-			const string credentialsFilePath = @"..\..\Files\ShopifyCredentials.csv";
-			NetcoLogger.LoggerFactory = new ConsoleLoggerFactory();
+			//Directory.SetCurrentDirectory( TestContext.CurrentContext.TestDirectory );
+			//const string credentialsFilePath = @"..\..\Files\ShopifyCredentials.csv";
+			//NetcoLogger.LoggerFactory = new ConsoleLoggerFactory();
 
-			var cc = new CsvContext();
-			var testConfig = cc.Read< TestCommandConfig >( credentialsFilePath, new CsvFileDescription { FirstLineHasColumnNames = true } ).FirstOrDefault();
+			//var cc = new CsvContext();
+			//var testConfig = cc.Read< TestCommandConfig >( credentialsFilePath, new CsvFileDescription { FirstLineHasColumnNames = true } ).FirstOrDefault();
 
-			if( testConfig != null )
-				this.Config = new ShopifyCommandConfig( testConfig.ShopName, testConfig.AccessToken );
+			//if( testConfig != null )
+				this.Config = new ShopifyCommandConfig("skuvault-duoplane", "c330954dceedca74343ff87ff6f806db");
 		}
 
 		[ Test ]

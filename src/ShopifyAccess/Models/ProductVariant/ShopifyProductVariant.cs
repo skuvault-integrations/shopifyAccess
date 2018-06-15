@@ -10,12 +10,16 @@ namespace ShopifyAccess.Models.ProductVariant
 		[ DataMember( Name = "id" ) ]
 		public long Id{ get; set; }
 
-		[ Obsolete ]
+		/// <summary>
+		/// This field is obsolete. DON'T USE IT
+		/// </summary>
 		[ DataMember( Name = "inventory_quantity" ) ]
 		public int Quantity{ get; set; }
 
-		[ Obsolete ]
-		[ DataMember( Name = "old_inventory_quantity" ) ]
+		/// <summary>
+		/// This field is obsolete. DON'T USE IT
+		/// </summary>
+		[DataMember( Name = "old_inventory_quantity" ) ]
 		public int OldQuantity{ get; set; }
 
 		[ DataMember( Name = "inventory_management" ) ]
