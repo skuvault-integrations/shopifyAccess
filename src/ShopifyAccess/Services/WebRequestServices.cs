@@ -121,7 +121,7 @@ namespace ShopifyAccess.Services
 
 			var url = new Uri( string.Concat( this._commandConfig.Host, command.Command ) );
 
-			var request = this.CreateServicePostRequest( url, jsonContent );
+			var request = this.CreateServicePostRequest( url, this._commandConfig.AccessToken, jsonContent );
 			this.LogUpdateRequest( request.RequestUri, jsonContent, mark );
 
 			T result;
