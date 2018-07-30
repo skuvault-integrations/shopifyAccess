@@ -59,6 +59,13 @@ namespace ShopifyAccess.Services
 			return endpoint;
 		}
 
+		public static string CreateInventoryLevelsIdsEndpoint( string[] ids, int page, int limit )
+		{
+			// INFO : limit should be 250. Page start from 1. Max of inventory_item_ids is 50.
+			var endpoint = string.Format( "?location_ids={0}&page={1}&limit={2}", string.Join( ",", ids.Select( x => x ) ), page, limit );
+			return endpoint;
+		}
+
 		public static string CreateGetUserEndpoint( long userId )
 		{
 			var endpoint = string.Format( "{0}.json", userId );
