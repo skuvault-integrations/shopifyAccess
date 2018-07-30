@@ -60,6 +60,20 @@ namespace ShopifyAccess
 		Task< ShopifyProducts > GetProductsAsync( Mark mark = null );
 
 		/// <summary>
+		/// Get all existing products (through locations)
+		/// </summary>
+		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
+		/// <returns>Products with variants (inventory items)</returns>
+		ShopifyProducts GetProductsThroughLocations( Mark mark = null );
+
+		/// <summary>
+		/// Get all existing products async (through locations)
+		/// </summary>
+		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
+		/// <returns>Products with variants (inventory items)</returns>
+		Task< ShopifyProducts > GetProductsThroughLocationsAsync( Mark mark = null );
+
+		/// <summary>
 		/// Update variants (inventory items). This method is obsolete. DON'T USE IT
 		/// </summary>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
