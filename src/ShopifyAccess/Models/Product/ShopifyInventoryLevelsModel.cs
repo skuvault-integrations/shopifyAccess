@@ -4,7 +4,7 @@ namespace ShopifyAccess.Models.Product
 {
 	public class ShopifyInventoryLevelsModel
 	{
-		public Dictionary< long, List< ShopifyInventoryLevelModel > > InventoryLevels{ get; }
+		public Dictionary< long, List< ShopifyInventoryLevelModel > > InventoryLevels{ get; set; }
 
 		public ShopifyInventoryLevelsModel()
 		{
