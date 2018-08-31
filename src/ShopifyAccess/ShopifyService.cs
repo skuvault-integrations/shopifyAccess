@@ -156,7 +156,13 @@ namespace ShopifyAccess
 			foreach( var product in products.Products )
 			foreach( var variant in product.Variants )
 			{
-				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevels.InventoryLevels.Where( x => x.InventoryItemId == variant.InventoryItemId ).ToList() };
+				var inventoryLevelsModelOfInventoryItemId = new List< ShopifyInventoryLevelModel >();
+				if( !inventoryLevels.InventoryLevels.TryGetValue( variant.InventoryItemId, out inventoryLevelsModelOfInventoryItemId ) )
+					continue;
+
+				var inventoryLevelsOfInventoryItemId = inventoryLevelsModelOfInventoryItemId.Select( x => x.ToShopifyInventoryLevel( variant.InventoryItemId ) ).ToList();
+
+				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevelsOfInventoryItemId };
 				variant.InventoryLevels = inventoryLevelsForVariant;
 			}
 
@@ -174,7 +180,13 @@ namespace ShopifyAccess
 			foreach( var product in products.Products )
 			foreach( var variant in product.Variants )
 			{
-				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevels.InventoryLevels.Where( x => x.InventoryItemId == variant.InventoryItemId ).ToList() };
+				var inventoryLevelsModelOfInventoryItemId = new List< ShopifyInventoryLevelModel >();
+				if( !inventoryLevels.InventoryLevels.TryGetValue( variant.InventoryItemId, out inventoryLevelsModelOfInventoryItemId ) )
+					continue;
+
+				var inventoryLevelsOfInventoryItemId = inventoryLevelsModelOfInventoryItemId.Select( x => x.ToShopifyInventoryLevel( variant.InventoryItemId ) ).ToList();
+
+				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevelsOfInventoryItemId };
 				variant.InventoryLevels = inventoryLevelsForVariant;
 			}
 
@@ -193,7 +205,13 @@ namespace ShopifyAccess
 			foreach( var product in products.Products )
 			foreach( var variant in product.Variants )
 			{
-				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevels.InventoryLevels.Where( x => x.InventoryItemId == variant.InventoryItemId ).ToList() };
+				var inventoryLevelsModelOfInventoryItemId = new List< ShopifyInventoryLevelModel >();
+				if( !inventoryLevels.InventoryLevels.TryGetValue( variant.InventoryItemId, out inventoryLevelsModelOfInventoryItemId ) )
+					continue;
+
+				var inventoryLevelsOfInventoryItemId = inventoryLevelsModelOfInventoryItemId.Select( x => x.ToShopifyInventoryLevel( variant.InventoryItemId ) ).ToList();
+
+				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevelsOfInventoryItemId };
 				variant.InventoryLevels = inventoryLevelsForVariant;
 			}
 
@@ -212,7 +230,13 @@ namespace ShopifyAccess
 			foreach( var product in products.Products )
 			foreach( var variant in product.Variants )
 			{
-				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevels.InventoryLevels.Where( x => x.InventoryItemId == variant.InventoryItemId ).ToList() };
+				var inventoryLevelsModelOfInventoryItemId = new List< ShopifyInventoryLevelModel >();
+				if( !inventoryLevels.InventoryLevels.TryGetValue( variant.InventoryItemId, out inventoryLevelsModelOfInventoryItemId ) )
+					continue;
+
+				var inventoryLevelsOfInventoryItemId = inventoryLevelsModelOfInventoryItemId.Select( x => x.ToShopifyInventoryLevel( variant.InventoryItemId ) ).ToList();
+
+				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevelsOfInventoryItemId };
 				variant.InventoryLevels = inventoryLevelsForVariant;
 			}
 
@@ -281,9 +305,27 @@ namespace ShopifyAccess
 			return products;
 		}
 
-		private ShopifyInventoryLevels CollectInventoryLevelsFromAllPages( Mark mark, long[] productIds )
+		private void ConvertToShopifyInventoryLevelsModel( ShopifyInventoryLevelsModel inventoryLevels, ShopifyInventoryLevels productsWithinPage )
 		{
-			var inventoryLevels = new ShopifyInventoryLevels();
+			var productsWithinPageGroupByInventoryItemId = productsWithinPage.InventoryLevels
+				.GroupBy( x => x.InventoryItemId )
+				.Select( x => new
+				{
+					InventoryItemId = x.Key,
+					Data = x.Select( t => new ShopifyInventoryLevelModel( t ) ).ToList()
+				} )
+				.ToList();
+
+			foreach( var item in productsWithinPageGroupByInventoryItemId )
+				if( !inventoryLevels.InventoryLevels.ContainsKey( item.InventoryItemId ) )
+					inventoryLevels.InventoryLevels.Add( item.InventoryItemId, item.Data );
+				else
+					inventoryLevels.InventoryLevels[ item.InventoryItemId ].AddRange( item.Data );
+		}
+
+		private ShopifyInventoryLevelsModel CollectInventoryLevelsFromAllPages( Mark mark, long[] productIds )
+		{
+			var inventoryLevels = new ShopifyInventoryLevelsModel();
 			var partsOfProductIds = productIds.Slice( RequestInventoryLevelsMaxLimit );
 
 			foreach( var ids in partsOfProductIds )
@@ -296,8 +338,8 @@ namespace ShopifyAccess
 					var productsWithinPage = ActionPolicies.GetPolicy( mark, this._shopName ).Get(
 						() => this._throttler.Execute(
 							() => this._webRequestServices.GetResponse< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark ) ) );
-					
-					inventoryLevels.InventoryLevels.AddRange( productsWithinPage.InventoryLevels );
+
+					this.ConvertToShopifyInventoryLevelsModel( inventoryLevels, productsWithinPage );
 
 					if( productsWithinPage.InventoryLevels.Count < RequestMaxLimit )
 						break;
@@ -309,9 +351,9 @@ namespace ShopifyAccess
 			return inventoryLevels;
 		}
 
-		private async Task< ShopifyInventoryLevels > CollectInventoryLevelsFromAllPagesAsync( Mark mark, long[] productIds )
+		private async Task< ShopifyInventoryLevelsModel > CollectInventoryLevelsFromAllPagesAsync( Mark mark, long[] productIds )
 		{
-			var inventoryLevels = new ShopifyInventoryLevels();
+			var inventoryLevels = new ShopifyInventoryLevelsModel();
 			var partsOfProductIds = productIds.Slice( RequestInventoryLevelsMaxLimit );
 
 			foreach( var ids in partsOfProductIds )
@@ -325,7 +367,7 @@ namespace ShopifyAccess
 						async () => await this._throttlerAsync.ExecuteAsync(
 							async () => await this._webRequestServices.GetResponseAsync< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark ) ) );
 					
-					inventoryLevels.InventoryLevels.AddRange( productsWithinPage.InventoryLevels );
+					this.ConvertToShopifyInventoryLevelsModel( inventoryLevels, productsWithinPage );
 
 					if( productsWithinPage.InventoryLevels.Count < RequestMaxLimit )
 						break;
@@ -337,9 +379,9 @@ namespace ShopifyAccess
 			return inventoryLevels;
 		}
 
-		private ShopifyInventoryLevels CollectInventoryLevelsFromAllPages( Mark mark, ShopifyLocations shopifyLocations )
+		private ShopifyInventoryLevelsModel CollectInventoryLevelsFromAllPages( Mark mark, ShopifyLocations shopifyLocations )
 		{
-			var inventoryLevels = new ShopifyInventoryLevels();
+			var inventoryLevels = new ShopifyInventoryLevelsModel();
 			var partsOfLocationIds = shopifyLocations.Locations.Select( x => x.Id ).Slice( RequestInventoryLevelsMaxLimit );
 
 			foreach( var ids in partsOfLocationIds )
@@ -353,7 +395,7 @@ namespace ShopifyAccess
 						() => this._throttler.Execute(
 							() => this._webRequestServices.GetResponse< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark ) ) );
 
-					inventoryLevels.InventoryLevels.AddRange( productsWithinPage.InventoryLevels );
+					this.ConvertToShopifyInventoryLevelsModel( inventoryLevels, productsWithinPage );
 
 					if( productsWithinPage.InventoryLevels.Count < RequestMaxLimit )
 						break;
@@ -365,9 +407,9 @@ namespace ShopifyAccess
 			return inventoryLevels;
 		}
 
-		private async Task< ShopifyInventoryLevels > CollectInventoryLevelsFromAllPagesAsync( Mark mark, ShopifyLocations shopifyLocations )
+		private async Task< ShopifyInventoryLevelsModel > CollectInventoryLevelsFromAllPagesAsync( Mark mark, ShopifyLocations shopifyLocations )
 		{
-			var inventoryLevels = new ShopifyInventoryLevels();
+			var inventoryLevels = new ShopifyInventoryLevelsModel();
 			var partsOfLocationIds = shopifyLocations.Locations.Select( x => x.Id ).Slice( RequestInventoryLevelsMaxLimit );
 
 			foreach( var ids in partsOfLocationIds )
@@ -381,7 +423,7 @@ namespace ShopifyAccess
 						async () => await this._throttlerAsync.ExecuteAsync(
 							async () => await this._webRequestServices.GetResponseAsync< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark ) ) );
 
-					inventoryLevels.InventoryLevels.AddRange( productsWithinPage.InventoryLevels );
+					this.ConvertToShopifyInventoryLevelsModel( inventoryLevels, productsWithinPage );
 
 					if( productsWithinPage.InventoryLevels.Count < RequestMaxLimit )
 						break;

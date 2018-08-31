@@ -92,6 +92,7 @@
     <Compile Include="Models\ProductVariant\ShopifyInventoryLevelForUpdate.cs" />
     <Compile Include="Models\ProductVariant\ShopifyProductVariantForUpdate.cs" />
     <Compile Include="Models\Product\ProductsCount.cs" />
+    <Compile Include="Models\Product\ShopifyInventoryLevelsModel.cs" />
     <Compile Include="Models\Product\ShopifyProduct.cs" />
     <Compile Include="Models\Product\ShopifyInventoryLevels.cs" />
     <Compile Include="Models\Product\ShopifyProducts.cs" />
