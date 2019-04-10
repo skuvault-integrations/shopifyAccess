@@ -243,6 +243,38 @@ namespace ShopifyAccess
 			return products;
 		}
 
+		public async Task< List< ShopifyProductVariant > > GetProductVariantsBySkusAsync( IEnumerable< string > skus, Mark mark = null )
+		{
+			mark = mark.CreateNewIfBlank();
+
+			var products = await this.CollectProductsFromAllPagesAsync( mark );
+			this.RemoveUntrackedProductVariants( products );
+
+			var productVariants = products.ToListVariants();
+			var variantIds = productVariants.Select( v => new { Sku = v.Sku.ToLowerInvariant(), v.InventoryItemId } );
+			var inventoryItemIds = skus.Select( s => s.ToLowerInvariant() ).Distinct()
+				.Join( variantIds, s => s, v => v.Sku, ( s, v ) => v.InventoryItemId )
+				.ToArray();
+			var inventoryLevels = await this.CollectInventoryLevelsFromAllPagesAsync( mark, inventoryItemIds );
+			productVariants = productVariants
+				.Join( inventoryItemIds, v => v.InventoryItemId, iid => iid, ( v, iid ) => v )
+				.ToList();
+
+			foreach( var variant in productVariants )
+			{
+				List< ShopifyInventoryLevelModel > inventoryLevelsModelOfInventoryItemId;
+				if( !inventoryLevels.InventoryLevels.TryGetValue( variant.InventoryItemId, out inventoryLevelsModelOfInventoryItemId ) )
+					continue;
+
+				var inventoryLevelsOfInventoryItemId = inventoryLevelsModelOfInventoryItemId.Select( x => x.ToShopifyInventoryLevel( variant.InventoryItemId ) ).ToList();
+
+				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevelsOfInventoryItemId };
+				variant.InventoryLevels = inventoryLevelsForVariant;
+			}
+
+			return productVariants;
+		}
+
 		private int GetProductsCount( Mark mark )
 		{
 			var count = ActionPolicies.GetPolicy( mark, this._shopName ).Get(

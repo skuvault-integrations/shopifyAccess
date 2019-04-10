@@ -54,6 +54,22 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
+		public async Task GetProductVariantsBySkusAsync()
+		{
+			var service = this.ShopifyFactory.CreateService( this.Config );
+			var products = await service.GetProductsAsync();
+			var productVariants = products.ToListVariants();
+
+			// take 10% random variants
+			var filteredProductVariants = productVariants.OrderBy( v => Guid.NewGuid() ).Take( productVariants.Count / 10 ).ToList();
+			var filteredSkus = filteredProductVariants.Select( v => v.Sku.ToUpperInvariant() );
+
+			var variants = await service.GetProductVariantsBySkusAsync( filteredSkus );
+			var expectedVariants = productVariants.Where( v => filteredSkus.Contains( v.Sku.ToUpperInvariant() ) ).ToList();
+			variants.ShouldBeEquivalentTo( expectedVariants );
+		}
+
+		[ Test ]
 		public void ProductVariantQuantityUpdated()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );

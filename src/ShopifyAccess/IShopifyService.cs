@@ -74,6 +74,14 @@ namespace ShopifyAccess
 		Task< ShopifyProducts > GetProductsThroughLocationsAsync( Mark mark = null );
 
 		/// <summary>
+		/// Get the list of product variants for specified SKUs
+		/// </summary>
+		/// <param name="skus">List of SKU for search</param>
+		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
+		/// <returns>List of variants (inventory items)</returns>
+		Task< List< ShopifyProductVariant > > GetProductVariantsBySkusAsync( IEnumerable< string > skus, Mark mark = null );
+
+		/// <summary>
 		/// Update variants (inventory items). This method is obsolete. DON'T USE IT
 		/// </summary>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
