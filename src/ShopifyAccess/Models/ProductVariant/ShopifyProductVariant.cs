@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using ShopifyAccess.Models.Product;
 
@@ -31,6 +32,28 @@ namespace ShopifyAccess.Models.ProductVariant
 		[ DataMember( Name = "inventory_item_id" ) ]
 		public long InventoryItemId{ get; set; }
 
+		[ DataMember( Name = "barcode" ) ]
+		public string Barcode { get; set; }
+		
+		[ DataMember( Name = "title" ) ]
+		public string Title { get; set; }
+
+		[ DataMember( Name = "weight" ) ]
+		public decimal Weight;
+
+		[ DataMember( Name = "weight_unit" ) ]
+		protected string WeightUnit { get; set; }
+		public string WeightUnitStandardized => this.WeightUnit?.Replace("kg", "kgs").Replace("lb", "lbs") ?? "lbs";
+
+		[ DataMember( Name = "price" ) ]
+		public decimal Price { get; set; }
+
+		[ DataMember( Name = "updated_at" ) ]
+		public DateTime UpdatedAt { get; set; }
+
+		[ DataMember( Name = "image_id" ) ]
+		public long ImageId { get; set; }
+
 		public ShopifyInventoryLevels InventoryLevels{ get; set; }
 
 		public override int GetHashCode()
@@ -41,7 +64,13 @@ namespace ShopifyAccess.Models.ProductVariant
 				hashCode = ( hashCode * 397 ) ^ this.Quantity.GetHashCode();
 				hashCode = ( hashCode * 397 ) ^ this.InventoryManagement.GetHashCode();
 				hashCode = ( hashCode * 397 ) ^ this.Sku.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ this.InventoryLevels.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ this.Barcode.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ this.Title.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ this.Weight.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ this.WeightUnit.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ this.Price.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ this.UpdatedAt.GetHashCode();
+
 				return hashCode;
 			}
 		}

@@ -96,6 +96,7 @@
     <Compile Include="Models\Product\ShopifyProduct.cs" />
     <Compile Include="Models\Product\ShopifyInventoryLevels.cs" />
     <Compile Include="Models\Product\ShopifyProducts.cs" />
+    <Compile Include="Models\ShopifyProductImage.cs" />
     <Compile Include="Models\User\ShopifyUser.cs" />
     <Compile Include="Models\User\ShopifyUsers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
