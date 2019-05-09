@@ -43,10 +43,16 @@ namespace ShopifyAccess.Models.ProductVariant
 
 		[ DataMember( Name = "weight_unit" ) ]
 		protected string WeightUnit { get; set; }
-		public string WeightUnitStandardized => this.WeightUnit?.Replace("kg", "kgs").Replace("lb", "lbs") ?? "lbs";
+		public string WeightUnitStandardized
+		{
+			get { return this.WeightUnit != null ? this.WeightUnit.Replace( "kg", "kgs" ).Replace( "lb", "lbs" ) : "lbs"; }
+		}
 
 		[ DataMember( Name = "price" ) ]
-		public decimal Price { get; set; }
+		public decimal SalePrice { get; set; }
+		
+		[ DataMember( Name = "compare_at_price" ) ]
+		public decimal RetailPrice { get; set; }
 
 		[ DataMember( Name = "updated_at" ) ]
 		public DateTime UpdatedAt { get; set; }
@@ -68,8 +74,10 @@ namespace ShopifyAccess.Models.ProductVariant
 				hashCode = ( hashCode * 397 ) ^ this.Title.GetHashCode();
 				hashCode = ( hashCode * 397 ) ^ this.Weight.GetHashCode();
 				hashCode = ( hashCode * 397 ) ^ this.WeightUnit.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ this.Price.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ this.SalePrice.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ this.RetailPrice.GetHashCode();
 				hashCode = ( hashCode * 397 ) ^ this.UpdatedAt.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ this.ImageId.GetHashCode();
 
 				return hashCode;
 			}

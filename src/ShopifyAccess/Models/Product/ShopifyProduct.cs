@@ -24,5 +24,8 @@ namespace ShopifyAccess.Models.Product
 
 		[ DataMember( Name = "body_html" ) ]
 		public string Description { get; set; }
+		
+		[ DataMember( Name = "tags" ) ]
+		public string Note { get; set; }
 	}
 }
