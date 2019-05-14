@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 using ShopifyAccess.Models.Product;
 
@@ -49,10 +48,10 @@ namespace ShopifyAccess.Models.ProductVariant
 		}
 
 		[ DataMember( Name = "price" ) ]
-		public decimal SalePrice { get; set; }
+		public decimal Price { get; set; }
 		
 		[ DataMember( Name = "compare_at_price" ) ]
-		public decimal RetailPrice { get; set; }
+		public decimal CompareAtPrice { get; set; }
 
 		[ DataMember( Name = "updated_at" ) ]
 		public DateTime UpdatedAt { get; set; }
@@ -74,8 +73,8 @@ namespace ShopifyAccess.Models.ProductVariant
 				hashCode = ( hashCode * 397 ) ^ this.Title.GetHashCode();
 				hashCode = ( hashCode * 397 ) ^ this.Weight.GetHashCode();
 				hashCode = ( hashCode * 397 ) ^ this.WeightUnit.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ this.SalePrice.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ this.RetailPrice.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ this.Price.GetHashCode();
+				hashCode = ( hashCode * 397 ) ^ this.CompareAtPrice.GetHashCode();
 				hashCode = ( hashCode * 397 ) ^ this.UpdatedAt.GetHashCode();
 				hashCode = ( hashCode * 397 ) ^ this.ImageId.GetHashCode();
 
