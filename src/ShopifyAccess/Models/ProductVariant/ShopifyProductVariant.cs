@@ -41,7 +41,7 @@ namespace ShopifyAccess.Models.ProductVariant
 		public decimal Weight;
 
 		[ DataMember( Name = "weight_unit" ) ]
-		protected string WeightUnit { get; set; }
+		public string WeightUnit { get; set; }
 		public string WeightUnitStandardized
 		{
 			get { return this.WeightUnit != null ? this.WeightUnit.Replace( "kg", "kgs" ).Replace( "lb", "lbs" ) : "lbs"; }
