@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using ShopifyAccess.Models.ProductVariant;
 
@@ -30,5 +31,8 @@ namespace ShopifyAccess.Models.Product
 		
 		[ DataMember( Name = "tags" ) ]
 		public string Tags { get; set; }
+
+		[ DataMember( Name = "updated_at" ) ]
+		public DateTime UpdatedAt { get; set; }
 	}
 }
