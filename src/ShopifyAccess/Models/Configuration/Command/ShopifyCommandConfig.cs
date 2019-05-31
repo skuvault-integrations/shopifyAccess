@@ -6,6 +6,8 @@ namespace ShopifyAccess.Models.Configuration.Command
 	{
 		public string AccessToken { get; private set; }
 
+		public readonly int RequestTimeoutMs = 10 * 60 * 1000;
+
 		public ShopifyCommandConfig( string shopName, string accessToken )
 			: base( shopName )
 		{
