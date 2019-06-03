@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using ShopifyAccess.Models;
 using ShopifyAccess.Models.Location;
@@ -29,9 +28,8 @@ namespace ShopifyAccess
 		/// <param name="dateFrom">created_at_min. Show orders created after date (format: 2008-01-01 03:00)</param>
 		/// <param name="dateTo">created_at_max. Show orders created before date (format: 2008-01-01 03:00)</param>
 		/// <param name="status">fulfillment_status. Shipped,partial, unshipped or any</param>
-		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo, CancellationToken token, Mark mark = null );
+		Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo, Mark mark = null );
 
 		/// <summary>
 		/// get locations
@@ -43,10 +41,9 @@ namespace ShopifyAccess
 		/// <summary>
 		/// get locations async
 		/// </summary>
-		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns></returns>
-		Task< ShopifyLocations > GetLocationsAsync( CancellationToken token, Mark mark = null );
+		Task< ShopifyLocations > GetLocationsAsync( Mark mark = null );
 
 		/// <summary>
 		/// Get all existing products
@@ -59,9 +56,8 @@ namespace ShopifyAccess
 		/// Get all existing products async
 		/// </summary>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		/// <param name="token">CancellationToken</param>
 		/// <returns>Products with variants (inventory items)</returns>
-		Task< ShopifyProducts > GetProductsAsync( CancellationToken token, Mark mark = null );
+		Task< ShopifyProducts > GetProductsAsync( Mark mark = null );
 
 		/// <summary>
 		/// Get all existing products (through locations)
@@ -73,19 +69,17 @@ namespace ShopifyAccess
 		/// <summary>
 		/// Get all existing products async (through locations)
 		/// </summary>
-		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns>Products with variants (inventory items)</returns>
-		Task< ShopifyProducts > GetProductsThroughLocationsAsync( CancellationToken token, Mark mark = null );
+		Task< ShopifyProducts > GetProductsThroughLocationsAsync( Mark mark = null );
 
 		/// <summary>
 		/// Get the list of product variants for specified SKUs
 		/// </summary>
 		/// <param name="skus">List of SKU for search</param>
-		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns>List of variants (inventory items)</returns>
-		Task< List< ShopifyProductVariant > > GetProductVariantsBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null );
+		Task< List< ShopifyProductVariant > > GetProductVariantsBySkusAsync( IEnumerable< string > skus, Mark mark = null );
 
 		/// <summary>
 		/// Update variants (inventory items). This method is obsolete. DON'T USE IT
@@ -121,10 +115,9 @@ namespace ShopifyAccess
 		/// <summary>
 		/// Get all users async
 		/// </summary>
-		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns></returns>
-		Task< ShopifyUsers > GetUsersAsync( CancellationToken token, Mark mark = null );
+		Task< ShopifyUsers > GetUsersAsync( Mark mark = null );
 
 		/// <summary>
 		/// Get user
@@ -136,10 +129,9 @@ namespace ShopifyAccess
 		/// <summary>
 		/// Get user async
 		/// </summary>
-		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns></returns>
-		Task< ShopifyUser > GetUserAsync( long id, CancellationToken token, Mark mark = null );
+		Task< ShopifyUser > GetUserAsync( long id, Mark mark = null );
 
 		/// <summary>
 		/// Does shopify plus customer
@@ -151,9 +143,8 @@ namespace ShopifyAccess
 		/// <summary>
 		/// Does shopify plus customer async
 		/// </summary>
-		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns></returns>
-		Task< bool > DoesShopifyPlusAccountAsync( CancellationToken token, Mark mark = null );
+		Task< bool > DoesShopifyPlusAccountAsync( Mark mark = null );
 	}
 }

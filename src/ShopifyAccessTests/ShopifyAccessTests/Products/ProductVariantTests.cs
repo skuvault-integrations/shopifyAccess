@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using LINQtoCSV;
@@ -49,7 +48,7 @@ namespace ShopifyAccessTests.Products
 		public async Task GetProductsAsync()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var products = await service.GetProductsAsync( CancellationToken.None );
+			var products = await service.GetProductsAsync();
 
 			products.Products.Count.Should().BeGreaterThan( 0 );
 		}
@@ -58,14 +57,14 @@ namespace ShopifyAccessTests.Products
 		public async Task GetProductVariantsBySkusAsync()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var products = await service.GetProductsAsync( CancellationToken.None );
+			var products = await service.GetProductsAsync();
 			var productVariants = products.ToListVariants();
 
 			// take 10% random variants
 			var filteredProductVariants = productVariants.OrderBy( v => Guid.NewGuid() ).Take( productVariants.Count / 10 ).ToList();
 			var filteredSkus = filteredProductVariants.Select( v => v.Sku.ToUpperInvariant() );
 
-			var variants = await service.GetProductVariantsBySkusAsync( filteredSkus, CancellationToken.None );
+			var variants = await service.GetProductVariantsBySkusAsync( filteredSkus );
 			var expectedVariants = productVariants.Where( v => filteredSkus.Contains( v.Sku.ToUpperInvariant() ) ).ToList();
 			variants.ShouldBeEquivalentTo( expectedVariants );
 		}
