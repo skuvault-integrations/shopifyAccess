@@ -55,13 +55,17 @@ namespace ShopifyAccess.Services
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
+			if( token.IsCancellationRequested )
+			{
+				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
+			}
+
+			var request = this.CreateServiceGetRequest( command, endpoint );
+			this.LogGetRequest( request.RequestUri, mark );
+
 			using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
 			{ 
-				linkedCancellationTokenSource.CancelAfter( _commandConfig.RequestTimeoutMs );
-
-				var request = this.CreateServiceGetRequest( command, endpoint );
-				this.LogGetRequest( request.RequestUri, mark );
-
+				linkedCancellationTokenSource.CancelAfter( this._commandConfig.RequestTimeoutMs );
 				using( linkedCancellationTokenSource.Token.Register( request.Abort ) )
 				{
 					return await this.ParseExceptionAsync( mark, async () =>
