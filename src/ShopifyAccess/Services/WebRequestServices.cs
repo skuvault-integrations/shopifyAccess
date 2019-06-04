@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using CuttingEdge.Conditions;
 using ServiceStack;
@@ -50,20 +51,32 @@ namespace ShopifyAccess.Services
 			} );
 		}
 
-		public async Task< T > GetResponseAsync< T >( ShopifyCommand command, string endpoint, Mark mark )
+		public async Task< T > GetResponseAsync< T >( ShopifyCommand command, string endpoint, Mark mark, CancellationToken token )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
+
+			if( token.IsCancellationRequested )
+			{
+				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
+			}
 
 			var request = this.CreateServiceGetRequest( command, endpoint );
 			this.LogGetRequest( request.RequestUri, mark );
 
-			return await this.ParseExceptionAsync( mark, async () =>
-			{
-				T result;
-				using( var response = await request.GetResponseAsync() )
-					result = this.ParseResponse< T >( response, mark );
-				return result;
-			} );
+			using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
+			{ 
+				linkedCancellationTokenSource.CancelAfter( this._commandConfig.RequestTimeoutMs );
+				using( linkedCancellationTokenSource.Token.Register( request.Abort ) )
+				{
+					return await this.ParseExceptionAsync( mark, async () =>
+					{
+						T result;
+						using( var response = await request.GetResponseAsync() )
+							result = this.ParseResponse< T >( response, mark );
+						return result;
+					} );
+				}
+			}
 		}
 
 		public void PutData( ShopifyCommand command, string endpoint, string jsonContent, Mark mark )

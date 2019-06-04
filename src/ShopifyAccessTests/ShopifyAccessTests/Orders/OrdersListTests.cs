@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using LINQtoCSV;
@@ -47,7 +48,7 @@ namespace ShopifyAccessTests.Orders
 		public async Task OrdersFilteredFulfillmentStatusDateLoadedAsync()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var orders = await service.GetOrdersAsync( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow );
+			var orders = await service.GetOrdersAsync( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow, CancellationToken.None );
 
 			orders.Count.Should().Be( 1 );
 		}
