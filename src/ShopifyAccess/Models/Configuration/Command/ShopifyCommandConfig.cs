@@ -11,6 +11,7 @@ namespace ShopifyAccess.Models.Configuration.Command
 			: base( shopName )
 		{
 			Condition.Requires( accessToken, "accessToken" ).IsNotNullOrWhiteSpace();
+			Condition.Requires( requestTimeoutMs, "requestTimeoutMs" ).IsGreaterThan( 0 );
 
 			this.AccessToken = accessToken;
 			this.RequestTimeoutMs = requestTimeoutMs;

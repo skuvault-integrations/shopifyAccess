@@ -54,7 +54,7 @@ namespace ShopifyAccessTests.Cancellation
 		[ Test ]
 		public async Task RequestTimesOut()
 		{
-			const int reallyShortTime = 0;
+			const int reallyShortTime = 1;
 			var service = this.ShopifyFactory.CreateService( this.CreateConfig( reallyShortTime ) );
 			var cancellationTokenSource = new CancellationTokenSource();
 
