@@ -78,6 +78,7 @@
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Cancellation\CancellationTokenTests.cs" />
+    <Compile Include="EndpointsBuilderTests.cs" />
     <Compile Include="Locations\LocationListTests.cs" />
     <Compile Include="Orders\OrdersListTests.cs" />
     <Compile Include="Products\ProductVariantTests.cs" />

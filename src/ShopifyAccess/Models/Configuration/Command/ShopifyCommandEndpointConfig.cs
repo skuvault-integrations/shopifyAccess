@@ -2,7 +2,7 @@
 
 namespace ShopifyAccess.Models.Configuration.Command
 {
-	internal class ShopifyCommandEndpointConfig
+	public class ShopifyCommandEndpointConfig
 	{
 		public long SinceId{ get; private set; }
 		public int Limit{ get; private set; }

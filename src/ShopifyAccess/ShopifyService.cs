@@ -169,19 +169,51 @@ namespace ShopifyAccess
 
 			return products;
 		}
-		
+
 		public async Task< ShopifyProducts > GetProductsAsync( CancellationToken token, Mark mark = null )
+		{
+			return await this.GetProductsCreatedAfterAsync( DateTime.MinValue, token, mark );
+		}
+		
+		public async Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null )
 		{
 			mark = mark.CreateNewIfBlank();
 
-			var products = await this.CollectProductsFromAllPagesAsync( mark, token );
+			var productsDateFilter = new ProductsDateFilter
+			{
+				FilterType = FilterType.CreatedAfter,
+				ProductsStartUtc = productsStartUtc
+			};
+			var products = await this.CollectProductsFromAllPagesAsync( productsDateFilter, mark, token );
+			await this.GetInventoryLevels( token, mark, products );
+
+			return products;
+		}
+		
+		public async Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null )
+		{
+			mark = mark.CreateNewIfBlank();
+
+			var productsDateFilter = new ProductsDateFilter
+			{
+				FilterType = FilterType.CreatedBeforeUpdatedAfter,
+				ProductsStartUtc = productsStartUtc
+			};
+			var products = await this.CollectProductsFromAllPagesAsync( productsDateFilter, mark, token );
+			await this.GetInventoryLevels( token, mark, products );
+
+			return products;
+		}
+
+		private async Task GetInventoryLevels( CancellationToken token, Mark mark, ShopifyProducts products )
+		{
 			this.RemoveUntrackedProductVariants( products );
 			var inventoryLevels = await this.CollectInventoryLevelsFromAllPagesAsync( mark, products.Products.SelectMany( x => x.Variants.Select( t => t.InventoryItemId ) ).ToArray(), token );
 
 			foreach( var product in products.Products )
 			foreach( var variant in product.Variants )
 			{
-				var inventoryLevelsModelOfInventoryItemId = new List< ShopifyInventoryLevelModel >();
+				List< ShopifyInventoryLevelModel > inventoryLevelsModelOfInventoryItemId;
 				if( !inventoryLevels.InventoryLevels.TryGetValue( variant.InventoryItemId, out inventoryLevelsModelOfInventoryItemId ) )
 					continue;
 
@@ -190,8 +222,6 @@ namespace ShopifyAccess
 				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevelsOfInventoryItemId };
 				variant.InventoryLevels = inventoryLevelsForVariant;
 			}
-
-			return products;
 		}
 
 		public ShopifyProducts GetProductsThroughLocations( Mark mark = null )
@@ -317,12 +347,23 @@ namespace ShopifyAccess
 
 		private async Task< ShopifyProducts > CollectProductsFromAllPagesAsync( Mark mark, CancellationToken token )
 		{
+			var noFilter = new ProductsDateFilter { FilterType = FilterType.None };
+
+			return await this.CollectProductsFromAllPagesAsync( noFilter, mark, token );
+		}
+
+		private async Task< ShopifyProducts > CollectProductsFromAllPagesAsync( ProductsDateFilter productsDateFilter, Mark mark, CancellationToken token )
+		{
 			var products = new ShopifyProducts();
 			long sinceId = 0;
 
 			while( true )
 			{
 				var endpoint = EndpointsBuilder.CreateGetNextPageSinceIdEndpoint( new ShopifyCommandEndpointConfig( sinceId, RequestMaxLimit ) );
+				if( productsDateFilter.FilterType != FilterType.None )
+				{
+					endpoint += EndpointsBuilder.AppendGetProductsFilteredByDateEndpoint( productsDateFilter, endpoint );
+				}
 
 				var productsWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
 					() => this._throttlerAsync.ExecuteAsync(

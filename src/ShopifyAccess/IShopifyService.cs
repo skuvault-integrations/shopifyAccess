@@ -64,6 +64,24 @@ namespace ShopifyAccess
 		Task< ShopifyProducts > GetProductsAsync( CancellationToken token, Mark mark = null );
 
 		/// <summary>
+		/// Get products created after the given date async
+		/// </summary>
+		/// <param name="productsStartUtc"></param>
+		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
+		/// <param name="token">CancellationToken</param>
+		/// <returns>Products with variants (inventory items)</returns>
+		Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null );
+
+		/// <summary>
+		/// Get products created before the given date but updated after async
+		/// </summary>
+		/// <param name="productsStartUtc"></param>
+		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
+		/// <param name="token">CancellationToken</param>
+		/// <returns>Products with variants (inventory items)</returns>
+		Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null );
+
+		/// <summary>
 		/// Get all existing products (through locations)
 		/// </summary>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
