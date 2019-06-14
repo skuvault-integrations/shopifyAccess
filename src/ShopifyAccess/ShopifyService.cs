@@ -196,7 +196,7 @@ namespace ShopifyAccess
 
 			if( productsStartUtc == DateTime.MinValue )
 			{
-				return null;
+				return new ShopifyProducts();
 			}
 
 			var productsDateFilter = new ProductsDateFilter
