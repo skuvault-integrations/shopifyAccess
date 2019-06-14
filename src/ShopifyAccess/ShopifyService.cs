@@ -181,7 +181,7 @@ namespace ShopifyAccess
 
 			var productsDateFilter = new ProductsDateFilter
 			{
-				FilterType = FilterType.CreatedAfter,
+				FilterType = productsStartUtc != DateTime.MinValue ? FilterType.CreatedAfter : FilterType.None,
 				ProductsStartUtc = productsStartUtc
 			};
 			var products = await this.CollectProductsFromAllPagesAsync( productsDateFilter, mark, token );
@@ -193,6 +193,11 @@ namespace ShopifyAccess
 		public async Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null )
 		{
 			mark = mark.CreateNewIfBlank();
+
+			if( productsStartUtc == DateTime.MinValue )
+			{
+				return null;
+			}
 
 			var productsDateFilter = new ProductsDateFilter
 			{
