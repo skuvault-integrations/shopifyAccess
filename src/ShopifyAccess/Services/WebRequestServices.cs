@@ -71,10 +71,10 @@ namespace ShopifyAccess.Services
 					return await this.ParseExceptionAsync( mark, async () =>
 					{
 						T result;
-						using( var response = await request.GetResponseAsync() )
+						using( var response = await request.GetResponseAsync().ConfigureAwait( false ) )
 							result = this.ParseResponse< T >( response, mark );
 						return result;
-					} );
+					} ).ConfigureAwait( false );
 				}
 			}
 		}
