@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using LINQtoCSV;
 using Netco.Extensions;
@@ -42,8 +43,8 @@ namespace ShopifyAccessTests.Throttler
 			var list = new int[ 40 ];
 			await list.DoInBatchAsync( 50, async x =>
 			{
-				var orders = await service.GetOrdersAsync( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -20 ), DateTime.UtcNow );
-				var products = await service.GetProductsAsync();
+				var orders = await service.GetOrdersAsync( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -20 ), DateTime.UtcNow, CancellationToken.None );
+				var products = await service.GetProductsAsync( CancellationToken.None );
 				var variantToUpdate = new ShopifyProductVariantForUpdate { Id = 3341291969, Quantity = 2 };
 				await service.UpdateProductVariantsAsync( new List< ShopifyProductVariantForUpdate > { variantToUpdate } );
 			} );

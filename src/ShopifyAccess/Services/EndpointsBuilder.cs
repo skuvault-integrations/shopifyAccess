@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using ServiceStack;
 using ShopifyAccess.Models.Configuration.Command;
 using ShopifyAccess.Models.Order;
+using ShopifyAccess.Models.Product;
 
 namespace ShopifyAccess.Services
 {
-	internal static class EndpointsBuilder
+	public static class EndpointsBuilder
 	{
 		public static readonly string EmptyEndpoint = string.Empty;
 
@@ -26,6 +28,29 @@ namespace ShopifyAccess.Services
 				ShopifyOrderCommandEndpointName.OrderStatus.Name, status,
 				ShopifyOrderCommandEndpointName.OrdersDateUpdatedFrom.Name, DateTime.SpecifyKind( startDate, DateTimeKind.Utc ).ToString( "o" ),
 				ShopifyOrderCommandEndpointName.OrdersDateUpdatedTo.Name, DateTime.SpecifyKind( endDate, DateTimeKind.Utc ).ToString( "o" ));
+			return endpoint;
+		}
+
+		public static string AppendGetProductsFilteredByDateEndpoint( ProductsDateFilter productsDateFilter, string initialEndpoint )
+		{
+			if( productsDateFilter.FilterType == FilterType.None )
+				return string.Empty;
+
+			var endpoint = !initialEndpoint.IsNullOrEmpty() ? "&" : "";
+
+			switch( productsDateFilter.FilterType )
+			{
+				case FilterType.CreatedAfter:
+					endpoint += string.Format( "{0}={1}",
+						ShopifyProductCommandEndpointName.ProductDateCreatedAfter.Name, DateTime.SpecifyKind( productsDateFilter.ProductsStartUtc, DateTimeKind.Utc ).ToString( "o" ));
+					break;
+				case FilterType.CreatedBeforeUpdatedAfter:
+					endpoint += string.Format( "{0}={1}&{2}={3}",
+						ShopifyProductCommandEndpointName.ProductDateCreatedBefore.Name, DateTime.SpecifyKind( productsDateFilter.ProductsStartUtc, DateTimeKind.Utc ).ToString( "o" ),
+						ShopifyProductCommandEndpointName.ProductDateUpdatedAfter.Name, DateTime.SpecifyKind( productsDateFilter.ProductsStartUtc, DateTimeKind.Utc ).ToString( "o" ));
+					break;
+			}
+
 			return endpoint;
 		}
 

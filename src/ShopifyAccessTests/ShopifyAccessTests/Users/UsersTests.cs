@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using LINQtoCSV;
@@ -44,7 +45,7 @@ namespace ShopifyAccessTests.Users
 		public async Task GetUsersAsync()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var users = await service.GetUsersAsync();
+			var users = await service.GetUsersAsync( CancellationToken.None );
 
 			users.Users.Count.Should().BeGreaterThan( 0 );
 		}
@@ -62,7 +63,7 @@ namespace ShopifyAccessTests.Users
 		public async Task GetUserAsync()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var user = await service.GetUserAsync( 6250887 );
+			var user = await service.GetUserAsync( 6250887, CancellationToken.None );
 
 			user.Should().NotBeNull();
 		}
@@ -80,7 +81,7 @@ namespace ShopifyAccessTests.Users
 		public async Task DoesShopifyPlusAccountAsync()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var result = await service.DoesShopifyPlusAccountAsync();
+			var result = await service.DoesShopifyPlusAccountAsync( CancellationToken.None );
 
 			result.Should().Be( false );
 		}

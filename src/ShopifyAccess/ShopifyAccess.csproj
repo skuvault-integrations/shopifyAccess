@@ -72,6 +72,7 @@
     <Compile Include="Models\Configuration\Authorization\ShopifyAuthorizationConfig.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyCommandEndpointConfig.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyCommandEndpointName.cs" />
+    <Compile Include="Models\Configuration\Command\ShopifyProductCommandEndpointName.cs" />
     <Compile Include="Models\Configuration\ShopifyConfigBase.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyCommand.cs" />
     <Compile Include="Models\Location\ShopifyLocation.cs" />
@@ -92,10 +93,12 @@
     <Compile Include="Models\ProductVariant\ShopifyInventoryLevelForUpdate.cs" />
     <Compile Include="Models\ProductVariant\ShopifyProductVariantForUpdate.cs" />
     <Compile Include="Models\Product\ProductsCount.cs" />
+    <Compile Include="Models\Product\ProductsDateFilter.cs" />
     <Compile Include="Models\Product\ShopifyInventoryLevelsModel.cs" />
     <Compile Include="Models\Product\ShopifyProduct.cs" />
     <Compile Include="Models\Product\ShopifyInventoryLevels.cs" />
     <Compile Include="Models\Product\ShopifyProducts.cs" />
+    <Compile Include="Models\ShopifyProductImage.cs" />
     <Compile Include="Models\User\ShopifyUser.cs" />
     <Compile Include="Models\User\ShopifyUsers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
