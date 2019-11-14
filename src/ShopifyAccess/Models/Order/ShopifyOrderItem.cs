@@ -1,4 +1,6 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
+using ShopifyAccess.Models.Order.Discounts;
 
 namespace ShopifyAccess.Models.Order
 {
@@ -25,5 +27,11 @@ namespace ShopifyAccess.Models.Order
 
 		[ DataMember( Name = "total_discount" ) ]
 		public decimal TotalDiscount{ get; set; }
+
+		[ DataMember( Name = "total_discount_set" ) ]
+		public ShopifyPriceSet TotalDiscountSet{ get; set; }
+
+		[ DataMember( Name = "tax_lines" ) ]
+		public IEnumerable< ShopifyTaxLine > TaxLines{ get; set; }
 	}
 }
