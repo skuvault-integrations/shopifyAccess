@@ -5,6 +5,11 @@ namespace ShopifyAccess.Models.Order.Discounts
 	[ DataContract ]
 	public class ShopifyDiscountCode
 	{
+		public ShopifyDiscountCode( string typeValue )
+		{
+			this.TypeValue = typeValue;
+		}
+
 		[ DataMember( Name = "code" ) ]
 		public string Code{ get; set; }
 
@@ -12,13 +17,28 @@ namespace ShopifyAccess.Models.Order.Discounts
 		public decimal Amount{ get; set; }
 		
 		[ DataMember( Name = "type" ) ]
-		public ShopifyDiscountTypeEnum Type{ get; set; }
+		private string TypeValue { get; set; }
+		public ShopifyDiscountTypeEnum Type
+		{ 
+			get
+			{
+				switch( this.TypeValue )
+				{
+					case "fixed_amount":
+						return ShopifyDiscountTypeEnum.FixedAmount;
+					case "percentage":
+						return ShopifyDiscountTypeEnum.Percentage;
+					default:
+						return ShopifyDiscountTypeEnum.Undefined;
+				}
+			} 
+		}
 	}
 
 	public enum ShopifyDiscountTypeEnum
 	{
 		Undefined,
-		fixed_amount,
-		percentage
+		FixedAmount,
+		Percentage
 	}
 }
