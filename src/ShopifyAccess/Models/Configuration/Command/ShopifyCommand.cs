@@ -10,8 +10,8 @@
 		public static readonly ShopifyCommand GetProducts = new ShopifyCommand( "/admin/products.json" );
 		public static readonly ShopifyCommand GetProductsCount = new ShopifyCommand( "/admin/products/count.json" );
 		public static readonly ShopifyCommand GetInventoryLevels = new ShopifyCommand( "/admin/inventory_levels.json" );
-		public static readonly ShopifyCommand GetOrdersCount = new ShopifyCommand( $"/admin/api/{ApiVersions.V2019_04}/orders/count.json" );
-		public static readonly ShopifyCommand GetOrders = new ShopifyCommand( $"/admin/api/{ApiVersions.V2019_04}/orders.json" );
+		public static readonly ShopifyCommand GetOrdersCount = new ShopifyCommand( "/admin/api/{0}/orders/count.json", ApiVersion.V2019_04 );
+		public static readonly ShopifyCommand GetOrders = new ShopifyCommand( "/admin/api/{0}/orders.json", ApiVersion.V2019_04 );
 		public static readonly ShopifyCommand GetLocations = new ShopifyCommand( "/admin/locations.json" );
 		public static readonly ShopifyCommand GetUsers = new ShopifyCommand( "/admin/users.json" );
 		public static readonly ShopifyCommand GetUser = new ShopifyCommand( "/admin/users/" );
@@ -21,10 +21,15 @@
 			this.Command = command;
 		}
 
+		private ShopifyCommand( string commandUrl, string apiVersion )
+		{
+			this.Command = string.Format( commandUrl, apiVersion );
+		}
+
 		public string Command{ get; private set; }
 	}
 
-	public struct ApiVersions
+	public struct ApiVersion
 	{
 		public static readonly string V2019_04 = "2019-04";
 	}
