@@ -82,6 +82,7 @@ namespace ShopifyAccess
 			return locations;
 		}
 
+		//TODO GUARD-220 Convert to cursors, like CollectProductsFromAllPagesAsync
 		private ShopifyOrders CollectOrdersFromAllPages( string mainUpdatedOrdersEndpoint, Mark mark )
 		{
 			var orders = new ShopifyOrders();
@@ -93,6 +94,7 @@ namespace ShopifyAccess
 
 				var updatedOrdersWithinPage = ActionPolicies.GetPolicy( mark, this._shopName ).Get(
 					() => this._throttler.Execute(
+						//TODO GUARD-220 Call GetResponsePage
 						() => this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint, mark ) ) );
 
 				if( updatedOrdersWithinPage.Orders.Count == 0 )
@@ -105,6 +107,7 @@ namespace ShopifyAccess
 			return orders;
 		}
 
+		//TODO GUARD-220 Convert to cursors, like CollectProductsFromAllPagesAsync
 		private async Task< ShopifyOrders > CollectOrdersFromAllPagesAsync( string mainUpdatedOrdersEndpoint, Mark mark, CancellationToken token )
 		{
 			var orders = new ShopifyOrders();
@@ -116,6 +119,7 @@ namespace ShopifyAccess
 
 				var updatedOrdersWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
 					() => this._throttlerAsync.ExecuteAsync(
+						//TODO GUARD-220 Call GetResponsePage
 						() => this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint, mark, token ) ) );
 
 				if( updatedOrdersWithinPage.Orders.Count == 0 )
@@ -330,21 +334,23 @@ namespace ShopifyAccess
 		private ShopifyProducts CollectProductsFromAllPages( Mark mark )
 		{
 			var products = new ShopifyProducts();
-			long sinceId = 0;
+			var endpoint = EndpointsBuilder.CreateGetNextPageSinceIdEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
 
 			while( true )
 			{
-				var endpoint = EndpointsBuilder.CreateGetNextPageSinceIdEndpoint( new ShopifyCommandEndpointConfig( sinceId, RequestMaxLimit ) );
-
 				var productsWithinPage = ActionPolicies.GetPolicy( mark, this._shopName ).Get(
 					() => this._throttler.Execute(
-						() => this._webRequestServices.GetResponse< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint, mark ) ) );
+						() => this._webRequestServices.GetResponsePage< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint, mark ) ) );
 
-				if( productsWithinPage.Products.Count == 0 )
+				if( productsWithinPage.Response.Products.Count == 0 )
 					break;
 
-				sinceId = productsWithinPage.Products.Max( p => p.Id );
-				products.Products.AddRange( productsWithinPage.Products );
+				products.Products.AddRange( productsWithinPage.Response.Products );
+
+				if( productsWithinPage.NextPageQueryStr == string.Empty )
+					break;
+
+				endpoint = productsWithinPage.NextPageQueryStr;
 			}
 
 			return products;
@@ -360,11 +366,10 @@ namespace ShopifyAccess
 		private async Task< ShopifyProducts > CollectProductsFromAllPagesAsync( ProductsDateFilter productsDateFilter, Mark mark, CancellationToken token )
 		{
 			var products = new ShopifyProducts();
-			long sinceId = 0;
+			var endpoint = EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
 
 			while( true )
 			{
-				var endpoint = EndpointsBuilder.CreateGetNextPageSinceIdEndpoint( new ShopifyCommandEndpointConfig( sinceId, RequestMaxLimit ) );
 				if( productsDateFilter.FilterType != FilterType.None )
 				{
 					endpoint += EndpointsBuilder.AppendGetProductsFilteredByDateEndpoint( productsDateFilter, endpoint );
@@ -372,13 +377,16 @@ namespace ShopifyAccess
 
 				var productsWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
 					() => this._throttlerAsync.ExecuteAsync(
-						() => this._webRequestServices.GetResponseAsync< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint, mark, token ) ) );
-				
-				if( productsWithinPage.Products.Count == 0 )
+						() => this._webRequestServices.GetResponsePageAsync< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint, mark, token ) ) );
+				if( productsWithinPage.Response.Products.Count == 0 )
 					break;
-				
-				sinceId = productsWithinPage.Products.Max( p => p.Id );
-				products.Products.AddRange( productsWithinPage.Products );
+
+				products.Products.AddRange( productsWithinPage.Response.Products );
+
+				if( productsWithinPage.NextPageQueryStr == string.Empty )
+					break;
+
+				endpoint = productsWithinPage.NextPageQueryStr;
 			}
 
 			return products;
@@ -402,6 +410,7 @@ namespace ShopifyAccess
 					inventoryLevels.InventoryLevels[ item.InventoryItemId ].AddRange( item.Data );
 		}
 
+		//TODO GUARD-220 Convert to cursors, like CollectProductsFromAllPagesAsync
 		private ShopifyInventoryLevelsModel CollectInventoryLevelsFromAllPages( Mark mark, long[] productIds )
 		{
 			var inventoryLevels = new ShopifyInventoryLevelsModel();
@@ -416,6 +425,7 @@ namespace ShopifyAccess
 
 					var productsWithinPage = ActionPolicies.GetPolicy( mark, this._shopName ).Get(
 						() => this._throttler.Execute(
+							//TODO GUARD-220 Call GetResponsePage
 							() => this._webRequestServices.GetResponse< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark ) ) );
 
 					this.ConvertToShopifyInventoryLevelsModel( inventoryLevels, productsWithinPage );
@@ -430,6 +440,7 @@ namespace ShopifyAccess
 			return inventoryLevels;
 		}
 
+		//TODO GUARD-220 Convert to cursors, like CollectProductsFromAllPagesAsync
 		private async Task< ShopifyInventoryLevelsModel > CollectInventoryLevelsFromAllPagesAsync( Mark mark, long[] productIds, CancellationToken token )
 		{
 			var inventoryLevels = new ShopifyInventoryLevelsModel();
@@ -444,6 +455,7 @@ namespace ShopifyAccess
 
 					var productsWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
 						() => this._throttlerAsync.ExecuteAsync(
+							//TODO GUARD-220 Call GetResponsePage
 							() => this._webRequestServices.GetResponseAsync< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark, token ) ) );
 					
 					this.ConvertToShopifyInventoryLevelsModel( inventoryLevels, productsWithinPage );
@@ -458,6 +470,7 @@ namespace ShopifyAccess
 			return inventoryLevels;
 		}
 
+		//TODO GUARD-220 Convert to cursors, like CollectProductsFromAllPagesAsync
 		private ShopifyInventoryLevelsModel CollectInventoryLevelsFromAllPages( Mark mark, ShopifyLocations shopifyLocations )
 		{
 			var inventoryLevels = new ShopifyInventoryLevelsModel();
@@ -472,11 +485,12 @@ namespace ShopifyAccess
 
 					var productsWithinPage = ActionPolicies.GetPolicy( mark, this._shopName ).Get(
 						() => this._throttler.Execute(
-							() => this._webRequestServices.GetResponse< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark ) ) );
+							//TODO GUARD-220 Call GetResponsePage
+							() => this._webRequestServices.GetResponsePage< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark ) ) );
 
-					this.ConvertToShopifyInventoryLevelsModel( inventoryLevels, productsWithinPage );
+					this.ConvertToShopifyInventoryLevelsModel( inventoryLevels, productsWithinPage.Response );
 
-					if( productsWithinPage.InventoryLevels.Count < RequestMaxLimit )
+					if( productsWithinPage.Response.InventoryLevels.Count < RequestMaxLimit )
 						break;
 
 					page++;
@@ -486,6 +500,7 @@ namespace ShopifyAccess
 			return inventoryLevels;
 		}
 
+		//TODO GUARD-220 Convert to cursors, like CollectProductsFromAllPagesAsync
 		private async Task< ShopifyInventoryLevelsModel > CollectInventoryLevelsFromAllPagesAsync( Mark mark, ShopifyLocations shopifyLocations, CancellationToken token )
 		{
 			var inventoryLevels = new ShopifyInventoryLevelsModel();
@@ -500,6 +515,7 @@ namespace ShopifyAccess
 
 					var productsWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
 						() => this._throttlerAsync.ExecuteAsync(
+							//TODO GUARD-220 Call GetResponsePage
 							() => this._webRequestServices.GetResponseAsync< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark, token ) ) );
 
 					this.ConvertToShopifyInventoryLevelsModel( inventoryLevels, productsWithinPage );

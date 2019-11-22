@@ -7,6 +7,7 @@ namespace ShopifyAccess.Models.Configuration.Command
 		public long SinceId{ get; private set; }
 		public int Limit{ get; private set; }
 
+		//TODO GUARD-220 Every place that calls this will need to be updated to not use page=
 		public ShopifyCommandEndpointConfig( long sinceId, int limit )
 			: this( limit )
 		{

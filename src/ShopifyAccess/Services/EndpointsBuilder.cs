@@ -77,6 +77,7 @@ namespace ShopifyAccess.Services
 			return endpoint;
 		}
 
+		//TODO GUARD-220 Convert to cursors. "page=" in the Url is getting depricated
 		public static string CreateInventoryLevelsIdsEndpoint( long[] ids, int page, int limit )
 		{
 			// INFO : limit should be 250. Page start from 1. Max of inventory_item_ids is 50.
@@ -84,6 +85,7 @@ namespace ShopifyAccess.Services
 			return endpoint;
 		}
 
+		//TODO GUARD-220 Convert to cursors. "page=" in the Url is getting depricated
 		public static string CreateInventoryLevelsIdsEndpoint( string[] ids, int page, int limit )
 		{
 			// INFO : limit should be 250. Page start from 1. Max of inventory_item_ids is 50.
