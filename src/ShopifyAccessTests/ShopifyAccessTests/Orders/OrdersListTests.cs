@@ -41,7 +41,7 @@ namespace ShopifyAccessTests.Orders
 			var service = this.ShopifyFactory.CreateService( this.Config );
 			var orders = service.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -10 ), DateTime.UtcNow );
 
-			orders.Count.Should().Be( 1 );
+			orders.Count.Should().BeGreaterThan( 0 );
 		}
 
 		[ Test ]
@@ -50,7 +50,7 @@ namespace ShopifyAccessTests.Orders
 			var service = this.ShopifyFactory.CreateService( this.Config );
 			var orders = await service.GetOrdersAsync( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow, CancellationToken.None );
 
-			orders.Count.Should().Be( 1 );
+			orders.Count.Should().BeGreaterThan( 0 );
 		}
 
 		[ Test ]

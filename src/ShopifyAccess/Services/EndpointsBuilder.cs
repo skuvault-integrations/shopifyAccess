@@ -60,20 +60,11 @@ namespace ShopifyAccess.Services
 			return endpoint;
 		}
 
-		public static string CreateGetSinglePageEndpoint( ShopifyCommandEndpointConfig config )
+		public static string CreateGetEndpoint( ShopifyCommandEndpointConfig config )
 		{
 			var endpoint = string.Format( "?{0}={1}",
 				ShopifyCommandEndpointName.Limit.Name, config.Limit
 				);
-			return endpoint;
-		}
-
-		public static string CreateGetNextPageSinceIdEndpoint( ShopifyCommandEndpointConfig config )
-		{
-			var endpoint = string.Format( "?{0}={1}&{2}={3}",
-				ShopifyCommandEndpointName.Limit.Name, config.Limit,
-				ShopifyCommandEndpointName.SinceId.Name, config.SinceId
-			);
 			return endpoint;
 		}
 

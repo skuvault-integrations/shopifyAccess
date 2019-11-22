@@ -82,52 +82,46 @@ namespace ShopifyAccess
 			return locations;
 		}
 
-		//TODO GUARD-220 Convert to cursors, like CollectProductsFromAllPagesAsync
 		private ShopifyOrders CollectOrdersFromAllPages( string mainUpdatedOrdersEndpoint, Mark mark )
 		{
 			var orders = new ShopifyOrders();
-			long sinceId = 0;
+			var compositeUpdatedOrdersEndpoint = mainUpdatedOrdersEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
 
-			while( true )
+			do
 			{
-				var compositeUpdatedOrdersEndpoint = mainUpdatedOrdersEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetNextPageSinceIdEndpoint( new ShopifyCommandEndpointConfig( sinceId, RequestMaxLimit ) ) );
-
 				var updatedOrdersWithinPage = ActionPolicies.GetPolicy( mark, this._shopName ).Get(
 					() => this._throttler.Execute(
-						//TODO GUARD-220 Call GetResponsePage
-						() => this._webRequestServices.GetResponse< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint, mark ) ) );
+						() => this._webRequestServices.GetResponsePage< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint, mark ) ) );
 
-				if( updatedOrdersWithinPage.Orders.Count == 0 )
+				if( updatedOrdersWithinPage.Response.Orders.Count == 0 )
 					break;
 
-				sinceId = updatedOrdersWithinPage.Orders.Max( p => p.Id );
-				orders.Orders.AddRange( updatedOrdersWithinPage.Orders );
-			}
+				orders.Orders.AddRange( updatedOrdersWithinPage.Response.Orders );
+
+				compositeUpdatedOrdersEndpoint = updatedOrdersWithinPage.NextPageQueryStr;
+			} while( compositeUpdatedOrdersEndpoint != string.Empty );
 
 			return orders;
 		}
 
-		//TODO GUARD-220 Convert to cursors, like CollectProductsFromAllPagesAsync
 		private async Task< ShopifyOrders > CollectOrdersFromAllPagesAsync( string mainUpdatedOrdersEndpoint, Mark mark, CancellationToken token )
 		{
 			var orders = new ShopifyOrders();
-			long sinceId = 0;
+			var compositeUpdatedOrdersEndpoint = mainUpdatedOrdersEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
 
-			while( true )
+			do
 			{
-				var compositeUpdatedOrdersEndpoint = mainUpdatedOrdersEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetNextPageSinceIdEndpoint( new ShopifyCommandEndpointConfig( sinceId, RequestMaxLimit ) ) );
-
 				var updatedOrdersWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
 					() => this._throttlerAsync.ExecuteAsync(
-						//TODO GUARD-220 Call GetResponsePage
-						() => this._webRequestServices.GetResponseAsync< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint, mark, token ) ) );
+						() => this._webRequestServices.GetResponsePageAsync< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint, mark, token ) ) );
 
-				if( updatedOrdersWithinPage.Orders.Count == 0 )
+				if( updatedOrdersWithinPage.Response.Orders.Count == 0 )
 					break;
 
-				sinceId = updatedOrdersWithinPage.Orders.Max( p => p.Id );
-				orders.Orders.AddRange( updatedOrdersWithinPage.Orders );
-			}
+				orders.Orders.AddRange( updatedOrdersWithinPage.Response.Orders );
+
+				compositeUpdatedOrdersEndpoint = updatedOrdersWithinPage.NextPageQueryStr;
+			} while( compositeUpdatedOrdersEndpoint != string.Empty );
 
 			return orders;
 		}
@@ -334,9 +328,9 @@ namespace ShopifyAccess
 		private ShopifyProducts CollectProductsFromAllPages( Mark mark )
 		{
 			var products = new ShopifyProducts();
-			var endpoint = EndpointsBuilder.CreateGetNextPageSinceIdEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
+			var endpoint = EndpointsBuilder.CreateGetEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
 
-			while( true )
+			do
 			{
 				var productsWithinPage = ActionPolicies.GetPolicy( mark, this._shopName ).Get(
 					() => this._throttler.Execute(
@@ -347,11 +341,8 @@ namespace ShopifyAccess
 
 				products.Products.AddRange( productsWithinPage.Response.Products );
 
-				if( productsWithinPage.NextPageQueryStr == string.Empty )
-					break;
-
 				endpoint = productsWithinPage.NextPageQueryStr;
-			}
+			} while( endpoint != string.Empty );
 
 			return products;
 		}
@@ -366,9 +357,9 @@ namespace ShopifyAccess
 		private async Task< ShopifyProducts > CollectProductsFromAllPagesAsync( ProductsDateFilter productsDateFilter, Mark mark, CancellationToken token )
 		{
 			var products = new ShopifyProducts();
-			var endpoint = EndpointsBuilder.CreateGetSinglePageEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
+			var endpoint = EndpointsBuilder.CreateGetEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
 
-			while( true )
+			do
 			{
 				if( productsDateFilter.FilterType != FilterType.None )
 				{
@@ -383,11 +374,9 @@ namespace ShopifyAccess
 
 				products.Products.AddRange( productsWithinPage.Response.Products );
 
-				if( productsWithinPage.NextPageQueryStr == string.Empty )
-					break;
 
 				endpoint = productsWithinPage.NextPageQueryStr;
-			}
+			} while( endpoint != string.Empty );
 
 			return products;
 		}
