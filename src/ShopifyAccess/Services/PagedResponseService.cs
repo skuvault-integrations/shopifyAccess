@@ -30,8 +30,8 @@ namespace ShopifyAccess.Services
 			this.Relationship = linkParts[ 1 ].Trim();
 		}
 
-		public string Url { get; }
-		public string Relationship { get; }
+		public string Url { get; private set; }
+		public string Relationship { get; private set; }
 	}
 
 	public class ResponsePage< T >
