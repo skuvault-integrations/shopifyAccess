@@ -399,7 +399,6 @@ namespace ShopifyAccess
 					inventoryLevels.InventoryLevels[ item.InventoryItemId ].AddRange( item.Data );
 		}
 
-		//TODO GUARD-220 Convert to cursors, like CollectProductsFromAllPagesAsync
 		private ShopifyInventoryLevelsModel CollectInventoryLevelsFromAllPages( Mark mark, long[] productIds )
 		{
 			var inventoryLevels = new ShopifyInventoryLevelsModel();
@@ -407,74 +406,12 @@ namespace ShopifyAccess
 
 			foreach( var ids in partsOfProductIds )
 			{
-				var page = 1;
-				while( true )
-				{
-					var endpoint = EndpointsBuilder.CreateInventoryLevelsIdsEndpoint( ids, page, RequestMaxLimit );
+				var endpoint = EndpointsBuilder.CreateInventoryLevelsIdsEndpoint( ids, RequestMaxLimit );
 
+				do
+				{
 					var productsWithinPage = ActionPolicies.GetPolicy( mark, this._shopName ).Get(
 						() => this._throttler.Execute(
-							//TODO GUARD-220 Call GetResponsePage
-							() => this._webRequestServices.GetResponse< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark ) ) );
-
-					this.ConvertToShopifyInventoryLevelsModel( inventoryLevels, productsWithinPage );
-
-					if( productsWithinPage.InventoryLevels.Count < RequestMaxLimit )
-						break;
-
-					page++;
-				}
-			}
-
-			return inventoryLevels;
-		}
-
-		//TODO GUARD-220 Convert to cursors, like CollectProductsFromAllPagesAsync
-		private async Task< ShopifyInventoryLevelsModel > CollectInventoryLevelsFromAllPagesAsync( Mark mark, long[] productIds, CancellationToken token )
-		{
-			var inventoryLevels = new ShopifyInventoryLevelsModel();
-			var partsOfProductIds = productIds.Slice( RequestInventoryLevelsMaxLimit );
-
-			foreach( var ids in partsOfProductIds )
-			{
-				var page = 1;
-				while( true )
-				{
-					var endpoint = EndpointsBuilder.CreateInventoryLevelsIdsEndpoint( ids, page, RequestMaxLimit );
-
-					var productsWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
-						() => this._throttlerAsync.ExecuteAsync(
-							//TODO GUARD-220 Call GetResponsePage
-							() => this._webRequestServices.GetResponseAsync< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark, token ) ) );
-					
-					this.ConvertToShopifyInventoryLevelsModel( inventoryLevels, productsWithinPage );
-
-					if( productsWithinPage.InventoryLevels.Count < RequestMaxLimit )
-						break;
-
-					page++;
-				}
-			}
-
-			return inventoryLevels;
-		}
-
-		//TODO GUARD-220 Convert to cursors, like CollectProductsFromAllPagesAsync
-		private ShopifyInventoryLevelsModel CollectInventoryLevelsFromAllPages( Mark mark, ShopifyLocations shopifyLocations )
-		{
-			var inventoryLevels = new ShopifyInventoryLevelsModel();
-			var partsOfLocationIds = shopifyLocations.Locations.Select( x => x.Id ).Slice( RequestInventoryLevelsMaxLimit );
-
-			foreach( var ids in partsOfLocationIds )
-			{
-				var page = 1;
-				while( true )
-				{
-					var endpoint = EndpointsBuilder.CreateInventoryLevelsIdsEndpoint( ids, page, RequestMaxLimit );
-
-					var productsWithinPage = ActionPolicies.GetPolicy( mark, this._shopName ).Get(
-						() => this._throttler.Execute(
-							//TODO GUARD-220 Call GetResponsePage
 							() => this._webRequestServices.GetResponsePage< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark ) ) );
 
 					this.ConvertToShopifyInventoryLevelsModel( inventoryLevels, productsWithinPage.Response );
@@ -482,14 +419,68 @@ namespace ShopifyAccess
 					if( productsWithinPage.Response.InventoryLevels.Count < RequestMaxLimit )
 						break;
 
-					page++;
-				}
+					endpoint = productsWithinPage.NextPageQueryStr;
+				} while( endpoint != string.Empty );
 			}
 
 			return inventoryLevels;
 		}
 
-		//TODO GUARD-220 Convert to cursors, like CollectProductsFromAllPagesAsync
+		private async Task< ShopifyInventoryLevelsModel > CollectInventoryLevelsFromAllPagesAsync( Mark mark, long[] productIds, CancellationToken token )
+		{
+			var inventoryLevels = new ShopifyInventoryLevelsModel();
+			var partsOfProductIds = productIds.Slice( RequestInventoryLevelsMaxLimit );
+
+			foreach( var ids in partsOfProductIds )
+			{
+				var endpoint = EndpointsBuilder.CreateInventoryLevelsIdsEndpoint( ids, RequestMaxLimit );
+
+				do
+				{
+					var productsWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
+						() => this._throttlerAsync.ExecuteAsync(
+							() => this._webRequestServices.GetResponsePageAsync< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark, token ) ) );
+					
+					this.ConvertToShopifyInventoryLevelsModel( inventoryLevels, productsWithinPage.Response );
+
+					if( productsWithinPage.Response.InventoryLevels.Count < RequestMaxLimit )
+						break;
+
+					endpoint = productsWithinPage.NextPageQueryStr;
+				} while( endpoint != string.Empty );
+			}
+
+			return inventoryLevels;
+		}
+
+		private ShopifyInventoryLevelsModel CollectInventoryLevelsFromAllPages( Mark mark, ShopifyLocations shopifyLocations )
+		{
+			var inventoryLevels = new ShopifyInventoryLevelsModel();
+			var partsOfLocationIds = shopifyLocations.Locations.Select( x => x.Id ).Slice( RequestInventoryLevelsMaxLimit );
+
+			foreach( var ids in partsOfLocationIds )
+			{
+				var endpoint = EndpointsBuilder.CreateInventoryLevelsIdsEndpoint( ids, RequestMaxLimit );
+
+				do
+				{
+
+					var productsWithinPage = ActionPolicies.GetPolicy( mark, this._shopName ).Get(
+						() => this._throttler.Execute(
+							() => this._webRequestServices.GetResponsePage< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark ) ) );
+
+					this.ConvertToShopifyInventoryLevelsModel( inventoryLevels, productsWithinPage.Response );
+
+					if( productsWithinPage.Response.InventoryLevels.Count < RequestMaxLimit )
+						break;
+
+					endpoint = productsWithinPage.NextPageQueryStr;
+				} while( endpoint != string.Empty );
+			}
+
+			return inventoryLevels;
+		}
+
 		private async Task< ShopifyInventoryLevelsModel > CollectInventoryLevelsFromAllPagesAsync( Mark mark, ShopifyLocations shopifyLocations, CancellationToken token )
 		{
 			var inventoryLevels = new ShopifyInventoryLevelsModel();
@@ -497,23 +488,22 @@ namespace ShopifyAccess
 
 			foreach( var ids in partsOfLocationIds )
 			{
-				var page = 1;
-				while( true )
+				var endpoint = EndpointsBuilder.CreateInventoryLevelsIdsEndpoint( ids, RequestMaxLimit );
+
+				do
 				{
-					var endpoint = EndpointsBuilder.CreateInventoryLevelsIdsEndpoint( ids, page, RequestMaxLimit );
 
 					var productsWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
 						() => this._throttlerAsync.ExecuteAsync(
-							//TODO GUARD-220 Call GetResponsePage
-							() => this._webRequestServices.GetResponseAsync< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark, token ) ) );
+							() => this._webRequestServices.GetResponsePageAsync< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark, token ) ) );
 
-					this.ConvertToShopifyInventoryLevelsModel( inventoryLevels, productsWithinPage );
+					this.ConvertToShopifyInventoryLevelsModel( inventoryLevels, productsWithinPage.Response );
 
-					if( productsWithinPage.InventoryLevels.Count < RequestMaxLimit )
+					if( productsWithinPage.Response.InventoryLevels.Count < RequestMaxLimit )
 						break;
 
-					page++;
-				}
+					endpoint = productsWithinPage.NextPageQueryStr;
+				} while( endpoint != String.Empty );
 			}
 
 			return inventoryLevels;

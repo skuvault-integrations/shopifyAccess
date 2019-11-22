@@ -68,19 +68,17 @@ namespace ShopifyAccess.Services
 			return endpoint;
 		}
 
-		//TODO GUARD-220 Convert to cursors. "page=" in the Url is getting depricated
-		public static string CreateInventoryLevelsIdsEndpoint( long[] ids, int page, int limit )
+		public static string CreateInventoryLevelsIdsEndpoint( long[] ids, int limit )
 		{
-			// INFO : limit should be 250. Page start from 1. Max of inventory_item_ids is 50.
-			var endpoint = string.Format( "?inventory_item_ids={0}&page={1}&limit={2}", string.Join( ",", ids.Select( x => x ) ), page, limit );
+			// INFO : Max of inventory_item_ids is 50.
+			var endpoint = string.Format( "?inventory_item_ids={0}&limit={1}", string.Join( ",", ids.Select( x => x ) ), limit );
 			return endpoint;
 		}
 
-		//TODO GUARD-220 Convert to cursors. "page=" in the Url is getting depricated
-		public static string CreateInventoryLevelsIdsEndpoint( string[] ids, int page, int limit )
+		public static string CreateInventoryLevelsIdsEndpoint( string[] ids, int limit )
 		{
-			// INFO : limit should be 250. Page start from 1. Max of inventory_item_ids is 50.
-			var endpoint = string.Format( "?location_ids={0}&page={1}&limit={2}", string.Join( ",", ids.Select( x => x ) ), page, limit );
+			// INFO : Max of inventory_item_ids is 50.
+			var endpoint = string.Format( "?location_ids={0}&limit={1}", string.Join( ",", ids.Select( x => x ) ), limit );
 			return endpoint;
 		}
 
