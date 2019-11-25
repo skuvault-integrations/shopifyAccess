@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using LINQtoCSV;
 using Netco.Logging;
-using Netco.Logging.NLogIntegration;
 using NUnit.Framework;
 using ShopifyAccess;
 using ShopifyAccess.Models.Configuration.Command;
@@ -20,7 +19,7 @@ namespace ShopifyAccessTests.Products
 	public class ProductVariantTests
 	{
 		private readonly IShopifyFactory ShopifyFactory = new ShopifyFactory();
-		private ShopifyCommandConfig Config;
+		private IShopifyService _service;
 
 		[ SetUp ]
 		public void Init()
@@ -33,14 +32,13 @@ namespace ShopifyAccessTests.Products
 			var testConfig = cc.Read< TestCommandConfig >( credentialsFilePath, new CsvFileDescription { FirstLineHasColumnNames = true } ).FirstOrDefault();
 
 			if( testConfig != null )
-				this.Config = new ShopifyCommandConfig( testConfig.ShopName, testConfig.AccessToken );
+				this._service = this.ShopifyFactory.CreateService( new ShopifyCommandConfig( testConfig.ShopName, testConfig.AccessToken ) );
 		}
 
 		[ Test ]
 		public void GetProducts()
 		{
-			var service = this.ShopifyFactory.CreateService( this.Config );
-			var products = service.GetProducts();
+			var products = this._service.GetProducts();
 
 			products.Products.Count.Should().BeGreaterThan( 0 );
 		}
@@ -48,8 +46,7 @@ namespace ShopifyAccessTests.Products
 		[ Test ]
 		public async Task GetProductsAsync()
 		{
-			var service = this.ShopifyFactory.CreateService( this.Config );
-			var products = await service.GetProductsAsync( CancellationToken.None );
+			var products = await this._service.GetProductsAsync( CancellationToken.None );
 
 			products.Products.Count.Should().BeGreaterThan( 0 );
 		}
@@ -57,33 +54,37 @@ namespace ShopifyAccessTests.Products
 		[ Test ]
 		public async Task GetProductVariantsBySkusAsync()
 		{
-			var service = this.ShopifyFactory.CreateService( this.Config );
-			var products = await service.GetProductsAsync( CancellationToken.None );
+			var products = await this._service.GetProductsAsync( CancellationToken.None );
 			var productVariants = products.ToListVariants();
 
 			// take 10% random variants
 			var filteredProductVariants = productVariants.OrderBy( v => Guid.NewGuid() ).Take( productVariants.Count / 10 ).ToList();
 			var filteredSkus = filteredProductVariants.Select( v => v.Sku.ToUpperInvariant() );
 
-			var variants = await service.GetProductVariantsBySkusAsync( filteredSkus, CancellationToken.None );
+			var variants = await this._service.GetProductVariantsBySkusAsync( filteredSkus, CancellationToken.None );
 			var expectedVariants = productVariants.Where( v => filteredSkus.Contains( v.Sku.ToUpperInvariant() ) ).ToList();
 			variants.ShouldBeEquivalentTo( expectedVariants );
 		}
 
 		[ Test ]
+		public async Task GetProductsThroughLocationsAsync()
+		{
+			var products = await this._service.GetProductsThroughLocationsAsync( CancellationToken.None );
+
+			products.Products.Should().NotBeNullOrEmpty();
+		}
+
+		[ Test ]
 		public void ProductVariantQuantityUpdated()
 		{
-			var service = this.ShopifyFactory.CreateService( this.Config );
-
 			var variantToUpdate = new ShopifyProductVariantForUpdate { Id = 337095344, Quantity = 2 };
-			service.UpdateProductVariants( new List< ShopifyProductVariantForUpdate > { variantToUpdate } );
+			this._service.UpdateProductVariants( new List< ShopifyProductVariantForUpdate > { variantToUpdate } );
 		}
 
 		[ Test ]
 		public void GetAndUpdateProduct()
 		{
-			var service = this.ShopifyFactory.CreateService( this.Config );
-			var products = service.GetProducts().ToDictionary();
+			var products = this._service.GetProducts().ToDictionary();
 
 			var productsForUpdate = new List< ShopifyInventoryLevelForUpdate >();
 			foreach( var product in products )
@@ -107,10 +108,46 @@ namespace ShopifyAccessTests.Products
 				
 			}
 
-			service.UpdateInventoryLevels( productsForUpdate );
-			var updatedProducts = service.GetProducts().ToDictionary();
+			_service.UpdateInventoryLevels( productsForUpdate );
+			var updatedProducts = this._service.GetProducts().ToDictionary();
 			
 			products.Should().Equal( updatedProducts );
+		}
+
+		[ Test ]
+		public async Task GetAndUpdateProductAsync()
+		{
+			const string sku = "testsku1";
+			var inventoryItem = await this.GetFirstInventoryItem( sku );
+			var initialQuantity = inventoryItem.Available;
+			const int quantity = 39;
+
+			await this._service.UpdateInventoryLevelsAsync( CreateInventoryLevelForUpdate( inventoryItem, quantity ) );
+			var product = ( await this._service.GetProductVariantsBySkusAsync( new List< string > { sku }, CancellationToken.None ) ).First();
+			var newQuantity = product.InventoryLevels.InventoryLevels.First().Available;
+			await this._service.UpdateInventoryLevelsAsync( CreateInventoryLevelForUpdate( inventoryItem, initialQuantity ) );
+
+			newQuantity.Should().Be( quantity );
+		}
+
+		private async Task< ShopifyInventoryLevel > GetFirstInventoryItem( string sku )
+		{
+			var product = ( await this._service.GetProductVariantsBySkusAsync( new List< string > { sku }, CancellationToken.None ) ).First();
+			return product.InventoryLevels.InventoryLevels.First();
+		}
+
+		private static IEnumerable< ShopifyInventoryLevelForUpdate > CreateInventoryLevelForUpdate( ShopifyInventoryLevel inventory, int setQuantity )
+		{
+			IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels = new List< ShopifyInventoryLevelForUpdate >
+			{
+				new ShopifyInventoryLevelForUpdate
+				{
+					InventoryItemId = inventory.InventoryItemId,
+					Quantity = setQuantity,
+					LocationId = inventory.LocationId
+				}
+			};
+			return inventoryLevels;
 		}
 	}
 }

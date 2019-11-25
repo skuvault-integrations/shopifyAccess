@@ -51,6 +51,22 @@ namespace ShopifyAccess.Services
 			} );
 		}
 
+		public ResponsePage< T > GetResponsePage< T >( ShopifyCommand command, string endpoint, Mark mark )
+		{
+			Condition.Requires( mark, "mark" ).IsNotNull();
+
+			var request = this.CreateServiceGetRequest( command, endpoint );
+			this.LogGetRequest( request.RequestUri, mark );
+
+			return this.ParseException( mark, () =>
+			{
+				ResponsePage< T > result;
+				using( var response = request.GetResponse() )
+					result = this.ParsePagedResponse< T >( response, mark );
+				return result;
+			} );
+		}
+
 		public async Task< T > GetResponseAsync< T >( ShopifyCommand command, string endpoint, Mark mark, CancellationToken token )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
@@ -73,6 +89,34 @@ namespace ShopifyAccess.Services
 						T result;
 						using( var response = await request.GetResponseAsync().ConfigureAwait( false ) )
 							result = this.ParseResponse< T >( response, mark );
+						return result;
+					} ).ConfigureAwait( false );
+				}
+			}
+		}
+
+		public async Task< ResponsePage< T > > GetResponsePageAsync< T >( ShopifyCommand command, string endpoint, Mark mark, CancellationToken token )
+		{
+			Condition.Requires( mark, "mark" ).IsNotNull();
+
+			if( token.IsCancellationRequested )
+			{
+				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
+			}
+
+			var request = this.CreateServiceGetRequest( command, endpoint );
+			this.LogGetRequest( request.RequestUri, mark );
+
+			using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
+			{ 
+				linkedCancellationTokenSource.CancelAfter( this._commandConfig.RequestTimeoutMs );
+				using( linkedCancellationTokenSource.Token.Register( request.Abort ) )
+				{
+					return await this.ParseExceptionAsync( mark, async () =>
+					{
+						ResponsePage< T > result;
+						using( var response = await request.GetResponseAsync().ConfigureAwait( false ) )
+							result = this.ParsePagedResponse< T >( response, mark );
 						return result;
 					} ).ConfigureAwait( false );
 				}
@@ -182,6 +226,31 @@ namespace ShopifyAccess.Services
 			}
 
 			return result;
+		}
+
+		private ResponsePage< T > ParsePagedResponse< T >( WebResponse response, Mark mark )
+		{
+			var result = default(T);
+			string nextPageLink;
+
+			using( var stream = response.GetResponseStream() )
+			using( var reader = new StreamReader( stream ) )
+			{
+				var jsonResponse = reader.ReadToEnd();
+
+				var limit = this.GetLimitFromHeader( response );
+				nextPageLink = PagedResponseService.GetNextPageQueryStrFromHeader( response.Headers );
+				this.LogGetResponse( response.ResponseUri, limit, nextPageLink, jsonResponse, mark );
+
+				if( !string.IsNullOrEmpty( jsonResponse ) )
+					result = jsonResponse.FromJson< T >();
+			}
+
+			return new ResponsePage< T > 
+			{
+				Response = result,
+				NextPageQueryStr = nextPageLink
+			};
 		}
 
 		private string GetLimitFromHeader( WebResponse response )
@@ -314,6 +383,11 @@ namespace ShopifyAccess.Services
 		private void LogGetResponse( Uri requestUri, string limit, string jsonResponse, Mark mark )
 		{
 			ShopifyLogger.Trace( mark, "GET response\tRequest: {0}\tLimit: {1}\tResponse: {2}", requestUri, limit, jsonResponse );
+		}
+
+		private void LogGetResponse( Uri requestUri, string limit, string nextPage, string jsonResponse, Mark mark )
+		{
+			ShopifyLogger.Trace( mark, "GET response\tRequest: {0}\tLimit: {1}\tNext Page: {2}\tResponse: {3}", requestUri, limit, nextPage, jsonResponse );
 		}
 
 		private void LogUpdateRequest( Uri requestUri, string jsonContent, Mark mark )
