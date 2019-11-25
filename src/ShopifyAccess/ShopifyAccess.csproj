@@ -81,6 +81,7 @@
     <Compile Include="Models\Mark.cs" />
     <Compile Include="Models\Order\OrdersCount.cs" />
     <Compile Include="Models\Order\ShopifyBillingAddress.cs" />
+    <Compile Include="Models\Order\ShopifyDiscounts.cs" />
     <Compile Include="Models\Order\ShopifyFulfillment.cs" />
     <Compile Include="Models\Order\ShopifyCustomer.cs" />
     <Compile Include="Models\Order\ShopifyOrder.cs" />
@@ -89,7 +90,9 @@
     <Compile Include="Models\Configuration\Authorization\ShopifyScopeName.cs" />
     <Compile Include="Models\Configuration\Authorization\TokenRequestResult.cs" />
     <Compile Include="Models\Order\ShopifyOrders.cs" />
+    <Compile Include="Models\Order\ShopifyPriceSet.cs" />
     <Compile Include="Models\Order\ShopifyShippingAddress.cs" />
+    <Compile Include="Models\Order\ShopifyTaxLine.cs" />
     <Compile Include="Models\ProductVariant\ShopifyProductVariant.cs" />
     <Compile Include="Models\ProductVariant\ShopifyInventoryLevelForUpdate.cs" />
     <Compile Include="Models\ProductVariant\ShopifyProductVariantForUpdate.cs" />
