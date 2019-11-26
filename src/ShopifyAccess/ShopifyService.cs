@@ -359,13 +359,13 @@ namespace ShopifyAccess
 			var products = new ShopifyProducts();
 			var endpoint = EndpointsBuilder.CreateGetEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
 
+			if( productsDateFilter.FilterType != FilterType.None )
+			{
+				endpoint += EndpointsBuilder.AppendGetProductsFilteredByDateEndpoint( productsDateFilter, endpoint );
+			}
+
 			do
 			{
-				if( productsDateFilter.FilterType != FilterType.None )
-				{
-					endpoint += EndpointsBuilder.AppendGetProductsFilteredByDateEndpoint( productsDateFilter, endpoint );
-				}
-
 				var productsWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
 					() => this._throttlerAsync.ExecuteAsync(
 						() => this._webRequestServices.GetResponsePageAsync< ShopifyProducts >( ShopifyCommand.GetProducts, endpoint, mark, token ) ) );
@@ -373,7 +373,6 @@ namespace ShopifyAccess
 					break;
 
 				products.Products.AddRange( productsWithinPage.Response.Products );
-
 
 				endpoint = productsWithinPage.NextPageQueryStr;
 			} while( endpoint != string.Empty );
@@ -464,7 +463,6 @@ namespace ShopifyAccess
 
 				do
 				{
-
 					var productsWithinPage = ActionPolicies.GetPolicy( mark, this._shopName ).Get(
 						() => this._throttler.Execute(
 							() => this._webRequestServices.GetResponsePage< ShopifyInventoryLevels >( ShopifyCommand.GetInventoryLevels, endpoint, mark ) ) );

@@ -52,6 +52,16 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
+		public async Task GetProductsCreatedAfterAsync()
+		{
+			var productsStartUtc = new DateTime( 1800, 1, 1 );
+
+			var products = await this._service.GetProductsCreatedAfterAsync( productsStartUtc, CancellationToken.None );
+
+			products.Products.Count.Should().BeGreaterThan( 250 );
+		}
+
+		[ Test ]
 		public async Task GetProductVariantsBySkusAsync()
 		{
 			var products = await this._service.GetProductsAsync( CancellationToken.None );
