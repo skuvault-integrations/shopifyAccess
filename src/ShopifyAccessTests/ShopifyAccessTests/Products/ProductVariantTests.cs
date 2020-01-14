@@ -79,7 +79,7 @@ namespace ShopifyAccessTests.Products
 			var filteredProductVariants = productVariants.OrderBy( v => Guid.NewGuid() ).Take( productVariants.Count / 10 ).ToList();
 			var filteredSkus = filteredProductVariants.Select( v => v.Sku.ToUpperInvariant() );
 
-			var variants = await this._service.GetProductVariantsBySkusAsync( filteredSkus, CancellationToken.None );
+			var variants = await this._service.GetProductVariantsInventoryBySkusAsync( filteredSkus, CancellationToken.None );
 			var expectedVariants = productVariants.Where( v => filteredSkus.Contains( v.Sku.ToUpperInvariant() ) ).ToList();
 			variants.ShouldBeEquivalentTo( expectedVariants );
 		}
@@ -87,7 +87,7 @@ namespace ShopifyAccessTests.Products
 		[ Test ]
 		public async Task GetProductsThroughLocationsAsync()
 		{
-			var products = await this._service.GetProductsThroughLocationsAsync( CancellationToken.None );
+			var products = await this._service.GetProductsInventoryAsync( CancellationToken.None );
 
 			products.Products.Should().NotBeNullOrEmpty();
 		}
@@ -141,7 +141,7 @@ namespace ShopifyAccessTests.Products
 			const int quantity = 39;
 
 			await this._service.UpdateInventoryLevelsAsync( CreateInventoryLevelForUpdate( inventoryItem, quantity ) );
-			var product = ( await this._service.GetProductVariantsBySkusAsync( new List< string > { sku }, CancellationToken.None ) ).First();
+			var product = ( await this._service.GetProductVariantsInventoryBySkusAsync( new List< string > { sku }, CancellationToken.None ) ).First();
 			var newQuantity = product.InventoryLevels.InventoryLevels.First().Available;
 			await this._service.UpdateInventoryLevelsAsync( CreateInventoryLevelForUpdate( inventoryItem, initialQuantity ) );
 
@@ -150,7 +150,7 @@ namespace ShopifyAccessTests.Products
 
 		private async Task< ShopifyInventoryLevel > GetFirstInventoryItem( string sku )
 		{
-			var product = ( await this._service.GetProductVariantsBySkusAsync( new List< string > { sku }, CancellationToken.None ) ).First();
+			var product = ( await this._service.GetProductVariantsInventoryBySkusAsync( new List< string > { sku }, CancellationToken.None ) ).First();
 			return product.InventoryLevels.InventoryLevels.First();
 		}
 

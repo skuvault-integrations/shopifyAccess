@@ -206,7 +206,7 @@ namespace ShopifyAccess
 			return products;
 		}
 
-		public ShopifyProducts GetProductsThroughLocations( Mark mark = null )
+		public ShopifyProducts GetProductsInventory( Mark mark = null )
 		{
 			mark = mark.CreateNewIfBlank();
 
@@ -231,7 +231,7 @@ namespace ShopifyAccess
 			return products;
 		}
 
-		public async Task< ShopifyProducts > GetProductsThroughLocationsAsync( CancellationToken token, Mark mark = null )
+		public async Task< ShopifyProducts > GetProductsInventoryAsync( CancellationToken token, Mark mark = null )
 		{
 			mark = mark.CreateNewIfBlank();
 
@@ -256,7 +256,7 @@ namespace ShopifyAccess
 			return products;
 		}
 
-		public async Task< List< ShopifyProductVariant > > GetProductVariantsBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null )
+		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null )
 		{
 			mark = mark.CreateNewIfBlank();
 
