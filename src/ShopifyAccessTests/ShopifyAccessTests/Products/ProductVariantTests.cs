@@ -62,6 +62,14 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
+		public async Task GetProductsCreatedAfterAsync_GetsVariationsWithUntrackedQuantity()
+		{
+			var products = await this._service.GetProductsCreatedAfterAsync( DateTime.MinValue, CancellationToken.None );
+
+			products.Products.Any( p => p.Variants.Any( v => v.InventoryManagement == InventoryManagement.Blank ) );
+		}
+
+		[Test ]
 		public async Task GetProductVariantsBySkusAsync()
 		{
 			var products = await this._service.GetProductsAsync( CancellationToken.None );
