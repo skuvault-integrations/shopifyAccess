@@ -81,7 +81,7 @@ task NuGet Package, Version, {
 		<projectUrl>https://github.com/agileharbor/$project_name</projectUrl>
 		<licenseUrl>https://raw.github.com/agileharbor/$project_name/master/License.txt</licenseUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<copyright>Copyright (C) 2019 SkuVault Inc.</copyright>
+		<copyright>Copyright (C) 2020 SkuVault Inc.</copyright>
 		<summary>$text</summary>
 		<description>$text</description>
 		<tags>$project_short_name</tags>

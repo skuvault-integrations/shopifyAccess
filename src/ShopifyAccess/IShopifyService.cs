@@ -86,7 +86,7 @@ namespace ShopifyAccess
 		/// </summary>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns>Products with variants (inventory items)</returns>
-		ShopifyProducts GetProductsThroughLocations( Mark mark = null );
+		ShopifyProducts GetProductsInventory( Mark mark = null );
 
 		/// <summary>
 		/// Get all existing products async (through locations)
@@ -94,7 +94,7 @@ namespace ShopifyAccess
 		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns>Products with variants (inventory items)</returns>
-		Task< ShopifyProducts > GetProductsThroughLocationsAsync( CancellationToken token, Mark mark = null );
+		Task< ShopifyProducts > GetProductsInventoryAsync( CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		/// Get the list of product variants for specified SKUs
@@ -103,7 +103,7 @@ namespace ShopifyAccess
 		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns>List of variants (inventory items)</returns>
-		Task< List< ShopifyProductVariant > > GetProductVariantsBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null );
+		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		/// Update variants (inventory items). This method is obsolete. DON'T USE IT

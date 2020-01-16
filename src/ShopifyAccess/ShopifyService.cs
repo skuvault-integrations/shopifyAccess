@@ -183,7 +183,6 @@ namespace ShopifyAccess
 				ProductsStartUtc = productsStartUtc
 			};
 			var products = await this.CollectProductsFromAllPagesAsync( productsDateFilter, mark, token );
-			await this.GetInventoryLevels( token, mark, products );
 
 			return products;
 		}
@@ -203,31 +202,11 @@ namespace ShopifyAccess
 				ProductsStartUtc = productsStartUtc
 			};
 			var products = await this.CollectProductsFromAllPagesAsync( productsDateFilter, mark, token );
-			await this.GetInventoryLevels( token, mark, products );
 
 			return products;
 		}
 
-		private async Task GetInventoryLevels( CancellationToken token, Mark mark, ShopifyProducts products )
-		{
-			this.RemoveUntrackedProductVariants( products );
-			var inventoryLevels = await this.CollectInventoryLevelsFromAllPagesAsync( mark, products.Products.SelectMany( x => x.Variants.Select( t => t.InventoryItemId ) ).ToArray(), token );
-
-			foreach( var product in products.Products )
-			foreach( var variant in product.Variants )
-			{
-				List< ShopifyInventoryLevelModel > inventoryLevelsModelOfInventoryItemId;
-				if( !inventoryLevels.InventoryLevels.TryGetValue( variant.InventoryItemId, out inventoryLevelsModelOfInventoryItemId ) )
-					continue;
-
-				var inventoryLevelsOfInventoryItemId = inventoryLevelsModelOfInventoryItemId.Select( x => x.ToShopifyInventoryLevel( variant.InventoryItemId ) ).ToList();
-
-				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevelsOfInventoryItemId };
-				variant.InventoryLevels = inventoryLevelsForVariant;
-			}
-		}
-
-		public ShopifyProducts GetProductsThroughLocations( Mark mark = null )
+		public ShopifyProducts GetProductsInventory( Mark mark = null )
 		{
 			mark = mark.CreateNewIfBlank();
 
@@ -252,7 +231,7 @@ namespace ShopifyAccess
 			return products;
 		}
 
-		public async Task< ShopifyProducts > GetProductsThroughLocationsAsync( CancellationToken token, Mark mark = null )
+		public async Task< ShopifyProducts > GetProductsInventoryAsync( CancellationToken token, Mark mark = null )
 		{
 			mark = mark.CreateNewIfBlank();
 
@@ -277,7 +256,7 @@ namespace ShopifyAccess
 			return products;
 		}
 
-		public async Task< List< ShopifyProductVariant > > GetProductVariantsBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null )
+		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null )
 		{
 			mark = mark.CreateNewIfBlank();
 
