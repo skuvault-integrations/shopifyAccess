@@ -118,12 +118,53 @@ namespace ShopifyAccess
 				if( updatedOrdersWithinPage.Response.Orders.Count == 0 )
 					break;
 
+				foreach( var order in updatedOrdersWithinPage.Response.Orders )
+					this.RemoveCancelledOrderItems( order );
+
 				orders.Orders.AddRange( updatedOrdersWithinPage.Response.Orders );
 
 				compositeUpdatedOrdersEndpoint = updatedOrdersWithinPage.NextPageQueryStr;
 			} while( compositeUpdatedOrdersEndpoint != string.Empty );
 
 			return orders;
+		}
+
+		private void RemoveCancelledOrderItems( ShopifyOrder order )
+		{
+			if ( order.Refunds == null || !order.Refunds.Any() )
+				return;
+
+			var actualOrderItems = new List< ShopifyOrderItem >();
+			foreach( var orderItem in order.OrderItems )
+			{
+				bool isCancelled = false;
+				int cancelledQuantity = 0;
+
+				foreach( var refund in order.Refunds )
+				{
+					var refundLineItem = refund.RefundLineItems.FirstOrDefault( rl => rl.LineItemId.ToString().Equals( orderItem.Id ) );
+
+					if ( refundLineItem != null && refundLineItem.RestockType.Equals( "cancel" ) )
+					{
+						// complete refund
+						if ( orderItem.Quantity == refundLineItem.Quantity )
+						{
+							isCancelled = true;
+							break;
+						}
+					
+						cancelledQuantity += refundLineItem.Quantity;
+					}
+				}
+
+				if ( !isCancelled )
+				{
+					orderItem.Quantity -= cancelledQuantity;
+					actualOrderItems.Add( orderItem );
+				}
+			}
+
+			order.OrderItems = actualOrderItems;
 		}
 
 		private int GetOrdersCount( string updatedOrdersEndpoint, Mark mark )
