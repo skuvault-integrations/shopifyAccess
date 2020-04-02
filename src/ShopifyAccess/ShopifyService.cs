@@ -146,13 +146,14 @@ namespace ShopifyAccess
 
 					if ( refundLineItem != null && refundLineItem.RestockType.Equals( "cancel" ) )
 					{
-						// complete refund
+						// remove order item
 						if ( orderItem.Quantity == refundLineItem.Quantity )
 						{
 							isCancelled = true;
 							break;
 						}
-					
+						
+						// adjust quantity
 						cancelledQuantity += refundLineItem.Quantity;
 					}
 				}

@@ -63,7 +63,7 @@ namespace ShopifyAccess.Models.Order
 		public IEnumerable< ShopifyTaxLine > TaxLines{ get; set; }
 
 		[ DataMember( Name = "refunds" ) ]
-		public IList< ShopifyOrderRefund > Refunds { get; set; }
+		public IEnumerable< ShopifyOrderRefund > Refunds { get; set; }
 
 		public bool IsShipped
 		{
@@ -84,7 +84,7 @@ namespace ShopifyAccess.Models.Order
 		[ DataMember( Name = "order_id" ) ]
 		public long OrderId { get; set; }
 		[ DataMember( Name = "refund_line_items" ) ]
-		public IList< ShopifyOrderRefundLineItem > RefundLineItems { get; set; }
+		public IEnumerable< ShopifyOrderRefundLineItem > RefundLineItems { get; set; }
 	}
 
 	[ DataContract ]
