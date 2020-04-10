@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 [ assembly : ComVisible( false ) ]
 [ assembly : AssemblyProduct( "ShopifyAccess" ) ]
 [ assembly : AssemblyCompany( "SkuVault Inc." ) ]
-[ assembly : AssemblyCopyright( "Copyright (C) 2019 SkuVault Inc." ) ]
+[ assembly : AssemblyCopyright( "Copyright (C) 2020 SkuVault Inc." ) ]
 [ assembly : AssemblyDescription( "Shopify webservices API wrapper." ) ]
 [ assembly : AssemblyTrademark( "" ) ]
 [ assembly : AssemblyCulture( "" ) ]
@@ -24,4 +24,4 @@ using System.Runtime.InteropServices;
 
 // Keep in track with CA API version
 
-[ assembly : AssemblyVersion( "1.3.1.0" ) ]
+[ assembly : AssemblyVersion( "1.3.2.0" ) ]

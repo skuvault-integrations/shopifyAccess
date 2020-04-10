@@ -62,6 +62,9 @@ namespace ShopifyAccess.Models.Order
 		[ DataMember( Name = "tax_lines" ) ]
 		public IEnumerable< ShopifyTaxLine > TaxLines{ get; set; }
 
+		[ DataMember( Name = "refunds" ) ]
+		public IEnumerable< ShopifyOrderRefund > Refunds { get; set; }
+
 		public bool IsShipped
 		{
 			get { return this.ClosedAt.HasValue; }
@@ -71,6 +74,30 @@ namespace ShopifyAccess.Models.Order
 		{
 			get { return this.CancelledAt.HasValue; }
 		}
+	}
+
+	[ DataContract ]
+	public class ShopifyOrderRefund
+	{
+		[ DataMember( Name = "id" ) ]
+		public long Id { get; set; }
+		[ DataMember( Name = "order_id" ) ]
+		public long OrderId { get; set; }
+		[ DataMember( Name = "refund_line_items" ) ]
+		public IEnumerable< ShopifyOrderRefundLineItem > RefundLineItems { get; set; }
+	}
+
+	[ DataContract ]
+	public class ShopifyOrderRefundLineItem
+	{
+		[ DataMember( Name = "id" ) ]
+		public long Id { get; set; }
+		[ DataMember( Name = "line_item_id" ) ]
+		public long LineItemId { get; set; }
+		[ DataMember( Name = "quantity" ) ]
+		public int Quantity { get; set; }
+		[ DataMember( Name = "restock_type" ) ]
+		public string RestockType { get; set; }
 	}
 
 	public enum ShopifyFinancialStatus
