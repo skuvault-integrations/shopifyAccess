@@ -60,6 +60,10 @@ namespace ShopifyAccess.Models.Order
 		public string Sku { get; set; }
 		[ DataMember( Name = "quantity" ) ]
 		public int Quantity { get; set; }
+		[ DataMember( Name = "grams" ) ]
+		public int Grams { get; set; }
+		[ DataMember( Name = "price" ) ]
+		public decimal Price { get; set; }
 	}
 
 	public enum ShopifyOrderFulfillmentStatusEnum
@@ -73,7 +77,6 @@ namespace ShopifyAccess.Models.Order
 		Failure
 	}
 
-	// ReSharper disable InconsistentNaming
 	public enum ShopifyOrderStatus
 	{
 		Undefined,
@@ -95,6 +98,4 @@ namespace ShopifyAccess.Models.Order
 		voided,
 		any
 	}
-
-	// ReSharper restore InconsistentNaming
 }
