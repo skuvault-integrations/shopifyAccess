@@ -41,6 +41,9 @@ namespace ShopifyAccess.Models.Order
 		[ DataMember( Name = "financial_status" ) ]
 		public ShopifyFinancialStatus FinancialStatus{ get; set; }
 
+		[ DataMember( Name = "fulfillments" ) ]
+		public IEnumerable< ShopifyFulfillment > Fulfillments{ get; set; }
+
 		[ DataMember( Name = "fulfillment_status" ) ]
 		public FulfillmentStatusEnum FulfillmentStatus{ get; set; }
 
