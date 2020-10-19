@@ -19,9 +19,10 @@ namespace ShopifyAccess
 		/// <param name="status">Fulfillment_status. Shipped, partial, unshipped or any</param>
 		/// <param name="dateFrom">created_at_min. Show orders created after date (format: 2008-01-01 03:00)</param>
 		/// <param name="dateTo">created_at_max. Show orders created before date (format: 2008-01-01 03:00)</param>
+		/// <param name="token"></param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns>Orders collection</returns>
-		ShopifyOrders GetOrders( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo, Mark mark = null );
+		ShopifyOrders GetOrders( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo, CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		/// Get shipped orders async
@@ -36,9 +37,10 @@ namespace ShopifyAccess
 		/// <summary>
 		/// get locations
 		/// </summary>
+		/// <param name="token"></param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns></returns>
-		ShopifyLocations GetLocations( Mark mark = null );
+		ShopifyLocations GetLocations( CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		/// get locations async
@@ -51,9 +53,10 @@ namespace ShopifyAccess
 		/// <summary>
 		/// Get all existing products
 		/// </summary>
+		/// <param name="token"></param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns>Products with variants (inventory items)</returns>
-		ShopifyProducts GetProducts( Mark mark = null );
+		ShopifyProducts GetProducts( CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		/// Get all existing products async
@@ -84,9 +87,10 @@ namespace ShopifyAccess
 		/// <summary>
 		/// Get all existing products (through locations)
 		/// </summary>
+		/// <param name="token"></param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns>Products with variants (inventory items)</returns>
-		ShopifyProducts GetProductsInventory( Mark mark = null );
+		ShopifyProducts GetProductsInventory( CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		/// Get all existing products async (through locations)
@@ -108,33 +112,40 @@ namespace ShopifyAccess
 		/// <summary>
 		/// Update variants (inventory items). This method is obsolete. DON'T USE IT
 		/// </summary>
+		/// <param name="token">Cancellation token</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		void UpdateProductVariants( IEnumerable< ShopifyProductVariantForUpdate > variants, Mark mark = null );
+		void UpdateProductVariants( IEnumerable< ShopifyProductVariantForUpdate > variants, CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		/// Update variants (inventory items) async. This method is obsolete. DON'T USE IT
 		/// </summary>
+		/// <param name="token">Cancellation token</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		Task UpdateProductVariantsAsync( IEnumerable< ShopifyProductVariantForUpdate > variants, Mark mark = null );
+		Task UpdateProductVariantsAsync( IEnumerable< ShopifyProductVariantForUpdate > variants, CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		///     Update inventory levels (inventory items)
 		/// </summary>
+		/// <param name="token">Cancellation tokens</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		void UpdateInventoryLevels( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, Mark mark = null );
+		/// <param name="inventoryLevels"></param>
+		void UpdateInventoryLevels( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		///     Update inventory levels (inventory items) async
 		/// </summary>
+		/// <param name="token">Cancellation tokens</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		Task UpdateInventoryLevelsAsync( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, Mark mark = null );
+		/// <param name="inventoryLevels"></param>
+		Task UpdateInventoryLevelsAsync( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		/// Get all users
 		/// </summary>
+		/// <param name="token"></param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns></returns>
-		ShopifyUsers GetUsers( Mark mark = null );
+		ShopifyUsers GetUsers( CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		/// Get all users async
@@ -147,9 +158,10 @@ namespace ShopifyAccess
 		/// <summary>
 		/// Get user
 		/// </summary>
+		/// <param name="token"></param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns></returns>
-		ShopifyUser GetUser( long id, Mark mark = null );
+		ShopifyUser GetUser( long id, CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		/// Get user async
@@ -160,18 +172,19 @@ namespace ShopifyAccess
 		Task< ShopifyUser > GetUserAsync( long id, CancellationToken token, Mark mark = null );
 
 		/// <summary>
-		/// Does shopify plus customer
+		/// Is Shopify Plus customer
 		/// </summary>
+		/// <param name="token"></param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns></returns>
-		bool DoesShopifyPlusAccount( Mark mark = null );
+		bool IsShopifyPlusAccount( CancellationToken token, Mark mark = null );
 
 		/// <summary>
-		/// Does shopify plus customer async
+		/// Is Shopify Plus customer async
 		/// </summary>
 		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns></returns>
-		Task< bool > DoesShopifyPlusAccountAsync( CancellationToken token, Mark mark = null );
+		Task< bool > IsShopifyPlusAccountAsync( CancellationToken token, Mark mark = null );
 	}
 }

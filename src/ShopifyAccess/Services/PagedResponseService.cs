@@ -1,15 +1,17 @@
 ﻿using System;
-using System.Collections.Specialized;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 
 namespace ShopifyAccess.Services
 {
 	public static class PagedResponseService
 	{
-		public static string GetNextPageQueryStrFromHeader( NameValueCollection responseHeaders )
+		public static string GetNextPageQueryStrFromHeader( HttpHeaders responseHeaders )
 		{
-			var linkHeaders = responseHeaders.GetValues( "Link" );
-			if( linkHeaders == null || linkHeaders.Length == 0 )
+			IEnumerable< string > linkHeaders;
+			responseHeaders.TryGetValues( "Link", out linkHeaders );
+			if( linkHeaders == null || !linkHeaders.Any() )
 				return string.Empty;
 
 			var links = linkHeaders.First().Split(',').Select( x => new PageLink ( x.Split(';') ) ).ToArray();

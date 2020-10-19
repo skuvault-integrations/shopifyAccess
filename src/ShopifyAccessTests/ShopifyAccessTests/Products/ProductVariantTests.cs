@@ -38,7 +38,7 @@ namespace ShopifyAccessTests.Products
 		[ Test ]
 		public void GetProducts()
 		{
-			var products = this._service.GetProducts();
+			var products = this._service.GetProducts( CancellationToken.None );
 
 			products.Products.Count.Should().BeGreaterThan( 0 );
 		}
@@ -69,7 +69,7 @@ namespace ShopifyAccessTests.Products
 			products.Products.Any( p => p.Variants.Any( v => v.InventoryManagement == InventoryManagement.Blank ) );
 		}
 
-		[Test ]
+		[ Test ]
 		public async Task GetProductVariantsBySkusAsync()
 		{
 			var products = await this._service.GetProductsAsync( CancellationToken.None );
@@ -96,13 +96,13 @@ namespace ShopifyAccessTests.Products
 		public void ProductVariantQuantityUpdated()
 		{
 			var variantToUpdate = new ShopifyProductVariantForUpdate { Id = 337095344, Quantity = 2 };
-			this._service.UpdateProductVariants( new List< ShopifyProductVariantForUpdate > { variantToUpdate } );
+			this._service.UpdateProductVariants( new List< ShopifyProductVariantForUpdate > { variantToUpdate }, CancellationToken.None );
 		}
 
 		[ Test ]
 		public void GetAndUpdateProduct()
 		{
-			var products = this._service.GetProducts().ToDictionary();
+			var products = this._service.GetProducts( CancellationToken.None ).ToDictionary();
 
 			var productsForUpdate = new List< ShopifyInventoryLevelForUpdate >();
 			foreach( var product in products )
@@ -126,8 +126,8 @@ namespace ShopifyAccessTests.Products
 				
 			}
 
-			_service.UpdateInventoryLevels( productsForUpdate );
-			var updatedProducts = this._service.GetProducts().ToDictionary();
+			_service.UpdateInventoryLevels( productsForUpdate, CancellationToken.None );
+			var updatedProducts = this._service.GetProducts( CancellationToken.None ).ToDictionary();
 			
 			products.Should().Equal( updatedProducts );
 		}
@@ -140,10 +140,10 @@ namespace ShopifyAccessTests.Products
 			var initialQuantity = inventoryItem.Available;
 			const int quantity = 39;
 
-			await this._service.UpdateInventoryLevelsAsync( CreateInventoryLevelForUpdate( inventoryItem, quantity ) );
+			await this._service.UpdateInventoryLevelsAsync( CreateInventoryLevelForUpdate( inventoryItem, quantity ), CancellationToken.None );
 			var product = ( await this._service.GetProductVariantsInventoryBySkusAsync( new List< string > { sku }, CancellationToken.None ) ).First();
 			var newQuantity = product.InventoryLevels.InventoryLevels.First().Available;
-			await this._service.UpdateInventoryLevelsAsync( CreateInventoryLevelForUpdate( inventoryItem, initialQuantity ) );
+			await this._service.UpdateInventoryLevelsAsync( CreateInventoryLevelForUpdate( inventoryItem, initialQuantity ), CancellationToken.None );
 
 			newQuantity.Should().Be( quantity );
 		}

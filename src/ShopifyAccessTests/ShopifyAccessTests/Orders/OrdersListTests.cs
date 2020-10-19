@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using LINQtoCSV;
 using Netco.Logging;
-using Netco.Logging.NLogIntegration;
 using NUnit.Framework;
 using ShopifyAccess;
 using ShopifyAccess.Models.Configuration.Command;
@@ -39,7 +38,7 @@ namespace ShopifyAccessTests.Orders
 		public void OrdersFilteredFulfillmentStatusDateLoaded()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var orders = service.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -10 ), DateTime.UtcNow );
+			var orders = service.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -10 ), DateTime.UtcNow, CancellationToken.None );
 
 			orders.Count.Should().BeGreaterThan( 0 );
 		}
@@ -61,7 +60,7 @@ namespace ShopifyAccessTests.Orders
 			ShopifyOrders orders = null;
 			try
 			{
-				orders = service.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow );
+				orders = service.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow, CancellationToken.None );
 			}
 			catch( WebException )
 			{
@@ -77,7 +76,7 @@ namespace ShopifyAccessTests.Orders
 			ShopifyOrders orders = null;
 			try
 			{
-				orders = service.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow );
+				orders = service.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow, CancellationToken.None );
 			}
 			catch( WebException )
 			{

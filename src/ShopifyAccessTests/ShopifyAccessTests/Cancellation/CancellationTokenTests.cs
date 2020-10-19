@@ -63,9 +63,9 @@ namespace ShopifyAccessTests.Cancellation
 				await service.GetProductsAsync( cancellationTokenSource.Token );
 				Assert.Fail();
 			}
-			catch( WebException ex )
+			catch( TaskCanceledException ex )
 			{
-				Assert.IsTrue( ex.Message.Contains( "The request was canceled" ) );
+				Assert.IsTrue( ex.Message.Contains( "task was canceled" ) );
 			}
 		}
 	}

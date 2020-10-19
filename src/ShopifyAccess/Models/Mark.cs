@@ -61,7 +61,7 @@ namespace ShopifyAccess.Models
 	{
 		public static Mark CreateNewIfBlank( this Mark source )
 		{
-			return source == null ? Mark.Create : source;
+			return source ?? Mark.Create;
 		}
 	}
 }

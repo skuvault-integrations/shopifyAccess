@@ -1,10 +1,10 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using FluentAssertions;
 using LINQtoCSV;
 using Netco.Logging;
-using Netco.Logging.NLogIntegration;
 using NUnit.Framework;
 using ShopifyAccess;
 using ShopifyAccess.Models.Configuration.Command;
@@ -36,7 +36,7 @@ namespace ShopifyAccessTests.Locations
 		public void GetCorrectLocationList()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			ShopifyLocations locations = service.GetLocations();
+			ShopifyLocations locations = service.GetLocations( CancellationToken.None );
 
 			locations.Locations.Count.Should().BeGreaterThan( 0 );
 		}
@@ -49,7 +49,7 @@ namespace ShopifyAccessTests.Locations
 			ShopifyLocations locations = null;
 			try
 			{
-				locations = service.GetLocations();
+				locations = service.GetLocations( CancellationToken.None );
 			}
 			catch( WebException )
 			{
@@ -65,7 +65,7 @@ namespace ShopifyAccessTests.Locations
 			ShopifyLocations locations = null;
 			try
 			{
-				locations = service.GetLocations();
+				locations = service.GetLocations( CancellationToken.None );
 			}
 			catch( WebException )
 			{

@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CuttingEdge.Conditions;
@@ -9,6 +13,7 @@ using ShopifyAccess.Misc;
 using ShopifyAccess.Models;
 using ShopifyAccess.Models.Configuration.Authorization;
 using ShopifyAccess.Models.Configuration.Command;
+using HttpHeaders = System.Net.Http.Headers.HttpHeaders;
 
 namespace ShopifyAccess.Services
 {
@@ -16,6 +21,9 @@ namespace ShopifyAccess.Services
 	{
 		private readonly ShopifyAuthorizationConfig _authorizationConfig;
 		private readonly ShopifyCommandConfig _commandConfig;
+		
+		public HttpClient HttpClient { get; }
+		private const int MaxHttpRequestTimeoutInMinutes = 30;
 
 		#region Constructors
 		public WebRequestServices( ShopifyAuthorizationConfig config )
@@ -23,6 +31,7 @@ namespace ShopifyAccess.Services
 			Condition.Requires( config, "config" ).IsNotNull();
 
 			this._authorizationConfig = config;
+			this.HttpClient = CreateHttpClient();
 			this._commandConfig = new ShopifyCommandConfig( config.ShopName, "authorization" );
 		}
 
@@ -31,43 +40,53 @@ namespace ShopifyAccess.Services
 			Condition.Requires( config, "config" ).IsNotNull();
 
 			this._commandConfig = config;
+			this.HttpClient = CreateHttpClient();
+			var servicePoint = ServicePointManager.FindServicePoint( new Uri( this._commandConfig.Host ) );
+			servicePoint.ConnectionLimit = 1000;
+		}
+
+		private HttpClient CreateHttpClient()
+		{
+			var httpClient = new HttpClient();
+			httpClient.Timeout = TimeSpan.FromMinutes( MaxHttpRequestTimeoutInMinutes );
+			httpClient.DefaultRequestHeaders.Remove( "X-Shopify-Access-Token" );
+			httpClient.DefaultRequestHeaders.Add( "X-Shopify-Access-Token", this._commandConfig.AccessToken );
+			return httpClient; 
 		}
 		#endregion
 
 		#region Requests handling
-		public T GetResponse< T >( ShopifyCommand command, string endpoint, Mark mark )
+		public T GetResponse< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
-			var request = this.CreateServiceGetRequest( command, endpoint );
-			this.LogGetRequest( request.RequestUri, mark );
+			var uri = this.CreateRequestUri( command, endpoint );
+			this.LogGetRequest( uri, mark );
 
-			return this.ParseException( mark, () =>
+			return this.ParseException( mark, async () =>
 			{
-				T result;
-				using( var response = request.GetResponse() )
-					result = this.ParseResponse< T >( response, mark );
-				return result;
-			} );
+				var response = await this.HttpClient.GetAsync( uri, token ).ConfigureAwait( false );
+				var content = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
+				return this.ParseResponse< T >( content, response.Headers, uri, mark );
+			} ).Result;
 		}
 
-		public ResponsePage< T > GetResponsePage< T >( ShopifyCommand command, string endpoint, Mark mark )
+		public ResponsePage< T > GetResponsePage< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
-			var request = this.CreateServiceGetRequest( command, endpoint );
-			this.LogGetRequest( request.RequestUri, mark );
+			var uri = this.CreateRequestUri( command, endpoint );
+			this.LogGetRequest( uri, mark );
 
-			return this.ParseException( mark, () =>
+			return this.ParseException( mark, async () =>
 			{
-				ResponsePage< T > result;
-				using( var response = request.GetResponse() )
-					result = this.ParsePagedResponse< T >( response, mark );
-				return result;
-			} );
+				var response = await this.HttpClient.GetAsync( uri, token ).ConfigureAwait( false );
+				var content = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
+				return this.ParsePagedResponse< T >( content, response.Headers, uri, mark );
+			} ).Result;
 		}
 
-		public async Task< T > GetResponseAsync< T >( ShopifyCommand command, string endpoint, Mark mark, CancellationToken token )
+		public async Task< T > GetResponseAsync< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
@@ -76,26 +95,22 @@ namespace ShopifyAccess.Services
 				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
 			}
 
-			var request = this.CreateServiceGetRequest( command, endpoint );
-			this.LogGetRequest( request.RequestUri, mark );
+			var uri = this.CreateRequestUri( command, endpoint );
+			this.LogGetRequest( uri, mark );
 
-			using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
-			{ 
-				linkedCancellationTokenSource.CancelAfter( this._commandConfig.RequestTimeoutMs );
-				using( linkedCancellationTokenSource.Token.Register( request.Abort ) )
-				{
-					return await this.ParseExceptionAsync( mark, async () =>
-					{
-						T result;
-						using( var response = await request.GetResponseAsync().ConfigureAwait( false ) )
-							result = this.ParseResponse< T >( response, mark );
-						return result;
-					} ).ConfigureAwait( false );
+			return await this.ParseExceptionAsync( mark, async () =>
+			{
+				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
+				{ 
+					linkedCancellationTokenSource.CancelAfter( this._commandConfig.RequestTimeoutMs );
+					var response = await this.HttpClient.GetAsync( uri, linkedCancellationTokenSource.Token ).ConfigureAwait( false );
+					var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
+					return this.ParseResponse< T >( responseContent, response.Headers, uri, mark );
 				}
-			}
+			} ).ConfigureAwait( false );
 		}
 
-		public async Task< ResponsePage< T > > GetResponsePageAsync< T >( ShopifyCommand command, string endpoint, Mark mark, CancellationToken token )
+		public async Task< ResponsePage< T > > GetResponsePageAsync< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
@@ -104,147 +119,115 @@ namespace ShopifyAccess.Services
 				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
 			}
 
-			var request = this.CreateServiceGetRequest( command, endpoint );
-			this.LogGetRequest( request.RequestUri, mark );
+			var uri = this.CreateRequestUri( command, endpoint );
+			this.LogGetRequest( uri, mark );
 
-			using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
-			{ 
-				linkedCancellationTokenSource.CancelAfter( this._commandConfig.RequestTimeoutMs );
-				using( linkedCancellationTokenSource.Token.Register( request.Abort ) )
-				{
-					return await this.ParseExceptionAsync( mark, async () =>
-					{
-						ResponsePage< T > result;
-						using( var response = await request.GetResponseAsync().ConfigureAwait( false ) )
-							result = this.ParsePagedResponse< T >( response, mark );
-						return result;
-					} ).ConfigureAwait( false );
+			return await this.ParseExceptionAsync( mark, async () =>
+			{
+				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
+				{ 
+					linkedCancellationTokenSource.CancelAfter( this._commandConfig.RequestTimeoutMs );
+					var response = await this.HttpClient.GetAsync( uri, linkedCancellationTokenSource.Token ).ConfigureAwait( false );
+					var content = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
+					return this.ParsePagedResponse< T >( content, response.Headers, uri, mark );
 				}
-			}
+			} ).ConfigureAwait( false );
+			
 		}
 
-		public void PutData( ShopifyCommand command, string endpoint, string jsonContent, Mark mark )
+		public void PutData( ShopifyCommand command, string endpoint, string jsonContent, CancellationToken token, Mark mark )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
-			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
-			this.LogUpdateRequest( request.RequestUri, jsonContent, mark );
+			var uri = this.CreateRequestUri( command, endpoint );
+			this.LogUpdateRequest( uri, jsonContent, mark );
 
 			this.ParseException( mark, () =>
 			{
-				using( var response = ( HttpWebResponse )request.GetResponse() )
-					this.LogUpdateResponse( request.RequestUri, this.GetLimitFromHeader( response ), response.StatusCode, mark );
+				var content = new StringContent( jsonContent, Encoding.UTF8, "application/json" );
+				var response = this.HttpClient.PutAsync( uri, content, token ).GetAwaiter().GetResult();
+				this.LogUpdateResponse( uri, GetLimitFromHeader( response.Headers ), response.StatusCode, mark );
 				return true;
 			} );
 		}
 
-		public async Task PutDataAsync( ShopifyCommand command, string endpoint, string jsonContent, Mark mark )
+		public async Task PutDataAsync( ShopifyCommand command, string endpoint, string jsonContent, CancellationToken token, Mark mark )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
-			var request = this.CreateServicePutRequest( command, endpoint, jsonContent );
-			this.LogUpdateRequest( request.RequestUri, jsonContent, mark );
+			var uri = this.CreateRequestUri( command, endpoint );
+			this.LogUpdateRequest( uri, jsonContent, mark );
 
 			await this.ParseExceptionAsync( mark, async () =>
 			{
-				using( var response = await request.GetResponseAsync() )
-					this.LogUpdateResponse( request.RequestUri, this.GetLimitFromHeader( response ), ( ( HttpWebResponse )response ).StatusCode, mark );
+				var content = new StringContent( jsonContent, Encoding.UTF8, "application/json" );
+				var response = await this.HttpClient.PutAsync( uri, content, token ).ConfigureAwait( false );
+				this.LogUpdateResponse( uri, GetLimitFromHeader( response.Headers ), response.StatusCode, mark );
 				return Task.FromResult( true );
-			} );
+			} ).ConfigureAwait( false );
 		}
 
-		public T PostData< T >( ShopifyCommand command, string jsonContent, Mark mark )
+		public void PostData< T >( ShopifyCommand command, string jsonContent, CancellationToken token, Mark mark )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
-			var url = new Uri( string.Concat( this._commandConfig.Host, command.Command ) );
+			var url = this.CreateRequestUri( command, endpoint: "" );
+			this.LogUpdateRequest( url, jsonContent, mark );
 
-			var request = this.CreateServicePostRequest( url, this._commandConfig.AccessToken, jsonContent );
-			this.LogUpdateRequest( request.RequestUri, jsonContent, mark );
 
-			T result;
+			var content = new StringContent( jsonContent, Encoding.UTF8, "application/json" );	
+			var response = this.HttpClient.PostAsync( url, content, token ).GetAwaiter().GetResult();
 
-			using( var response = request.GetResponse() )
-			{
-				result = this.ParseResponse< T >( response, mark );
-			}
-
-			return default(T);
+			this.ParseResponse< T >( response.Content.ReadAsStringAsync().Result, response.Headers, url, mark );
 		}
 
-		public async Task< T > PostDataAsync< T >( ShopifyCommand command, string jsonContent, Mark mark )
+		public async Task PostDataAsync< T >( ShopifyCommand command, string jsonContent, CancellationToken token, Mark mark )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
-			var url = new Uri( string.Concat( this._commandConfig.Host, command.Command ) );
+			var url = this.CreateRequestUri( command, endpoint: "" );
+			this.LogUpdateRequest( url, jsonContent, mark );
 
-			var request = this.CreateServicePostRequest( url, this._commandConfig.AccessToken, jsonContent );
-			this.LogUpdateRequest( request.RequestUri, jsonContent, mark );
 
-			T result;
+			var content = new StringContent( jsonContent, Encoding.UTF8, "application/json" );	
+			var response = await this.HttpClient.PostAsync( url, content, token );
 
-			using( var response = await request.GetResponseAsync() )
-			{
-				result = this.ParseResponse< T >( response, mark );
-			}
-
-			return default(T);
+			this.ParseResponse< T >( await response.Content.ReadAsStringAsync(), response.Headers, url, mark );
 		}
 
 		public string RequestPermanentToken( string code, Mark mark )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
-			string result;
 			var command = ShopifyCommand.GetAccessToken;
-			var tokenRequestUrl = new Uri( string.Concat( this._authorizationConfig.Host, command.Command ) );
+			var url = new Uri( string.Concat( this._authorizationConfig.Host, command.Command ) );
 			var tokenRequestPostContent = string.Format( "client_id={0}&client_secret={1}&code={2}", this._authorizationConfig.ApiKey, this._authorizationConfig.Secret, code );
-			var request = this.CreateServicePostRequest( tokenRequestUrl, tokenRequestPostContent );
+			var content = new StringContent( tokenRequestPostContent, Encoding.UTF8, "application/x-www-form-urlencoded" );	
 
-			using( var response = request.GetResponse() )
-				result = this.ParseResponse< TokenRequestResult >( response, mark ).Token;
+			var response = this.HttpClient.PostAsync( url, content ).GetAwaiter().GetResult();
+
+			var result = this.ParseResponse< TokenRequestResult >( response.Content.ReadAsStringAsync().Result, response.Headers, url, mark ).Token;
 
 			return result;
 		}
 		#endregion
 
 		#region Parsing response
-		private T ParseResponse< T >( WebResponse response, Mark mark )
+		private T ParseResponse< T >( string content, HttpHeaders headers, Uri uri, Mark mark )
 		{
-			var result = default(T);
+			var limit = GetLimitFromHeader( headers );
+			this.LogGetResponse( uri, limit, content, mark );
 
-			using( var stream = response.GetResponseStream() )
-			using( var reader = new StreamReader( stream ) )
-			{
-				var jsonResponse = reader.ReadToEnd();
-
-				var limit = this.GetLimitFromHeader( response );
-				this.LogGetResponse( response.ResponseUri, limit, jsonResponse, mark );
-
-				if( !string.IsNullOrEmpty( jsonResponse ) )
-					result = jsonResponse.FromJson< T >();
-			}
-
-			return result;
+			return !string.IsNullOrEmpty( content ) ? content.FromJson< T >() : default( T );
 		}
 
-		private ResponsePage< T > ParsePagedResponse< T >( WebResponse response, Mark mark )
+		private ResponsePage< T > ParsePagedResponse< T >( string content, HttpHeaders headers, Uri uri, Mark mark )
 		{
-			var result = default(T);
-			string nextPageLink;
+			var limit = GetLimitFromHeader( headers );
+			var nextPageLink = PagedResponseService.GetNextPageQueryStrFromHeader( headers );
+			this.LogGetResponse( uri, limit, nextPageLink, content, mark );
 
-			using( var stream = response.GetResponseStream() )
-			using( var reader = new StreamReader( stream ) )
-			{
-				var jsonResponse = reader.ReadToEnd();
-
-				var limit = this.GetLimitFromHeader( response );
-				nextPageLink = PagedResponseService.GetNextPageQueryStrFromHeader( response.Headers );
-				this.LogGetResponse( response.ResponseUri, limit, nextPageLink, jsonResponse, mark );
-
-				if( !string.IsNullOrEmpty( jsonResponse ) )
-					result = jsonResponse.FromJson< T >();
-			}
+			var result = !string.IsNullOrEmpty( content ) ? content.FromJson< T >() : default(T);
 
 			return new ResponsePage< T > 
 			{
@@ -253,11 +236,11 @@ namespace ShopifyAccess.Services
 			};
 		}
 
-		private string GetLimitFromHeader( WebResponse response )
+		private static string GetLimitFromHeader( HttpHeaders headers )
 		{
-			var limitMass = response.Headers.GetValues( "HTTP_X_SHOPIFY_SHOP_API_CALL_LIMIT" );
-			var limit = limitMass != null && limitMass.Length > 0 ? limitMass[ 0 ] : string.Empty;
-			return limit;
+			IEnumerable< string > limitHeader;
+			headers.TryGetValues( "HTTP_X_SHOPIFY_SHOP_API_CALL_LIMIT", out limitHeader );
+			return limitHeader?.FirstOrDefault() ?? string.Empty;
 		}
 
 		private T ParseException< T >( Mark mark, Func< T > body )
@@ -306,72 +289,16 @@ namespace ShopifyAccess.Services
 		#endregion
 
 		#region WebRequest configuration
-		private HttpWebRequest CreateServicePutRequest( ShopifyCommand command, string endpoint, string content )
+
+
+		private Uri CreateRequestUri( ShopifyCommand command, string endpoint )
 		{
-			var uri = new Uri( string.Concat( this._commandConfig.Host, command.Command, endpoint ) );
-			var request = ( HttpWebRequest )WebRequest.Create( uri );
-
-			request.Method = WebRequestMethods.Http.Put;
-			request.ContentType = "application/json";
-			request.Headers.Add( "X-Shopify-Access-Token", this._commandConfig.AccessToken );
-
-			using( var writer = new StreamWriter( request.GetRequestStream() ) )
-				writer.Write( content );
-
-			return request;
+			return new Uri( string.Concat( this._commandConfig.Host, command.Command, endpoint ) );
 		}
 
-		private HttpWebRequest CreateServicePostRequest( Uri uri, string content )
-		{
-			var request = ( HttpWebRequest )WebRequest.Create( uri );
-			request.Method = WebRequestMethods.Http.Post;
-			request.KeepAlive = true;
-			request.Credentials = CredentialCache.DefaultCredentials;
-			request.ContentType = "application/x-www-form-urlencoded";
 
-			if( !string.IsNullOrEmpty( content ) )
-			{
-				using( var writer = new StreamWriter( request.GetRequestStream() ) )
-					writer.Write( content );
-			}
 
-			return request;
-		}
 
-		private HttpWebRequest CreateServicePostRequest( Uri uri, string token, string content )
-		{
-			var request = ( HttpWebRequest )WebRequest.Create( uri );
-			request.Method = WebRequestMethods.Http.Post;
-			request.KeepAlive = true;
-			request.ContentType = "application/json";
-			request.Headers.Add( "X-Shopify-Access-Token", token );
-
-			if( !string.IsNullOrEmpty( content ) )
-				using( var writer = new StreamWriter( request.GetRequestStream() ) )
-				{
-					writer.Write( content );
-				}
-
-			return request;
-		}
-
-		private HttpWebRequest CreateServiceGetRequest( ShopifyCommand command, string endpoint )
-		{
-			var uri = new Uri( string.Concat( this._commandConfig.Host, command.Command, endpoint ) );
-			var servicePoint = ServicePointManager.FindServicePoint( new Uri( this._commandConfig.Host ) );
-			servicePoint.ConnectionLimit = 1000;
-
-			var request = ( HttpWebRequest )WebRequest.Create( uri );
-
-			request.Method = WebRequestMethods.Http.Get;
-			request.Headers.Add( "X-Shopify-Access-Token", this._commandConfig.AccessToken );
-			request.Timeout = 60 * 1000 * 10;
-			request.KeepAlive = false;
-			request.ProtocolVersion = HttpVersion.Version10;
-			request.ServicePoint.Expect100Continue = false;
-
-			return request;
-		}
 		#endregion
 
 		#region Logging
