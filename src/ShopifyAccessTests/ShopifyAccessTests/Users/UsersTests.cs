@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using LINQtoCSV;
 using Netco.Logging;
-using Netco.Logging.NLogIntegration;
 using NUnit.Framework;
 using ShopifyAccess;
 using ShopifyAccess.Models.Configuration.Command;
@@ -36,7 +35,7 @@ namespace ShopifyAccessTests.Users
 		public void GetUsers()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var users = service.GetUsers();
+			var users = service.GetUsers( CancellationToken.None );
 
 			users.Users.Count.Should().BeGreaterThan( 0 );
 		}
@@ -54,7 +53,7 @@ namespace ShopifyAccessTests.Users
 		public void GetUser()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var user = service.GetUser( 6250887 );
+			var user = service.GetUser( 6250887, CancellationToken.None );
 
 			user.Should().NotBeNull();
 		}
@@ -69,19 +68,19 @@ namespace ShopifyAccessTests.Users
 		}
 
 		[ Test ]
-		public void DoesShopifyPlusAccount()
+		public void IsShopifyPlusAccount()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var result = service.DoesShopifyPlusAccount();
+			var result = service.IsShopifyPlusAccount( CancellationToken.None );
 
 			result.Should().Be( false );
 		}
 
 		[ Test ]
-		public async Task DoesShopifyPlusAccountAsync()
+		public async Task IsShopifyPlusAccountAsync()
 		{
 			var service = this.ShopifyFactory.CreateService( this.Config );
-			var result = await service.DoesShopifyPlusAccountAsync( CancellationToken.None );
+			var result = await service.IsShopifyPlusAccountAsync( CancellationToken.None );
 
 			result.Should().Be( false );
 		}

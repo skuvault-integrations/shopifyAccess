@@ -7,6 +7,7 @@ using LINQtoCSV;
 using Netco.Logging;
 using NUnit.Framework;
 using ShopifyAccess;
+using ShopifyAccess.Models;
 using ShopifyAccess.Models.Configuration.Command;
 
 namespace ShopifyAccessTests.Cancellation
@@ -28,13 +29,12 @@ namespace ShopifyAccessTests.Cancellation
 			this.TestConfig = cc.Read< TestCommandConfig >( credentialsFilePath, new CsvFileDescription { FirstLineHasColumnNames = true } ).FirstOrDefault();
 		}
 
-		private ShopifyCommandConfig CreateConfig( int? requestTimeoutMs = null )
+		private ShopifyCommandConfig CreateConfig()
 		{
 			if( this.TestConfig == null )
 				return null;
 
-			return !requestTimeoutMs.HasValue ? new ShopifyCommandConfig( this.TestConfig.ShopName, this.TestConfig.AccessToken ) : 
-				new ShopifyCommandConfig( this.TestConfig.ShopName, this.TestConfig.AccessToken, requestTimeoutMs.Value );
+			return new ShopifyCommandConfig( this.TestConfig.ShopName, this.TestConfig.AccessToken );
 		}
 
 		[ Test ]
@@ -55,7 +55,7 @@ namespace ShopifyAccessTests.Cancellation
 		public async Task RequestTimesOut()
 		{
 			const int reallyShortTime = 1;
-			var service = this.ShopifyFactory.CreateService( this.CreateConfig( reallyShortTime ) );
+			var service = this.ShopifyFactory.CreateService( this.CreateConfig(), new ShopifyTimeouts( reallyShortTime ) );
 			var cancellationTokenSource = new CancellationTokenSource();
 
 			try

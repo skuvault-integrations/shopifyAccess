@@ -46,7 +46,7 @@ namespace ShopifyAccessTests.Throttler
 				var orders = await service.GetOrdersAsync( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -20 ), DateTime.UtcNow, CancellationToken.None );
 				var products = await service.GetProductsAsync( CancellationToken.None );
 				var variantToUpdate = new ShopifyProductVariantForUpdate { Id = 3341291969, Quantity = 2 };
-				await service.UpdateProductVariantsAsync( new List< ShopifyProductVariantForUpdate > { variantToUpdate } );
+				await service.UpdateProductVariantsAsync( new List< ShopifyProductVariantForUpdate > { variantToUpdate }, CancellationToken.None );
 			} );
 		}
 
@@ -60,10 +60,10 @@ namespace ShopifyAccessTests.Throttler
 			{
 				var task = new Task( () =>
 				{
-					var orders = service.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -20 ), DateTime.UtcNow );
-					var products = service.GetProducts();
+					var orders = service.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -20 ), DateTime.UtcNow, CancellationToken.None );
+					var products = service.GetProducts( CancellationToken.None );
 					var variantToUpdate = new ShopifyProductVariantForUpdate { Id = 3341291969, Quantity = 2 };
-					service.UpdateProductVariants( new List< ShopifyProductVariantForUpdate > { variantToUpdate } );
+					service.UpdateProductVariants( new List< ShopifyProductVariantForUpdate > { variantToUpdate }, CancellationToken.None );
 				} );
 				task.Start();
 				return task;

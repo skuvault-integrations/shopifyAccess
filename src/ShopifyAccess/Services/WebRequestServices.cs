@@ -56,37 +56,31 @@ namespace ShopifyAccess.Services
 		#endregion
 
 		#region Requests handling
-		public T GetResponse< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark )
+		public T GetResponse< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark, int timeout )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
+			
+			if( token.IsCancellationRequested )
+			{
+				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
+			}
 
 			var uri = this.CreateRequestUri( command, endpoint );
-			this.LogGetRequest( uri, mark );
+			this.LogGetRequest( uri, mark, timeout );
 
 			return this.ParseException( mark, async () =>
 			{
-				var response = await this.HttpClient.GetAsync( uri, token ).ConfigureAwait( false );
-				var content = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
-				return this.ParseResponse< T >( content, response.Headers, uri, mark );
+				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
+				{ 
+					linkedCancellationTokenSource.CancelAfter( timeout );
+					var response = await this.HttpClient.GetAsync( uri, linkedCancellationTokenSource.Token ).ConfigureAwait( false );
+					var content = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
+					return this.ParseResponse< T >( content, response.Headers, uri, mark );
+				}
 			} ).Result;
 		}
 
-		public ResponsePage< T > GetResponsePage< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark )
-		{
-			Condition.Requires( mark, "mark" ).IsNotNull();
-
-			var uri = this.CreateRequestUri( command, endpoint );
-			this.LogGetRequest( uri, mark );
-
-			return this.ParseException( mark, async () =>
-			{
-				var response = await this.HttpClient.GetAsync( uri, token ).ConfigureAwait( false );
-				var content = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
-				return this.ParsePagedResponse< T >( content, response.Headers, uri, mark );
-			} ).Result;
-		}
-
-		public async Task< T > GetResponseAsync< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark )
+		public ResponsePage< T > GetResponsePage< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark, int timeout )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
@@ -96,13 +90,37 @@ namespace ShopifyAccess.Services
 			}
 
 			var uri = this.CreateRequestUri( command, endpoint );
-			this.LogGetRequest( uri, mark );
+			this.LogGetRequest( uri, mark, timeout );
+
+			return this.ParseException( mark, async () =>
+			{
+				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
+				{ 
+					linkedCancellationTokenSource.CancelAfter( timeout );
+					var response = await this.HttpClient.GetAsync( uri, linkedCancellationTokenSource.Token ).ConfigureAwait( false );
+					var content = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
+					return this.ParsePagedResponse< T >( content, response.Headers, uri, mark );
+				}
+			} ).Result;
+		}
+
+		public async Task< T > GetResponseAsync< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark, int timeout )
+		{
+			Condition.Requires( mark, "mark" ).IsNotNull();
+
+			if( token.IsCancellationRequested )
+			{
+				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
+			}
+
+			var uri = this.CreateRequestUri( command, endpoint );
+			this.LogGetRequest( uri, mark, timeout );
 
 			return await this.ParseExceptionAsync( mark, async () =>
 			{
 				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
 				{ 
-					linkedCancellationTokenSource.CancelAfter( this._commandConfig.RequestTimeoutMs );
+					linkedCancellationTokenSource.CancelAfter( timeout );
 					var response = await this.HttpClient.GetAsync( uri, linkedCancellationTokenSource.Token ).ConfigureAwait( false );
 					var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
 					return this.ParseResponse< T >( responseContent, response.Headers, uri, mark );
@@ -110,7 +128,7 @@ namespace ShopifyAccess.Services
 			} ).ConfigureAwait( false );
 		}
 
-		public async Task< ResponsePage< T > > GetResponsePageAsync< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark )
+		public async Task< ResponsePage< T > > GetResponsePageAsync< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark, int timeout )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
@@ -120,13 +138,13 @@ namespace ShopifyAccess.Services
 			}
 
 			var uri = this.CreateRequestUri( command, endpoint );
-			this.LogGetRequest( uri, mark );
+			this.LogGetRequest( uri, mark, timeout );
 
 			return await this.ParseExceptionAsync( mark, async () =>
 			{
 				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
 				{ 
-					linkedCancellationTokenSource.CancelAfter( this._commandConfig.RequestTimeoutMs );
+					linkedCancellationTokenSource.CancelAfter( timeout );
 					var response = await this.HttpClient.GetAsync( uri, linkedCancellationTokenSource.Token ).ConfigureAwait( false );
 					var content = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
 					return this.ParsePagedResponse< T >( content, response.Headers, uri, mark );
@@ -135,62 +153,100 @@ namespace ShopifyAccess.Services
 			
 		}
 
-		public void PutData( ShopifyCommand command, string endpoint, string jsonContent, CancellationToken token, Mark mark )
+		public void PutData( ShopifyCommand command, string endpoint, string jsonContent, CancellationToken token, Mark mark, int timeout )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
+			if( token.IsCancellationRequested )
+			{
+				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
+			}
+
 			var uri = this.CreateRequestUri( command, endpoint );
-			this.LogUpdateRequest( uri, jsonContent, mark );
+			this.LogUpdateRequest( uri, jsonContent, mark, timeout );
 
 			this.ParseException( mark, () =>
 			{
-				var content = new StringContent( jsonContent, Encoding.UTF8, "application/json" );
-				var response = this.HttpClient.PutAsync( uri, content, token ).GetAwaiter().GetResult();
-				this.LogUpdateResponse( uri, GetLimitFromHeader( response.Headers ), response.StatusCode, mark );
-				return true;
+				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
+				{ 
+					linkedCancellationTokenSource.CancelAfter( timeout );
+					var content = new StringContent( jsonContent, Encoding.UTF8, "application/json" );
+					var response = this.HttpClient.PutAsync( uri, content, linkedCancellationTokenSource.Token ).GetAwaiter().GetResult();
+					this.LogUpdateResponse( uri, GetLimitFromHeader( response.Headers ), response.StatusCode, mark );
+					return true;
+				}
 			} );
 		}
 
-		public async Task PutDataAsync( ShopifyCommand command, string endpoint, string jsonContent, CancellationToken token, Mark mark )
+		public async Task PutDataAsync( ShopifyCommand command, string endpoint, string jsonContent, CancellationToken token, Mark mark, int timeout )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
+			if( token.IsCancellationRequested )
+			{
+				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
+			}
+
 			var uri = this.CreateRequestUri( command, endpoint );
-			this.LogUpdateRequest( uri, jsonContent, mark );
+			this.LogUpdateRequest( uri, jsonContent, mark, timeout );
 
 			await this.ParseExceptionAsync( mark, async () =>
 			{
-				var content = new StringContent( jsonContent, Encoding.UTF8, "application/json" );
-				var response = await this.HttpClient.PutAsync( uri, content, token ).ConfigureAwait( false );
-				this.LogUpdateResponse( uri, GetLimitFromHeader( response.Headers ), response.StatusCode, mark );
-				return Task.FromResult( true );
+				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
+				{ 
+					linkedCancellationTokenSource.CancelAfter( timeout );
+					var content = new StringContent( jsonContent, Encoding.UTF8, "application/json" );
+					var response = await this.HttpClient.PutAsync( uri, content, linkedCancellationTokenSource.Token ).ConfigureAwait( false );
+					this.LogUpdateResponse( uri, GetLimitFromHeader( response.Headers ), response.StatusCode, mark );
+					return Task.FromResult( true );
+				}
 			} ).ConfigureAwait( false );
 		}
 
-		public void PostData< T >( ShopifyCommand command, string jsonContent, CancellationToken token, Mark mark )
+		public void PostData< T >( ShopifyCommand command, string jsonContent, CancellationToken token, Mark mark, int timeout )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
+			if( token.IsCancellationRequested )
+			{
+				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
+			}
+
 			var url = this.CreateRequestUri( command, endpoint: "" );
-			this.LogUpdateRequest( url, jsonContent, mark );
+			this.LogUpdateRequest( url, jsonContent, mark, timeout );
 
 
 			var content = new StringContent( jsonContent, Encoding.UTF8, "application/json" );	
-			var response = this.HttpClient.PostAsync( url, content, token ).GetAwaiter().GetResult();
+			HttpResponseMessage response;
+			using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
+			{ 
+				linkedCancellationTokenSource.CancelAfter( timeout );
+				response = this.HttpClient.PostAsync( url, content, linkedCancellationTokenSource.Token ).GetAwaiter().GetResult();
+			}
 
 			this.ParseResponse< T >( response.Content.ReadAsStringAsync().Result, response.Headers, url, mark );
 		}
 
-		public async Task PostDataAsync< T >( ShopifyCommand command, string jsonContent, CancellationToken token, Mark mark )
+		public async Task PostDataAsync< T >( ShopifyCommand command, string jsonContent, CancellationToken token, Mark mark, int timeout )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
+			if( token.IsCancellationRequested )
+			{
+				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
+			}
+
 			var url = this.CreateRequestUri( command, endpoint: "" );
-			this.LogUpdateRequest( url, jsonContent, mark );
+			this.LogUpdateRequest( url, jsonContent, mark, timeout );
 
 
 			var content = new StringContent( jsonContent, Encoding.UTF8, "application/json" );	
-			var response = await this.HttpClient.PostAsync( url, content, token );
+			HttpResponseMessage response;
+			using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
+			{ 
+				linkedCancellationTokenSource.CancelAfter( timeout );
+				response = await this.HttpClient.PostAsync( url, content, linkedCancellationTokenSource.Token );
+			}
 
 			this.ParseResponse< T >( await response.Content.ReadAsStringAsync(), response.Headers, url, mark );
 		}
@@ -290,19 +346,14 @@ namespace ShopifyAccess.Services
 
 		#region WebRequest configuration
 
-
 		private Uri CreateRequestUri( ShopifyCommand command, string endpoint )
 		{
 			return new Uri( string.Concat( this._commandConfig.Host, command.Command, endpoint ) );
 		}
-
-
-
-
 		#endregion
 
 		#region Logging
-		private void LogGetRequest( Uri requestUri, Mark mark )
+		private void LogGetRequest( Uri requestUri, Mark mark, int timeout )
 		{
 			ShopifyLogger.Trace( mark, "GET request\tRequest: {0}", requestUri );
 		}
@@ -317,7 +368,7 @@ namespace ShopifyAccess.Services
 			ShopifyLogger.Trace( mark, "GET response\tRequest: {0}\tLimit: {1}\tNext Page: {2}\tResponse: {3}", requestUri, limit, nextPage, jsonResponse );
 		}
 
-		private void LogUpdateRequest( Uri requestUri, string jsonContent, Mark mark )
+		private void LogUpdateRequest( Uri requestUri, string jsonContent, Mark mark, int timeout )
 		{
 			ShopifyLogger.Trace( mark, "PUT request\tRequest: {0}\tData: {1}", requestUri, jsonContent );
 		}
