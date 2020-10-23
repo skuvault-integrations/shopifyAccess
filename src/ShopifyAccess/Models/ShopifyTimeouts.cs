@@ -42,7 +42,8 @@ namespace ShopifyAccess.Models
 		{
 			get
 			{
-				if ( this._timeouts.TryGetValue( operation, out ShopifyOperationTimeout timeout ) )
+				ShopifyOperationTimeout timeout;
+				if ( this._timeouts.TryGetValue( operation, out timeout ) )
 					return timeout.TimeoutInMs;
 
 				return this.DefaultOperationTimeout.TimeoutInMs;
