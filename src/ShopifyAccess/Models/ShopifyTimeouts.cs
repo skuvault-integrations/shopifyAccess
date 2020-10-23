@@ -9,7 +9,7 @@ namespace ShopifyAccess.Models
 		GetProducts,
 		GetProductsInventory,
 		UpdateInventory,
-		UpdateProductVariant,
+		UpdateProductVariantQuantity,
 		GetOrdersCount,
 		GetOrders,
 		GetLocations,
@@ -30,13 +30,13 @@ namespace ShopifyAccess.Models
 
 	public class ShopifyTimeouts
 	{
-		public const int DefaultTimeoutInMs = 10 * 60 * 1000;
-		private Dictionary< ShopifyOperationEnum, ShopifyOperationTimeout > _timeouts;
+		private const int DefaultTimeoutInMs = 10 * 60 * 1000;
+		private readonly Dictionary< ShopifyOperationEnum, ShopifyOperationTimeout > _timeouts;
 
 		/// <summary>
 		///	This timeout value will be used if specific timeout for operation is not provided. Default value can be changed through constructor.
 		/// </summary>
-		public ShopifyOperationTimeout DefaultOperationTimeout { get; private set; }
+		private ShopifyOperationTimeout DefaultOperationTimeout { get; set; }
 
 		public int this[ ShopifyOperationEnum operation ]
 		{

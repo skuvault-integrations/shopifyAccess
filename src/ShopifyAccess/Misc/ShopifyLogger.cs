@@ -28,27 +28,27 @@ namespace ShopifyAccess.Misc
 
 		public static void LogGetRequest( Uri requestUri, Mark mark, int timeout )
 		{
-			Trace( mark, "GET request\tRequest: {0}", requestUri );
+			Trace( mark, "GET request\tRequest: {0} with timeout {1}ms", requestUri, timeout );
 		}
 
-		public static void LogGetResponse( Uri requestUri, string limit, string jsonResponse, Mark mark )
+		public static void LogGetResponse( Uri requestUri, string limit, string jsonResponse, Mark mark, int timeout )
 		{
-			Trace( mark, "GET response\tRequest: {0}\tLimit: {1}\tResponse: {2}", requestUri, limit, jsonResponse );
+			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tResponse: {3", requestUri, timeout, limit, jsonResponse );
 		}
 
-		public static void LogGetResponse( Uri requestUri, string limit, string nextPage, string jsonResponse, Mark mark )
+		public static void LogGetResponse( Uri requestUri, string limit, string nextPage, string jsonResponse, Mark mark, int timeout )
 		{
-			Trace( mark, "GET response\tRequest: {0}\tLimit: {1}\tNext Page: {2}\tResponse: {3}", requestUri, limit, nextPage, jsonResponse );
+			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tNext Page: {3}\tResponse: {4}", requestUri, timeout, limit, nextPage, jsonResponse );
 		}
 
 		public static void LogUpdateRequest( Uri requestUri, string jsonContent, Mark mark, int timeout )
 		{
-			Trace( mark, "PUT request\tRequest: {0}\tData: {1}", requestUri, jsonContent );
+			Trace( mark, "PUT request\tRequest: {0} with timeout {1}ms\tData: {2}", requestUri, timeout, jsonContent );
 		}
 
-		public static void LogUpdateResponse( Uri requestUri, string limit, HttpStatusCode statusCode, Mark mark )
+		public static void LogUpdateResponse( Uri requestUri, string limit, HttpStatusCode statusCode, Mark mark, int timeout )
 		{
-			Trace( mark, "PUT/POST response\tRequest: {0}\tLimit: {1}\tStatusCode: {2}", requestUri, limit, statusCode );
+			Trace( mark, "PUT/POST response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tStatusCode: {3}", requestUri, timeout, limit, statusCode );
 		}
 
 		public static void LogException( WebException ex, Mark mark, string shopName )

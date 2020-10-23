@@ -569,7 +569,7 @@ namespace ShopifyAccess
 			ActionPolicies.SubmitPolicy( mark, this._shopName ).Do( () =>
 				this._productUpdateThrottler.Execute( () =>
 				{
-					this._webRequestServices.PutData( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent, token, mark, this._timeouts[ ShopifyOperationEnum.UpdateProductVariant ] );
+					this._webRequestServices.PutData( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent, token, mark, this._timeouts[ ShopifyOperationEnum.UpdateProductVariantQuantity ] );
 					return true;
 				} ) );
 		}
@@ -582,7 +582,7 @@ namespace ShopifyAccess
 			await ActionPolicies.SubmitPolicyAsync( mark, this._shopName ).Do( async () =>
 				await this._productUpdateThrottlerAsync.ExecuteAsync( async () =>
 				{
-					await this._webRequestServices.PutDataAsync( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent, token, mark, this._timeouts[ ShopifyOperationEnum.UpdateProductVariant ] );
+					await this._webRequestServices.PutDataAsync( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent, token, mark, this._timeouts[ ShopifyOperationEnum.UpdateProductVariantQuantity ] );
 					return true;
 				} ) );
 		}
