@@ -33,7 +33,7 @@ namespace ShopifyAccess.Misc
 
 		public static void LogGetResponse( Uri requestUri, string limit, string jsonResponse, Mark mark, int timeout )
 		{
-			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tResponse: {3", requestUri, timeout, limit, jsonResponse );
+			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tResponse: {3}", requestUri, timeout, limit, jsonResponse );
 		}
 
 		public static void LogGetResponse( Uri requestUri, string limit, string nextPage, string jsonResponse, Mark mark, int timeout )

@@ -70,21 +70,6 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
-		public async Task GetProductVariantsBySkusAsync()
-		{
-			var products = await this._service.GetProductsAsync( CancellationToken.None );
-			var productVariants = products.ToListVariants();
-
-			// take 10% random variants
-			var filteredProductVariants = productVariants.OrderBy( v => Guid.NewGuid() ).Take( productVariants.Count / 10 ).ToList();
-			var filteredSkus = filteredProductVariants.Select( v => v.Sku.ToUpperInvariant() );
-
-			var variants = await this._service.GetProductVariantsInventoryBySkusAsync( filteredSkus, CancellationToken.None );
-			var expectedVariants = productVariants.Where( v => filteredSkus.Contains( v.Sku.ToUpperInvariant() ) ).ToList();
-			variants.ShouldBeEquivalentTo( expectedVariants );
-		}
-
-		[ Test ]
 		public async Task GetProductsThroughLocationsAsync()
 		{
 			var products = await this._service.GetProductsInventoryAsync( CancellationToken.None );
@@ -100,9 +85,11 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
-		public void GetAndUpdateProduct()
+		public void GetAndUpdateProductQuantity()
 		{
+			const string sku = "testSku1";
 			var products = this._service.GetProducts( CancellationToken.None ).ToDictionary();
+			const int quantity = 17;
 
 			var productsForUpdate = new List< ShopifyInventoryLevelForUpdate >();
 			foreach( var product in products )
@@ -118,18 +105,19 @@ namespace ShopifyAccessTests.Products
 					Quantity = firstInventoryLevel.Available
 				};
 
-				if( product.Key.Equals( "T-BLA-S", StringComparison.InvariantCultureIgnoreCase ) )
+				if( product.Key.Equals( sku, StringComparison.InvariantCultureIgnoreCase ) )
 				{
-					productForUpdate.Quantity = 17;
+					productForUpdate.Quantity = quantity;
 					productsForUpdate.Add( productForUpdate );
+					break;
 				}
-				
 			}
 
 			_service.UpdateInventoryLevels( productsForUpdate, CancellationToken.None );
 			var updatedProducts = this._service.GetProducts( CancellationToken.None ).ToDictionary();
 			
-			products.Should().Equal( updatedProducts );
+			var updatedProduct = updatedProducts.FirstOrDefault( p => p.Key.Equals( sku, StringComparison.InvariantCultureIgnoreCase ) );
+			updatedProduct.Value.InventoryLevels.InventoryLevels[ 0 ].Available.Should().Be( quantity );
 		}
 
 		[ Test ]
