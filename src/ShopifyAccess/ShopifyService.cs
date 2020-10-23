@@ -72,7 +72,7 @@ namespace ShopifyAccess
 			mark = mark.CreateNewIfBlank();
 			var locations = ActionPolicies.GetPolicy( mark, this._shopName ).Get(
 				() => this._throttler.Execute(
-					() => this._webRequestServices.GetResponse< ShopifyLocations >( ShopifyCommand.GetLocations, endpoint : "", token : token, mark : mark, this._timeouts[ ShopifyOperationEnum.GetLocations ] ) ) );
+					() => this._webRequestServices.GetResponse< ShopifyLocations >( ShopifyCommand.GetLocations, "", token, mark, this._timeouts[ ShopifyOperationEnum.GetLocations ] ) ) );
 			return locations;
 		}
 

@@ -22,7 +22,7 @@ namespace ShopifyAccess.Services
 		private readonly ShopifyAuthorizationConfig _authorizationConfig;
 		private readonly ShopifyCommandConfig _commandConfig;
 		
-		public HttpClient HttpClient { get; }
+		public HttpClient HttpClient { get; private set; }
 		private const int MaxHttpRequestTimeoutInMinutes = 30;
 
 		#region Constructors
