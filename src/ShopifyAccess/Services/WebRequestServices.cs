@@ -68,7 +68,7 @@ namespace ShopifyAccess.Services
 				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
 			}
 
-			return this.ParseException( mark, async () =>
+			return this.ParseException( mark, timeout, async () =>
 			{
 				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
 				{ 
@@ -92,7 +92,7 @@ namespace ShopifyAccess.Services
 				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
 			}
 
-			return this.ParseException( mark, async () =>
+			return this.ParseException( mark, timeout, async () =>
 			{
 				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
 				{ 
@@ -116,7 +116,7 @@ namespace ShopifyAccess.Services
 			var uri = this.CreateRequestUri( command, endpoint );
 			ShopifyLogger.LogGetRequest( uri, mark, timeout );
 
-			return await this.ParseExceptionAsync( mark, async () =>
+			return await this.ParseExceptionAsync( mark, timeout, async () =>
 			{
 				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
 				{ 
@@ -140,7 +140,7 @@ namespace ShopifyAccess.Services
 				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
 			}
 
-			return await this.ParseExceptionAsync( mark, async () =>
+			return await this.ParseExceptionAsync( mark, timeout, async () =>
 			{
 				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
 				{ 
@@ -165,7 +165,7 @@ namespace ShopifyAccess.Services
 				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
 			}
 
-			this.ParseException( mark, () =>
+			this.ParseException( mark, timeout, () =>
 			{
 				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
 				{ 
@@ -190,7 +190,7 @@ namespace ShopifyAccess.Services
 				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
 			}
 
-			await this.ParseExceptionAsync( mark, async () =>
+			await this.ParseExceptionAsync( mark, timeout, async () =>
 			{
 				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
 				{ 
@@ -304,7 +304,7 @@ namespace ShopifyAccess.Services
 			return limitHeader?.FirstOrDefault() ?? string.Empty;
 		}
 
-		private T ParseException< T >( Mark mark, Func< T > body )
+		private T ParseException< T >( Mark mark, int timeout, Func< T > body )
 		{
 			try
 			{

@@ -52,12 +52,7 @@ namespace ShopifyAccess.Models
 
 		public void Set( ShopifyOperationEnum operation, ShopifyOperationTimeout timeout )
 		{
-			if ( this._timeouts.ContainsKey( operation ) )
-			{
-				this._timeouts.Remove( operation );
-			}
-
-			this._timeouts.Add( operation, timeout );
+			this._timeouts[ operation ] = timeout;
 		}
 
 		public ShopifyTimeouts( int defaultTimeoutInMs )

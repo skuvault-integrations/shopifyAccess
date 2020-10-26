@@ -48,25 +48,20 @@ namespace ShopifyAccessTests.Cancellation
 				cancellationTokenSource.Cancel();
 				await service.GetProductsAsync( cancellationTokenSource.Token );
 				Assert.Fail();
-			}, "Task was cancelled" );
+			}, "Task wasn't cancelled" );
 		}
 
 		[ Test ]
-		public async Task RequestTimesOut()
+		public void RequestTimesOut()
 		{
 			const int reallyShortTime = 1;
 			var service = this.ShopifyFactory.CreateService( this.CreateConfig(), new ShopifyTimeouts( reallyShortTime ) );
 			var cancellationTokenSource = new CancellationTokenSource();
 
-			try
+			Assert.ThrowsAsync< TaskCanceledException >( async () => 
 			{
 				await service.GetProductsAsync( cancellationTokenSource.Token );
-				Assert.Fail();
-			}
-			catch( TaskCanceledException ex )
-			{
-				Assert.IsTrue( ex.Message.Contains( "task was canceled" ) );
-			}
+			}, "Request didn't timeout. TaskCanceledException wasn't thrown");
 		}
 	}
 }
