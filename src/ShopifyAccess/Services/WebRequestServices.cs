@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace ShopifyAccess.Services
 		private readonly ShopifyCommandConfig _commandConfig;
 		
 		public HttpClient HttpClient { get; private set; }
+		public DateTime? LastNetworkActivityTime { get; private set; }
 		private const int MaxHttpRequestTimeoutInMinutes = 30;
 
 		#region Constructors
@@ -73,8 +75,10 @@ namespace ShopifyAccess.Services
 				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
 				{ 
 					linkedCancellationTokenSource.CancelAfter( timeout );
+					RefreshLastNetworkActivityTime();
 					var response = await this.HttpClient.GetAsync( uri, linkedCancellationTokenSource.Token ).ConfigureAwait( false );
 					var content = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
+					RefreshLastNetworkActivityTime();
 					return ParseResponse< T >( content, response.Headers, uri, mark, timeout );
 				}
 			} ).Result;
@@ -97,8 +101,10 @@ namespace ShopifyAccess.Services
 				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
 				{ 
 					linkedCancellationTokenSource.CancelAfter( timeout );
+					RefreshLastNetworkActivityTime();
 					var response = await this.HttpClient.GetAsync( uri, linkedCancellationTokenSource.Token ).ConfigureAwait( false );
 					var content = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
+					RefreshLastNetworkActivityTime();
 					return ParsePagedResponse< T >( content, response.Headers, uri, mark, timeout );
 				}
 			} ).Result;
@@ -121,8 +127,10 @@ namespace ShopifyAccess.Services
 				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
 				{ 
 					linkedCancellationTokenSource.CancelAfter( timeout );
+					RefreshLastNetworkActivityTime();
 					var response = await this.HttpClient.GetAsync( uri, linkedCancellationTokenSource.Token ).ConfigureAwait( false );
 					var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
+					RefreshLastNetworkActivityTime();
 					return ParseResponse< T >( responseContent, response.Headers, uri, mark, timeout );
 				}
 			} ).ConfigureAwait( false );
@@ -145,8 +153,10 @@ namespace ShopifyAccess.Services
 				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
 				{ 
 					linkedCancellationTokenSource.CancelAfter( timeout );
+					RefreshLastNetworkActivityTime();
 					var response = await this.HttpClient.GetAsync( uri, linkedCancellationTokenSource.Token ).ConfigureAwait( false );
 					var content = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
+					RefreshLastNetworkActivityTime();
 					return ParsePagedResponse< T >( content, response.Headers, uri, mark, timeout );
 				}
 			} ).ConfigureAwait( false );
@@ -171,7 +181,9 @@ namespace ShopifyAccess.Services
 				{ 
 					linkedCancellationTokenSource.CancelAfter( timeout );
 					var content = new StringContent( jsonContent, Encoding.UTF8, "application/json" );
+					RefreshLastNetworkActivityTime();
 					var response = this.HttpClient.PutAsync( uri, content, linkedCancellationTokenSource.Token ).GetAwaiter().GetResult();
+					RefreshLastNetworkActivityTime();
 					ShopifyLogger.LogUpdateResponse( uri, GetLimitFromHeader( response.Headers ), response.StatusCode, mark, timeout );
 					return true;
 				}
@@ -196,7 +208,9 @@ namespace ShopifyAccess.Services
 				{ 
 					linkedCancellationTokenSource.CancelAfter( timeout );
 					var content = new StringContent( jsonContent, Encoding.UTF8, "application/json" );
+					RefreshLastNetworkActivityTime();
 					var response = await this.HttpClient.PutAsync( uri, content, linkedCancellationTokenSource.Token ).ConfigureAwait( false );
+					RefreshLastNetworkActivityTime();
 					ShopifyLogger.LogUpdateResponse( uri, GetLimitFromHeader( response.Headers ), response.StatusCode, mark, timeout );
 					return Task.FromResult( true );
 				}
@@ -221,10 +235,12 @@ namespace ShopifyAccess.Services
 			using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
 			{ 
 				linkedCancellationTokenSource.CancelAfter( timeout );
+				RefreshLastNetworkActivityTime();
 				response = this.HttpClient.PostAsync( url, content, linkedCancellationTokenSource.Token ).GetAwaiter().GetResult();
 			}
-
-			ParseResponse< T >( response.Content.ReadAsStringAsync().Result, response.Headers, url, mark, timeout );
+			var responseContent = response.Content.ReadAsStringAsync().Result;
+			RefreshLastNetworkActivityTime();
+			ParseResponse< T >( responseContent, response.Headers, url, mark, timeout );
 		}
 
 		public async Task PostDataAsync< T >( ShopifyCommand command, string jsonContent, CancellationToken token, Mark mark, int timeout )
@@ -245,10 +261,12 @@ namespace ShopifyAccess.Services
 			using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( token ) ) 
 			{ 
 				linkedCancellationTokenSource.CancelAfter( timeout );
+				RefreshLastNetworkActivityTime();
 				response = await this.HttpClient.PostAsync( url, content, linkedCancellationTokenSource.Token );
 			}
-
-			ParseResponse< T >( await response.Content.ReadAsStringAsync(), response.Headers, url, mark, timeout );
+			var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
+			RefreshLastNetworkActivityTime();
+			ParseResponse< T >( responseContent, response.Headers, url, mark, timeout );
 		}
 
 		public string RequestPermanentToken( string code, Mark mark )
@@ -260,9 +278,11 @@ namespace ShopifyAccess.Services
 			var tokenRequestPostContent = string.Format( "client_id={0}&client_secret={1}&code={2}", this._authorizationConfig.ApiKey, this._authorizationConfig.Secret, code );
 			var content = new StringContent( tokenRequestPostContent, Encoding.UTF8, "application/x-www-form-urlencoded" );	
 
+			RefreshLastNetworkActivityTime();
 			var response = this.HttpClient.PostAsync( url, content ).GetAwaiter().GetResult();
-
-			var result = ParseResponse< TokenRequestResult >( response.Content.ReadAsStringAsync().Result, response.Headers, url, mark ).Token;
+			var responseContent = response.Content.ReadAsStringAsync().Result;
+			RefreshLastNetworkActivityTime();
+			var result = ParseResponse< TokenRequestResult >( responseContent, response.Headers, url, mark ).Token;
 
 			return result;
 		}
@@ -366,5 +386,13 @@ namespace ShopifyAccess.Services
 			return new Uri( string.Concat( this._commandConfig.Host, command.Command, endpoint ) );
 		}
 		#endregion
+
+		/// <summary>
+		///	Call before every API request to server or after handling the response, to save last network activity time
+		/// </summary>
+		private void RefreshLastNetworkActivityTime()
+		{
+			this.LastNetworkActivityTime = DateTime.UtcNow;
+		}
 	}
 }

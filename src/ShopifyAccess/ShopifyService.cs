@@ -34,6 +34,17 @@ namespace ShopifyAccess
 		private readonly ShopifyThrottlerAsync _productUpdateThrottlerAsync = new ShopifyThrottlerAsync( 30 );
 		private readonly ShopifyTimeouts _timeouts;
 
+		/// <summary>
+		///	Last service's network activity time. Can be used to monitor service's state.
+		/// </summary>
+		public DateTime LastActivityTime
+		{
+			get
+			{
+				return this._webRequestServices.LastNetworkActivityTime ?? DateTime.UtcNow;
+			}
+		}
+
 		public ShopifyService( ShopifyCommandConfig config, ShopifyTimeouts operationsTimeouts )
 		{
 			Condition.Requires( config, "config" ).IsNotNull();

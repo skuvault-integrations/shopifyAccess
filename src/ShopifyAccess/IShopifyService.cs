@@ -186,5 +186,10 @@ namespace ShopifyAccess
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns></returns>
 		Task< bool > IsShopifyPlusAccountAsync( CancellationToken token, Mark mark = null );
+
+		/// <summary>
+		///	This property can be used by the client to monitor the last access library's network activity time.
+		/// </summary>
+		DateTime LastActivityTime { get; }
 	}
 }
