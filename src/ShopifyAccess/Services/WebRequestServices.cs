@@ -314,9 +314,14 @@ namespace ShopifyAccess.Services
 			{
 				throw this.HandleException( ex, mark );
 			}
+			catch( TaskCanceledException )
+			{
+				ShopifyLogger.LogTimeoutException( mark, this._commandConfig.ShopName, timeout );
+				throw;
+			}
 		}
 
-		private async Task< T > ParseExceptionAsync< T >( Mark mark, Func< Task< T > > body )
+		private async Task< T > ParseExceptionAsync< T >( Mark mark, int timeout, Func< Task< T > > body )
 		{
 			try
 			{
@@ -325,6 +330,11 @@ namespace ShopifyAccess.Services
 			catch( WebException ex )
 			{
 				throw this.HandleException( ex, mark );
+			}
+			catch( TaskCanceledException )
+			{
+				ShopifyLogger.LogTimeoutException( mark, this._commandConfig.ShopName, timeout );
+				throw;
 			}
 		}
 

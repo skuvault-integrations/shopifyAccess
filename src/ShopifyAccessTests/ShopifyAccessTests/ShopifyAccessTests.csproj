@@ -78,6 +78,7 @@
     <Compile Include="..\..\Global\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="BaseTests.cs" />
     <Compile Include="Cancellation\CancellationTokenTests.cs" />
     <Compile Include="EndpointsBuilderTests.cs" />
     <Compile Include="Locations\LocationListTests.cs" />

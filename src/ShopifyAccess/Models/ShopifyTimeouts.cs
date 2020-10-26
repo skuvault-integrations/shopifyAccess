@@ -36,7 +36,7 @@ namespace ShopifyAccess.Models
 		/// <summary>
 		///	This timeout value will be used if specific timeout for operation is not provided. Default value can be changed through constructor.
 		/// </summary>
-		private ShopifyOperationTimeout DefaultOperationTimeout { get; set; }
+		public ShopifyOperationTimeout DefaultOperationTimeout { get; private set; }
 
 		public int this[ ShopifyOperationEnum operation ]
 		{
