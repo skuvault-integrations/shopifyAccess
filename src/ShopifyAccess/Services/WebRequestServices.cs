@@ -104,7 +104,7 @@ namespace ShopifyAccess.Services
 			} ).Result;
 		}
 
-		public async Task< T > GetResponseAsync< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark, int timeout, [ CallerMemberName ] string methodName = "" )
+		public async Task< T > GetResponseAsync< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark, int timeout )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
