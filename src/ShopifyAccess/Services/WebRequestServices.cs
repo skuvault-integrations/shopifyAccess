@@ -31,8 +31,8 @@ namespace ShopifyAccess.Services
 			Condition.Requires( config, "config" ).IsNotNull();
 
 			this._authorizationConfig = config;
-			this.HttpClient = CreateHttpClient();
 			this._commandConfig = new ShopifyCommandConfig( config.ShopName, "authorization" );
+			this.HttpClient = this.CreateHttpClient( this._commandConfig.AccessToken );
 		}
 
 		public WebRequestServices( ShopifyCommandConfig config )
@@ -40,17 +40,19 @@ namespace ShopifyAccess.Services
 			Condition.Requires( config, "config" ).IsNotNull();
 
 			this._commandConfig = config;
-			this.HttpClient = CreateHttpClient();
+			this.HttpClient = this.CreateHttpClient( this._commandConfig.AccessToken );
 			var servicePoint = ServicePointManager.FindServicePoint( new Uri( this._commandConfig.Host ) );
 			servicePoint.ConnectionLimit = 1000;
 		}
 
-		private HttpClient CreateHttpClient()
+		private HttpClient CreateHttpClient( string accessToken )
 		{
-			var httpClient = new HttpClient();
-			httpClient.Timeout = TimeSpan.FromMinutes( MaxHttpRequestTimeoutInMinutes );
-			httpClient.DefaultRequestHeaders.Remove( "X-Shopify-Access-Token" );
-			httpClient.DefaultRequestHeaders.Add( "X-Shopify-Access-Token", this._commandConfig.AccessToken );
+			var httpClient = new HttpClient { Timeout = TimeSpan.FromMinutes( MaxHttpRequestTimeoutInMinutes ) };
+			if ( !string.IsNullOrWhiteSpace( accessToken ) ) 
+			{
+				httpClient.DefaultRequestHeaders.Remove( "X-Shopify-Access-Token" );
+				httpClient.DefaultRequestHeaders.Add( "X-Shopify-Access-Token", accessToken );
+			}
 			return httpClient; 
 		}
 		#endregion
