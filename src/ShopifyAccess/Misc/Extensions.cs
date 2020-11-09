@@ -9,12 +9,11 @@ namespace ShopifyAccess.Misc
 			if ( string.IsNullOrWhiteSpace( rawUrl ) )
 				return rawUrl;
 
-			try
+			Uri url;
+			if ( Uri.TryCreate( rawUrl, UriKind.Absolute, out url ) )
 			{
-				var url = new Uri( rawUrl );
 				return url.GetLeftPart( UriPartial.Path );
 			}
-			catch { }
 
 			return rawUrl;
 		}
