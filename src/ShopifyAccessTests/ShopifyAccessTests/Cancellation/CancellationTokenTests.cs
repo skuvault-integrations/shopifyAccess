@@ -14,7 +14,7 @@ namespace ShopifyAccessTests.Cancellation
 		{
 			var cancellationTokenSource = new CancellationTokenSource();
 
-			Assert.ThrowsAsync< WebException >( async () =>
+			Assert.ThrowsAsync< TaskCanceledException >( async () =>
 			{
 				cancellationTokenSource.Cancel();
 				await this.Service.GetProductsAsync( cancellationTokenSource.Token );

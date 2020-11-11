@@ -67,7 +67,7 @@ namespace ShopifyAccess.Services
 			
 			if( token.IsCancellationRequested )
 			{
-				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
+				this.LogAndThrowTaskCanceledException( mark );
 			}
 
 			return this.ParseException( mark, timeout, async () =>
@@ -91,7 +91,7 @@ namespace ShopifyAccess.Services
 
 			if( token.IsCancellationRequested )
 			{
-				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
+				this.LogAndThrowTaskCanceledException( mark );
 			}
 
 			return this.ParseException( mark, timeout, async () =>
@@ -112,7 +112,7 @@ namespace ShopifyAccess.Services
 
 			if( token.IsCancellationRequested )
 			{
-				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
+				this.LogAndThrowTaskCanceledException( mark );
 			}
 
 			var uri = this.CreateRequestUri( command, endpoint );
@@ -139,7 +139,7 @@ namespace ShopifyAccess.Services
 
 			if( token.IsCancellationRequested )
 			{
-				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
+				this.LogAndThrowTaskCanceledException( mark );
 			}
 
 			return await this.ParseExceptionAsync( mark, timeout, async () =>
@@ -164,7 +164,7 @@ namespace ShopifyAccess.Services
 
 			if( token.IsCancellationRequested )
 			{
-				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
+				this.LogAndThrowTaskCanceledException( mark );
 			}
 
 			this.ParseException( mark, timeout, () =>
@@ -189,7 +189,7 @@ namespace ShopifyAccess.Services
 
 			if( token.IsCancellationRequested )
 			{
-				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
+				this.LogAndThrowTaskCanceledException( mark );
 			}
 
 			await this.ParseExceptionAsync( mark, timeout, async () =>
@@ -214,7 +214,7 @@ namespace ShopifyAccess.Services
 
 			if( token.IsCancellationRequested )
 			{
-				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
+				this.LogAndThrowTaskCanceledException( mark );
 			}
 
 
@@ -238,7 +238,7 @@ namespace ShopifyAccess.Services
 
 			if( token.IsCancellationRequested )
 			{
-				throw this.HandleException( new WebException( "Task was cancelled" ), mark );
+				this.LogAndThrowTaskCanceledException( mark );
 			}
 
 
@@ -314,7 +314,7 @@ namespace ShopifyAccess.Services
 			}
 			catch( WebException ex )
 			{
-				throw this.HandleException( ex, mark );
+				throw this.LogException( ex, mark );
 			}
 			catch( TaskCanceledException )
 			{
@@ -331,7 +331,7 @@ namespace ShopifyAccess.Services
 			}
 			catch( WebException ex )
 			{
-				throw this.HandleException( ex, mark );
+				throw this.LogException( ex, mark );
 			}
 			catch( TaskCanceledException )
 			{
@@ -340,12 +340,12 @@ namespace ShopifyAccess.Services
 			}
 		}
 
-		private WebException HandleException( WebException ex, Mark mark )
+		private WebException LogException( WebException ex, Mark mark )
 		{
 			if( ex.Response == null || ex.Status != WebExceptionStatus.ProtocolError ||
 			    ex.Response.ContentType == null || ex.Response.ContentType.Contains( "text/html" ) )
 			{
-				ShopifyLogger.LogException( ex, mark, this._commandConfig.ShopName );
+				ShopifyLogger.LogWebException( ex, mark, this._commandConfig.ShopName );
 				return ex;
 			}
 
@@ -358,6 +358,13 @@ namespace ShopifyAccess.Services
 				ShopifyLogger.LogException( ex, httpResponse, jsonResponse, mark );
 				return ex;
 			}
+		}
+
+		private void LogAndThrowTaskCanceledException( Mark mark )
+		{
+			var taskCanceledException = new TaskCanceledException();
+			ShopifyLogger.LogException( taskCanceledException, mark, this._commandConfig.ShopName );
+			throw taskCanceledException;
 		}
 		#endregion
 
