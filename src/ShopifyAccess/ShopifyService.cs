@@ -42,8 +42,6 @@ namespace ShopifyAccess
 			this._webRequestServices = new WebRequestServices( config );
 			this._shopName = config.ShopName;
 			this._timeouts = operationsTimeouts;
-
-			ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
 		}
 
 		#region GetOrders
