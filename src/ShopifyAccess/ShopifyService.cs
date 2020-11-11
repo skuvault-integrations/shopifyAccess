@@ -207,6 +207,8 @@ namespace ShopifyAccess
 				variant.InventoryLevels = inventoryLevelsForVariant;
 			}
 
+			RemoveQueryPartFromProductsImagesUrl( products );
+
 			return products;
 		}
 
@@ -225,6 +227,8 @@ namespace ShopifyAccess
 				ProductsStartUtc = productsStartUtc
 			};
 			var products = await this.CollectProductsFromAllPagesAsync( productsDateFilter, mark, token );
+			
+			RemoveQueryPartFromProductsImagesUrl( products );
 
 			return products;
 		}
@@ -244,6 +248,8 @@ namespace ShopifyAccess
 				ProductsStartUtc = productsStartUtc
 			};
 			var products = await this.CollectProductsFromAllPagesAsync( productsDateFilter, mark, token );
+
+			RemoveQueryPartFromProductsImagesUrl( products );
 
 			return products;
 		}
@@ -533,6 +539,20 @@ namespace ShopifyAccess
 			foreach( var product in products.Products )
 			{
 				product.Variants.RemoveAll( v => v.InventoryManagement == InventoryManagement.Blank );
+			}
+		}
+
+		private void RemoveQueryPartFromProductsImagesUrl( ShopifyProducts products )
+		{
+			foreach( var product in products.Products )
+			{
+				if ( product.Images == null )
+					return;
+			
+				foreach( var productImage in product.Images )
+				{
+					productImage.Src = productImage.Src.GetUrlWithoutQueryPart();
+				}
 			}
 		}
 		#endregion
