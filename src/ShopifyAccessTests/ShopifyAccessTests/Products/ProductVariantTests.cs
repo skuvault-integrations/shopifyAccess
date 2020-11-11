@@ -114,6 +114,30 @@ namespace ShopifyAccessTests.Products
 			newQuantity.Should().Be( quantity );
 		}
 
+		[ Test ]
+		public async Task WhenGetProductsCreatedAfterAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
+		{
+			var products = await this._service.GetProductsCreatedAfterAsync( DateTime.UtcNow.AddMonths( -2 ), CancellationToken.None );
+			var productsWithImages = products.Products.Where( p => p.Images != null && p.Images.Any() );
+
+			productsWithImages.Should().NotBeNullOrEmpty();
+
+			var imagesUrlsQueries = productsWithImages.SelectMany( p => p.Images ).Select( i => new Uri( i.Src ).Query ).Where( q => !string.IsNullOrWhiteSpace( q ) );
+			imagesUrlsQueries.Should().BeEmpty();
+		}
+
+		[ Test ]
+		public async Task WhenGetProductsCreatedBeforeButUpdatedAfterAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
+		{
+			var products = await this._service.GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime.UtcNow.AddMonths( -2 ), CancellationToken.None );
+			var productsWithImages = products.Products.Where( p => p.Images != null && p.Images.Any() );
+
+			productsWithImages.Should().NotBeNullOrEmpty();
+
+			var imagesUrlsQueries = productsWithImages.SelectMany( p => p.Images ).Select( i => new Uri( i.Src ).Query ).Where( q => !string.IsNullOrWhiteSpace( q ) );
+			imagesUrlsQueries.Should().BeEmpty();
+		}
+
 		private async Task< ShopifyInventoryLevel > GetFirstInventoryItem( string sku )
 		{
 			var product = ( await this.Service.GetProductVariantsInventoryBySkusAsync( new List< string > { sku }, CancellationToken.None ) ).First();

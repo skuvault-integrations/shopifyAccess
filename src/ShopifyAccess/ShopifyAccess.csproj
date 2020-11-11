@@ -63,6 +63,7 @@
     </Compile>
     <Compile Include="IShopifyService.cs" />
     <Compile Include="Misc\ActionPolicies.cs" />
+    <Compile Include="Misc\Extensions.cs" />
     <Compile Include="Misc\ShopifyLogger.cs" />
     <Compile Include="Misc\ShopifyThrottler.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyOrderCommandEndpoint.cs" />
