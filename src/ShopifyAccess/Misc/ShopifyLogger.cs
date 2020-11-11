@@ -51,7 +51,12 @@ namespace ShopifyAccess.Misc
 			Trace( mark, "PUT/POST response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tStatusCode: {3}", requestUri, timeout, limit, statusCode );
 		}
 
-		public static void LogException( WebException ex, Mark mark, string shopName )
+		public static void LogException( Exception ex, Mark mark, string shopName )
+		{
+			Trace( ex, mark, "Failed response\tShopName: {0}\tMessage: {1}", shopName, ex.Message );
+		}
+
+		public static void LogWebException( WebException ex, Mark mark, string shopName )
 		{
 			Trace( ex, mark, "Failed response\tShopName: {0}\tMessage: {1}\tStatus: {2}", shopName, ex.Message, ex.Status );
 		}
