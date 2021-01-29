@@ -15,7 +15,7 @@
 		public static readonly ShopifyCommand GetOrdersCount = new ShopifyCommand( "/orders/count.json", ApiVersion.V2019_10 );
 		public static readonly ShopifyCommand GetOrders = new ShopifyCommand( "/orders.json", ApiVersion.V2019_10 );
 		public static readonly ShopifyCommand GetLocations = new ShopifyCommand( "/locations.json", ApiVersion.V2019_10 );
-		public static readonly ShopifyCommand GetUsers = new ShopifyCommand( "/admin/users.json" );
+		public static readonly ShopifyCommand GetUsers = new ShopifyCommand( "/users.json", ApiVersion.V2019_10 );
 		public static readonly ShopifyCommand GetUser = new ShopifyCommand( "/admin/users/" );
 
 		/// <summary>

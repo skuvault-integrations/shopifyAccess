@@ -5,16 +5,13 @@ namespace ShopifyAccess.Models.Configuration.Command
 	public class ShopifyCommandConfig : ShopifyConfigBase
 	{
 		public string AccessToken { get; private set; }
-		public int RequestTimeoutMs { get; private set; }
 
-		public ShopifyCommandConfig( string shopName, string accessToken, int requestTimeoutMs = 10 * 60 * 1000 )
+		public ShopifyCommandConfig( string shopName, string accessToken )
 			: base( shopName )
 		{
 			Condition.Requires( accessToken, "accessToken" ).IsNotNullOrWhiteSpace();
-			Condition.Requires( requestTimeoutMs, "requestTimeoutMs" ).IsGreaterThan( 0 );
 
 			this.AccessToken = accessToken;
-			this.RequestTimeoutMs = requestTimeoutMs;
 		}
 	}
 }

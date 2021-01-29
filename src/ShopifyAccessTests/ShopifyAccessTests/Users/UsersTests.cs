@@ -1,42 +1,17 @@
-﻿using System.IO;
-using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using LINQtoCSV;
-using Netco.Logging;
-using Netco.Logging.NLogIntegration;
 using NUnit.Framework;
-using ShopifyAccess;
-using ShopifyAccess.Models.Configuration.Command;
 
 namespace ShopifyAccessTests.Users
 {
 	[ TestFixture ]
-	public class UsersTests
+	public class UsersTests : BaseTests
 	{
-		private readonly IShopifyFactory ShopifyFactory = new ShopifyFactory();
-		private ShopifyCommandConfig Config;
-
-		[ SetUp ]
-		public void Init()
-		{
-			Directory.SetCurrentDirectory( TestContext.CurrentContext.TestDirectory );
-			const string credentialsFilePath = @"..\..\Files\ShopifyCredentials.csv";
-			NetcoLogger.LoggerFactory = new ConsoleLoggerFactory();
-
-			var cc = new CsvContext();
-			var testConfig = cc.Read< TestCommandConfig >( credentialsFilePath, new CsvFileDescription { FirstLineHasColumnNames = true } ).FirstOrDefault();
-
-			if( testConfig != null )
-				this.Config = new ShopifyCommandConfig( testConfig.ShopName, testConfig.AccessToken );
-		}
-		
 		[ Test ]
 		public void GetUsers()
 		{
-			var service = this.ShopifyFactory.CreateService( this.Config );
-			var users = service.GetUsers();
+			var users = this.Service.GetUsers( CancellationToken.None );
 
 			users.Users.Count.Should().BeGreaterThan( 0 );
 		}
@@ -44,8 +19,7 @@ namespace ShopifyAccessTests.Users
 		[ Test ]
 		public async Task GetUsersAsync()
 		{
-			var service = this.ShopifyFactory.CreateService( this.Config );
-			var users = await service.GetUsersAsync( CancellationToken.None );
+			var users = await this.Service.GetUsersAsync( CancellationToken.None );
 
 			users.Users.Count.Should().BeGreaterThan( 0 );
 		}
@@ -53,8 +27,7 @@ namespace ShopifyAccessTests.Users
 		[ Test ]
 		public void GetUser()
 		{
-			var service = this.ShopifyFactory.CreateService( this.Config );
-			var user = service.GetUser( 6250887 );
+			var user = this.Service.GetUser( 6250887, CancellationToken.None );
 
 			user.Should().NotBeNull();
 		}
@@ -62,26 +35,23 @@ namespace ShopifyAccessTests.Users
 		[ Test ]
 		public async Task GetUserAsync()
 		{
-			var service = this.ShopifyFactory.CreateService( this.Config );
-			var user = await service.GetUserAsync( 6250887, CancellationToken.None );
+			var user = await this.Service.GetUserAsync( 6250887, CancellationToken.None );
 
 			user.Should().NotBeNull();
 		}
 
 		[ Test ]
-		public void DoesShopifyPlusAccount()
+		public void IsShopifyPlusAccount()
 		{
-			var service = this.ShopifyFactory.CreateService( this.Config );
-			var result = service.DoesShopifyPlusAccount();
+			var result = this.Service.IsShopifyPlusAccount( CancellationToken.None );
 
 			result.Should().Be( false );
 		}
 
 		[ Test ]
-		public async Task DoesShopifyPlusAccountAsync()
+		public async Task IsShopifyPlusAccountAsync()
 		{
-			var service = this.ShopifyFactory.CreateService( this.Config );
-			var result = await service.DoesShopifyPlusAccountAsync( CancellationToken.None );
+			var result = await this.Service.IsShopifyPlusAccountAsync( CancellationToken.None );
 
 			result.Should().Be( false );
 		}

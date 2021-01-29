@@ -67,6 +67,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -77,10 +78,12 @@
     <Compile Include="..\..\Global\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="BaseTests.cs" />
     <Compile Include="Cancellation\CancellationTokenTests.cs" />
     <Compile Include="EndpointsBuilderTests.cs" />
     <Compile Include="ExtensionsTests.cs" />
     <Compile Include="Locations\LocationListTests.cs" />
+    <Compile Include="OperationTimeoutTests.cs" />
     <Compile Include="Orders\OrderMapperTests.cs" />
     <Compile Include="Orders\OrdersListTests.cs" />
     <Compile Include="Products\ProductVariantTests.cs" />

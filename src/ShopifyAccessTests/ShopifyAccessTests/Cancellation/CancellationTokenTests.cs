@@ -1,72 +1,38 @@
-﻿using System.IO;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using LINQtoCSV;
-using Netco.Logging;
 using NUnit.Framework;
-using ShopifyAccess;
-using ShopifyAccess.Models.Configuration.Command;
+using ShopifyAccess.Models;
 
 namespace ShopifyAccessTests.Cancellation
 {
 	[ TestFixture ]
-	public class CancellationTokenTests
+	public class CancellationTokenTests : BaseTests
 	{
-		private readonly IShopifyFactory ShopifyFactory = new ShopifyFactory();
-		private TestCommandConfig TestConfig;
-
-		[ SetUp ]
-		public void Init()
-		{
-			Directory.SetCurrentDirectory( TestContext.CurrentContext.TestDirectory );
-			const string credentialsFilePath = @"..\..\Files\ShopifyCredentials.csv";
-			NetcoLogger.LoggerFactory = new ConsoleLoggerFactory();
-
-			var cc = new CsvContext();
-			this.TestConfig = cc.Read< TestCommandConfig >( credentialsFilePath, new CsvFileDescription { FirstLineHasColumnNames = true } ).FirstOrDefault();
-		}
-
-		private ShopifyCommandConfig CreateConfig( int? requestTimeoutMs = null )
-		{
-			if( this.TestConfig == null )
-				return null;
-
-			return !requestTimeoutMs.HasValue ? new ShopifyCommandConfig( this.TestConfig.ShopName, this.TestConfig.AccessToken ) : 
-				new ShopifyCommandConfig( this.TestConfig.ShopName, this.TestConfig.AccessToken, requestTimeoutMs.Value );
-		}
-
 		[ Test ]
 		public void CancelRequest()
 		{
-			var service = this.ShopifyFactory.CreateService( this.CreateConfig() );
 			var cancellationTokenSource = new CancellationTokenSource();
 
-			Assert.ThrowsAsync< WebException >( async () =>
+			Assert.ThrowsAsync< TaskCanceledException >( async () =>
 			{
 				cancellationTokenSource.Cancel();
-				await service.GetProductsAsync( cancellationTokenSource.Token );
+				await this.Service.GetProductsAsync( cancellationTokenSource.Token );
 				Assert.Fail();
-			}, "Task was cancelled" );
+			}, "Task wasn't cancelled" );
 		}
 
 		[ Test ]
-		public async Task RequestTimesOut()
+		public void RequestTimesOut()
 		{
 			const int reallyShortTime = 1;
-			var service = this.ShopifyFactory.CreateService( this.CreateConfig( reallyShortTime ) );
+			var service = this.ShopifyFactory.CreateService( this.Config, new ShopifyTimeouts( reallyShortTime ) );
 			var cancellationTokenSource = new CancellationTokenSource();
 
-			try
+			Assert.ThrowsAsync< TaskCanceledException >( async () => 
 			{
 				await service.GetProductsAsync( cancellationTokenSource.Token );
-				Assert.Fail();
-			}
-			catch( WebException ex )
-			{
-				Assert.IsTrue( ex.Message.Contains( "The request was canceled" ) );
-			}
+			}, "Request didn't timeout. TaskCanceledException wasn't thrown");
 		}
 	}
 }

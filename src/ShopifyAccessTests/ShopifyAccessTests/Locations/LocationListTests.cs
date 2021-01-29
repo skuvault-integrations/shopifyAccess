@@ -1,42 +1,19 @@
-﻿using System.IO;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
+using System.Threading;
 using FluentAssertions;
-using LINQtoCSV;
-using Netco.Logging;
-using Netco.Logging.NLogIntegration;
 using NUnit.Framework;
-using ShopifyAccess;
 using ShopifyAccess.Models.Configuration.Command;
 using ShopifyAccess.Models.Location;
 
 namespace ShopifyAccessTests.Locations
 {
 	[ TestFixture ]
-	public class LocationListTests
+	public class LocationListTests : BaseTests
 	{
-		private readonly IShopifyFactory ShopifyFactory = new ShopifyFactory();
-		private ShopifyCommandConfig Config;
-
-		[ SetUp ]
-		public void Init()
-		{
-			Directory.SetCurrentDirectory( TestContext.CurrentContext.TestDirectory );
-			const string credentialsFilePath = @"..\..\Files\ShopifyCredentials.csv";
-			NetcoLogger.LoggerFactory = new ConsoleLoggerFactory();
-
-			var cc = new CsvContext();
-			var testConfig = cc.Read< TestCommandConfig >( credentialsFilePath, new CsvFileDescription { FirstLineHasColumnNames = true } ).FirstOrDefault();
-
-			if( testConfig != null )
-				this.Config = new ShopifyCommandConfig( testConfig.ShopName, testConfig.AccessToken );
-		}
-
 		[ Test ]
 		public void GetCorrectLocationList()
 		{
-			var service = this.ShopifyFactory.CreateService( this.Config );
-			ShopifyLocations locations = service.GetLocations();
+			var locations = this.Service.GetLocations( CancellationToken.None );
 
 			locations.Locations.Count.Should().BeGreaterThan( 0 );
 		}
@@ -49,7 +26,7 @@ namespace ShopifyAccessTests.Locations
 			ShopifyLocations locations = null;
 			try
 			{
-				locations = service.GetLocations();
+				locations = service.GetLocations( CancellationToken.None );
 			}
 			catch( WebException )
 			{
@@ -65,7 +42,7 @@ namespace ShopifyAccessTests.Locations
 			ShopifyLocations locations = null;
 			try
 			{
-				locations = service.GetLocations();
+				locations = service.GetLocations( CancellationToken.None );
 			}
 			catch( WebException )
 			{

@@ -2,7 +2,7 @@
 
 namespace ShopifyAccessTests
 {
-	internal class TestCommandConfig
+	public class TestCommandConfig
 	{
 		[ CsvColumn( Name = "ShopName", FieldIndex = 1 ) ]
 		public string ShopName { get; set; }
