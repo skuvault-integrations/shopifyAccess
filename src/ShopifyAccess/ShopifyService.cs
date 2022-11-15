@@ -739,14 +739,6 @@ namespace ShopifyAccess
 		#region GraphQl
 		public async Task< Response< ProductVariantsData > > GetProductVariantPageGQLAsync( Mark mark, CancellationToken token )
 		{
-			var example = new Response< ProductVariantsData >();
-			example.Data = new ProductVariantsData();
-			example.Data.ProductVariants = new ProductVariants();
-			example.Data.ProductVariants.Variants.Add(new ProductVariant(){Id = "aaa", Sku = "bbb"});
-			var t = example.ToJson();
-			var t2 = t.FromJson<Response< ProductVariantsData >>();
-			
-			
 			var jsonContent = GraphQlRequestFactory.GetProductVariantsPage( 2 );
 
 			// ToDo: Add policy, throttling etc.
