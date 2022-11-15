@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using CuttingEdge.Conditions;
 using Netco.Extensions;
 using ServiceStack;
+using ShopifyAccess.GraphQl;
+using ShopifyAccess.GraphQl.Models;
+using ShopifyAccess.GraphQl.Models.ProductVariant;
 using ShopifyAccess.Misc;
 using ShopifyAccess.Models;
 using ShopifyAccess.Models.Configuration.Command;
@@ -729,6 +732,25 @@ namespace ShopifyAccess
 		private int CalculatePagesCount( int productsCount )
 		{
 			var result = ( int )Math.Ceiling( ( double )productsCount / RequestMaxLimit );
+			return result;
+		}
+		#endregion
+
+		#region GraphQl
+		public async Task< Response< ProductVariantsData > > GetProductVariantPageGQLAsync( Mark mark, CancellationToken token )
+		{
+			var example = new Response< ProductVariantsData >();
+			example.Data = new ProductVariantsData();
+			example.Data.ProductVariants = new ProductVariants();
+			example.Data.ProductVariants.Variants.Add(new ProductVariant(){Id = "aaa", Sku = "bbb"});
+			var t = example.ToJson();
+			var t2 = t.FromJson<Response< ProductVariantsData >>();
+			
+			
+			var jsonContent = GraphQlRequestFactory.GetProductVariantsPage( 2 );
+
+			// ToDo: Add policy, throttling etc.
+			var result = await this._webRequestServices.PostDataAsync< Response< ProductVariantsData > >( ShopifyCommand.GraphGl, jsonContent, token, mark, this._timeouts[ ShopifyOperationEnum.UpdateInventory ] );
 			return result;
 		}
 		#endregion

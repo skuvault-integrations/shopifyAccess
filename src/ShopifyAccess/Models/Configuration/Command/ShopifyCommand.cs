@@ -17,6 +17,7 @@
 		public static readonly ShopifyCommand GetLocations = new ShopifyCommand( "/locations.json", ApiVersion.V2019_10 );
 		public static readonly ShopifyCommand GetUsers = new ShopifyCommand( "/users.json", ApiVersion.V2019_10 );
 		public static readonly ShopifyCommand GetUser = new ShopifyCommand( "/admin/users/" );
+		public static readonly ShopifyCommand GraphGl = new ShopifyCommand( "/graphql.json", ApiVersion.V2022_04 );
 
 		/// <summary>
 		/// Create Shopify command using the oldest supported api version
@@ -45,5 +46,7 @@
 		public const string V2019_04 = "2019-04";
 		public const string V2019_07 = "2019-07";
 		public const string V2019_10 = "2019-10";
+		// For GraphQL requests. Can be removed after updating REST APIs from V2019_10
+		public const string V2022_04 = "2022-04";
 	}
 }

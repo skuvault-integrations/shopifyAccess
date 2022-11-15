@@ -61,6 +61,15 @@
     <Compile Include="..\Global\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="GraphQl\Command\GraphQlCommand.cs" />
+    <Compile Include="GraphQl\Command\Queries.cs" />
+    <Compile Include="GraphQl\GraphQlRequestFactory.cs" />
+    <Compile Include="GraphQl\Models\Pagination\PageInfo.cs" />
+    <Compile Include="GraphQl\Models\Pagination\PageRequestVariables.cs" />
+    <Compile Include="GraphQl\Models\Response.cs" />
+    <Compile Include="GraphQl\Models\ProductVariant\ProductVariant.cs" />
+    <Compile Include="GraphQl\Models\ProductVariant\ProductVariants.cs" />
+    <Compile Include="GraphQl\Models\ProductVariant\ProductVariantsData.cs" />
     <Compile Include="IShopifyService.cs" />
     <Compile Include="Misc\ActionPolicies.cs" />
     <Compile Include="Misc\Extensions.cs" />
@@ -116,7 +125,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
