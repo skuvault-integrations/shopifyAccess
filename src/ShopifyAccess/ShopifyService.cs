@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using CuttingEdge.Conditions;
@@ -92,6 +91,11 @@ namespace ShopifyAccess
 				() => this._throttlerAsync.ExecuteAsync(
 					() => this._webRequestServices.GetResponseAsync< ShopifyLocations >( ShopifyCommand.GetLocations, "", token, mark, this._timeouts[ ShopifyOperationEnum.GetLocations ] ) ) );
 			return locations;
+		}
+
+		public bool VerifyRequestAuthenticity(string request, string clientSecret) 
+		{
+			return RequestVerificationService.VerifyOAuthRequest(request, clientSecret);
 		}
 
 		private ShopifyOrders CollectOrdersFromAllPages( string mainUpdatedOrdersEndpoint, Mark mark, CancellationToken token, int timeout )

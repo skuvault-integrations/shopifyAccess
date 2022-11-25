@@ -91,6 +91,7 @@
     <Compile Include="TestCommandConfig.cs" />
     <Compile Include="Throttler\ThrottlerTests.cs" />
     <Compile Include="Users\UsersTests.cs" />
+    <Compile Include="RequestVerificationServiceTests.cs" />
     <Compile Include="WebRequestServicesTests.cs" />
   </ItemGroup>
   <ItemGroup>

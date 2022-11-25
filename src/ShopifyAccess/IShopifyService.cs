@@ -191,5 +191,14 @@ namespace ShopifyAccess
 		///	This property can be used by the client to monitor the last access library's network activity time.
 		/// </summary>
 		DateTime LastActivityTime { get; }
+
+		/// <summary>
+		/// Verifies the authenticity of Shopify requests on installs SkuVault app
+		/// through the Shopify App Store or using an installation link
+		/// </summary>
+		/// <param name="request"></param>
+		/// <param name="clientSecret"></param>
+		/// <returns></returns>
+		bool VerifyRequestAuthenticity(string request, string clientSecret);
 	}
 }
