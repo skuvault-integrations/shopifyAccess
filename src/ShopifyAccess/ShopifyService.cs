@@ -15,6 +15,7 @@ using ShopifyAccess.Models.Product;
 using ShopifyAccess.Models.ProductVariant;
 using ShopifyAccess.Models.User;
 using ShopifyAccess.Services;
+using ShopifyAccess.Services.Utils;
 
 namespace ShopifyAccess
 {
@@ -95,7 +96,7 @@ namespace ShopifyAccess
 
 		public bool VerifyRequestAuthenticity(string request, string clientSecret) 
 		{
-			return RequestVerificationService.VerifyOAuthRequest(request, clientSecret);
+			return HMacSignatureUtils.VerifyOAuthRequest(request, clientSecret);
 		}
 
 		private ShopifyOrders CollectOrdersFromAllPages( string mainUpdatedOrdersEndpoint, Mark mark, CancellationToken token, int timeout )

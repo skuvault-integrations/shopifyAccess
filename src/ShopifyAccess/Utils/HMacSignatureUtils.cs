@@ -5,12 +5,12 @@ using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace ShopifyAccess.Services
+namespace ShopifyAccess.Services.Utils
 {
 	/// <summary>
 	/// Verifies Shopify requests
 	/// </summary>
-	public static class RequestVerificationService
+	public static class HMacSignatureUtils
 	{
 		private const string HMACParamName = "hmac";
 
