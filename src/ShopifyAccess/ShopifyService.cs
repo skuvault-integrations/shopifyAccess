@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -94,9 +95,14 @@ namespace ShopifyAccess
 			return locations;
 		}
 
-		public bool VerifyRequestAuthenticity(string request, string clientSecret) 
+		public bool VerifyOAuthRequestAuthenticity(string request, string clientSecret) 
 		{
 			return HMacSignatureUtils.VerifyOAuthRequest(request, clientSecret);
+		}
+
+		public bool VerifyWebhookRequestAuthenticity(NameValueCollection requestHeaders, string request, string clientSecret)
+		{
+			return HMacSignatureUtils.VerifyWebhookRequest(requestHeaders, request, clientSecret);
 		}
 
 		private ShopifyOrders CollectOrdersFromAllPages( string mainUpdatedOrdersEndpoint, Mark mark, CancellationToken token, int timeout )
