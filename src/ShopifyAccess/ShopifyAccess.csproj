@@ -109,6 +109,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\EndpointsBuilder.cs" />
     <Compile Include="Services\PagedResponseService.cs" />
+    <Compile Include="Utils\HMacSignatureUtils.cs" />
     <Compile Include="Services\WebRequestServices.cs" />
     <Compile Include="ShopifyFactory.cs" />
     <Compile Include="ShopifyService.cs" />
