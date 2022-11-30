@@ -27,8 +27,7 @@ namespace ShopifyAccess.Services.Utils
 		public const string HeaderHMACParamName = "X-Shopify-Hmac-SHA256";
 
 		/// <summary>
-		/// Verify that an incoming OAuth Shopify requests (comes on installs SkuVault app) is authentic.
-		/// through the Shopify App Store or using an installation link
+		/// Verifies OAuth flow requests authenticity by validating its HMAC
 		/// </summary>
 		/// <param name="request"></param>
 		/// <param name="clientSecret"></param>
@@ -58,7 +57,7 @@ namespace ShopifyAccess.Services.Utils
 		}
 
 		/// <summary>
-		/// Verify that an incoming Shopify webhook request is authentic.
+		/// Verifies that an incoming Shopify webhook request is authentic.
 		/// </summary>
 		/// <param name="requestHeaders">The request's headers (see Request.Headers in ASP.NET MVC)
 		/// <param name="request">The body of the request.</param>

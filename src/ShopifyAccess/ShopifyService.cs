@@ -95,16 +95,6 @@ namespace ShopifyAccess
 			return locations;
 		}
 
-		public bool VerifyOAuthRequestAuthenticity(string request, string clientSecret) 
-		{
-			return HMacSignatureUtils.VerifyOAuthRequest(request, clientSecret);
-		}
-
-		public bool VerifyWebhookRequestAuthenticity(NameValueCollection requestHeaders, string request, string clientSecret)
-		{
-			return HMacSignatureUtils.VerifyWebhookRequest(requestHeaders, request, clientSecret);
-		}
-
 		private ShopifyOrders CollectOrdersFromAllPages( string mainUpdatedOrdersEndpoint, Mark mark, CancellationToken token, int timeout )
 		{
 			var orders = new ShopifyOrders();

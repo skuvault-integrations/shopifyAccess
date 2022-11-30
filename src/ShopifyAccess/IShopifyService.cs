@@ -192,23 +192,5 @@ namespace ShopifyAccess
 		///	This property can be used by the client to monitor the last access library's network activity time.
 		/// </summary>
 		DateTime LastActivityTime { get; }
-
-		/// <summary>
-		/// Verify that an incoming OAuth Shopify requests (comes on installs SkuVault app) is authentic.
-		/// through the Shopify App Store or using an installation link
-		/// </summary>
-		/// <param name="request"></param>
-		/// <param name="clientSecret"></param>
-		/// <returns></returns>
-		bool VerifyOAuthRequestAuthenticity(string request, string clientSecret);
-
-		/// <summary>
-		/// Verify that an incoming Shopify webhook request is authentic.
-		/// </summary>
-		/// <param name="requestHeaders">The request's headers (see Request.Headers in ASP.NET MVC)
-		/// <param name="request">The body of the request.</param>
-		/// <param name="clientSecret">app's secret key.</param>
-		/// <returns></returns>
-		bool VerifyWebhookRequestAuthenticity(NameValueCollection requestHeaders, string request, string clientSecret);
 	}
 }
