@@ -22,11 +22,10 @@ $src_dir = "$BuildRoot\src"
 $solution_file = "$src_dir\$($project_name).sln"
 	
 # Use MSBuild.
-use Framework\v4.0.30319 MSBuild
-Set-Alias MSBuild14 (Join-Path -Path (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\MSBuild\ToolsVersions\14.0").MSBuildToolsPath -ChildPath "MSBuild.exe")
+Set-Alias MSBuild16 (Join-Path -Path (Get-VSSetupInstance | Where-Object {$_.DisplayName -eq 'Visual Studio Professional 2019' -or $_.DisplayName -eq 'Visual Studio Build Tools 2019' } | select InstallationPath | Select-Object -first 1).InstallationPath -ChildPath "MSBuild\Current\Bin\MSBuild.exe")
 
 task Clean { 
-	exec { MSBuild14 "$solution_file" /t:Clean /p:Configuration=Release /p:VisualStudioVersion="14.0" /v:quiet } 
+	exec { MSBuild16 "$solution_file" /t:Clean /p:Configuration=Release /p:VisualStudioVersion="16.0" /v:quiet } 
 	Remove-Item -force -recurse $build_dir -ErrorAction SilentlyContinue | Out-Null
 }
 
@@ -37,7 +36,7 @@ task Init Clean, {
 }
 
 task Build {
-	exec { MSBuild14 "$solution_file" /t:Build /p:Configuration=Release /p:VisualStudioVersion="14.0" /v:minimal /p:OutDir="$build_artifacts_dir\" }
+	exec { MSBuild16 "$solution_file" /t:Build /p:Configuration=Release /p:VisualStudioVersion="16.0" /v:minimal /p:OutDir="$build_artifacts_dir\" }
 }
 
 task Package  {
@@ -84,6 +83,7 @@ task NuGet Package, Version, {
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<copyright>Copyright (C) 2020 SkuVault Inc.</copyright>
 		<summary>$text</summary>
+		<repository type="git" url="https://github.com/skuvault-integrations/shopifyAccess.git" />
 		<description>$text</description>
 		<tags>$project_short_name</tags>
 		<dependencies> 
@@ -102,9 +102,11 @@ task NuGet Package, Version, {
 	exec { & $nuget pack $build_output_dir\$project_name\$project_name.nuspec -Output $build_dir }
 	
 	$push_project = Read-Host "Push $($project_name) " $Version " to NuGet? (Y/N)"
+
 	Write-Host $push_project
 	if( $push_project -eq "y" -or $push_project -eq "Y" )	{
-		Get-ChildItem $build_dir\*.nupkg |% { exec { & $nuget push  $_.FullName -Source nuget.org }}
+		$github_token = Read-Host "Github PAT"
+		Get-ChildItem $build_dir\*.nupkg |% { exec { & $nuget push  $_.FullName -ApiKey $github_token -Source "https://nuget.pkg.github.com/skuvault-integrations/index.json" }}
 	}
 }
 
