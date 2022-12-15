@@ -98,8 +98,8 @@ namespace ShopifyAccess.Misc
 		{
 			var jObj = JObject.Parse(jsonString);
 			foreach (var p in jObj.Descendants()
-										.OfType<JProperty>()
-										.Where(p => personalFieldNames.Contains(p.Name)))
+				.OfType<JProperty>()
+				.Where(p => personalFieldNames.Contains(p.Name)))
 			{
 				p.Value = replaceWith;
 			}
