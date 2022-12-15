@@ -86,7 +86,7 @@ namespace ShopifyAccess.Services
 		}
 
 		public ResponsePage< T > GetResponsePage< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark, 
-			int timeout, bool removePersonalInfoFromLog = false )
+			int timeout, bool maskPersonalInfoInLog = false )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
@@ -107,7 +107,7 @@ namespace ShopifyAccess.Services
 					var response = await this.HttpClient.GetAsync( uri, linkedCancellationTokenSource.Token ).ConfigureAwait( false );
 					var content = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
 					RefreshLastNetworkActivityTime();
-					return ParsePagedResponse< T >( content, response.Headers, uri, mark, timeout, removePersonalInfoFromLog );
+					return ParsePagedResponse< T >( content, response.Headers, uri, mark, timeout, maskPersonalInfoInLog );
 				}
 			} ).Result;
 		}
@@ -139,7 +139,7 @@ namespace ShopifyAccess.Services
 		}
 
 		public async Task< ResponsePage< T > > GetResponsePageAsync< T >( ShopifyCommand command, string endpoint, CancellationToken token, 
-			Mark mark, int timeout, bool removePersonalInfoFromLog = false )
+			Mark mark, int timeout, bool maskPersonalInfoInLog = false )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
@@ -160,7 +160,7 @@ namespace ShopifyAccess.Services
 					var response = await this.HttpClient.GetAsync( uri, linkedCancellationTokenSource.Token ).ConfigureAwait( false );
 					var content = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
 					RefreshLastNetworkActivityTime();
-					return ParsePagedResponse< T >( content, response.Headers, uri, mark, timeout, removePersonalInfoFromLog );
+					return ParsePagedResponse< T >( content, response.Headers, uri, mark, timeout, maskPersonalInfoInLog );
 				}
 			} ).ConfigureAwait( false );
 			
@@ -306,11 +306,11 @@ namespace ShopifyAccess.Services
 		}
 
 		private static ResponsePage< T > ParsePagedResponse< T >( string content, HttpHeaders headers, Uri uri, 
-			Mark mark, int timeout, bool removePersonalInfoFromLog = false )
+			Mark mark, int timeout, bool maskPersonalInfoInLog = false )
 		{
 			var limit = GetLimitFromHeader( headers );
 			var nextPageLink = PagedResponseService.GetNextPageQueryStrFromHeader( headers );
-			ShopifyLogger.LogGetResponse( uri, limit, nextPageLink, content, mark, timeout, removePersonalInfoFromLog );
+			ShopifyLogger.LogGetResponse( uri, limit, nextPageLink, content, mark, timeout, maskPersonalInfoInLog );
 
 			var result = !string.IsNullOrEmpty( content ) ? content.FromJson< T >() : default(T);
 

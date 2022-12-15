@@ -105,7 +105,7 @@ namespace ShopifyAccess
 				var updatedOrdersWithinPage = ActionPolicies.GetPolicy( mark, this._shopName ).Get(
 					() => this._throttler.Execute(
 						() => this._webRequestServices.GetResponsePage< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint, 
-							token, mark, timeout, removePersonalInfoFromLog: true ) ) );
+							token, mark, timeout, maskPersonalInfoInLog: true ) ) );
 
 				if( updatedOrdersWithinPage.Response.Orders.Count == 0 )
 					break;
@@ -128,7 +128,7 @@ namespace ShopifyAccess
 				var updatedOrdersWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
 					() => this._throttlerAsync.ExecuteAsync(
 						() => this._webRequestServices.GetResponsePageAsync< ShopifyOrders >( ShopifyCommand.GetOrders, compositeUpdatedOrdersEndpoint, 
-							token, mark, timeout, removePersonalInfoFromLog: true ) ) );
+							token, mark, timeout, maskPersonalInfoInLog: true ) ) );
 
 				if( updatedOrdersWithinPage.Response.Orders.Count == 0 )
 					break;

@@ -47,15 +47,15 @@ namespace ShopifyAccess.Misc
 			Trace( mark, "GET request\tRequest: {0} with timeout {1}ms", requestUri, timeout );
 		}
 
-		public static void LogGetResponse( Uri requestUri, string limit, string jsonResponse, Mark mark, int timeout, bool removePersonalInfoFromLog = false )
+		public static void LogGetResponse( Uri requestUri, string limit, string jsonResponse, Mark mark, int timeout, bool maskPersonalInfoInLog = false )
 		{
-			jsonResponse = !removePersonalInfoFromLog ? jsonResponse : MaskPersonalInfoInJson( jsonResponse );
+			jsonResponse = !maskPersonalInfoInLog ? jsonResponse : MaskPersonalInfoInJson( jsonResponse );
 			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tResponse: {3}", requestUri, timeout, limit, jsonResponse );
 		}
 
-		public static void LogGetResponse( Uri requestUri, string limit, string nextPage, string jsonResponse, Mark mark, int timeout, bool removePersonalInfoFromLog = false )
+		public static void LogGetResponse( Uri requestUri, string limit, string nextPage, string jsonResponse, Mark mark, int timeout, bool maskPersonalInfoInLog = false )
 		{
-			jsonResponse = !removePersonalInfoFromLog ? jsonResponse : MaskPersonalInfoInJson( jsonResponse );
+			jsonResponse = !maskPersonalInfoInLog ? jsonResponse : MaskPersonalInfoInJson( jsonResponse );
 			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tNext Page: {3}\tResponse: {4}", requestUri, timeout, limit, nextPage, jsonResponse );
 		}
 
