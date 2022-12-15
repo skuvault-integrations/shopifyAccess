@@ -15,7 +15,7 @@ namespace ShopifyAccessTests.Orders
 		[ Test ]
 		public void OrdersFilteredFulfillmentStatusDateLoaded()
 		{
-			var orders = this.Service.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -10 ), DateTime.UtcNow, CancellationToken.None );
+			var orders = this.Service.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -200), DateTime.UtcNow, CancellationToken.None );
 
 			orders.Count.Should().BeGreaterThan( 0 );
 		}

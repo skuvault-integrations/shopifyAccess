@@ -47,16 +47,16 @@ namespace ShopifyAccess.Misc
 			Trace( mark, "GET request\tRequest: {0} with timeout {1}ms", requestUri, timeout );
 		}
 
-		public static void LogGetResponse( Uri requestUri, string limit, string jsonResponse, Mark mark, int timeout )
+		public static void LogGetResponse( Uri requestUri, string limit, string jsonResponse, Mark mark, int timeout, bool removePersonalInfoFromLog = false )
 		{
-			string maskedJsonResponse = MaskPersonalInfoInJson( jsonResponse );
-			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tResponse: {3}", requestUri, timeout, limit, maskedJsonResponse );
+			jsonResponse = !removePersonalInfoFromLog ? jsonResponse : MaskPersonalInfoInJson( jsonResponse );
+			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tResponse: {3}", requestUri, timeout, limit, jsonResponse );
 		}
 
-		public static void LogGetResponse( Uri requestUri, string limit, string nextPage, string jsonResponse, Mark mark, int timeout )
+		public static void LogGetResponse( Uri requestUri, string limit, string nextPage, string jsonResponse, Mark mark, int timeout, bool removePersonalInfoFromLog = false )
 		{
-			string maskedJsonResponse = MaskPersonalInfoInJson( jsonResponse );
-			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tNext Page: {3}\tResponse: {4}", requestUri, timeout, limit, nextPage, maskedJsonResponse );
+			jsonResponse = !removePersonalInfoFromLog ? jsonResponse : MaskPersonalInfoInJson( jsonResponse );
+			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tNext Page: {3}\tResponse: {4}", requestUri, timeout, limit, nextPage, jsonResponse );
 		}
 
 		public static void LogUpdateRequest( Uri requestUri, string jsonContent, Mark mark, int timeout )
@@ -86,6 +86,7 @@ namespace ShopifyAccess.Misc
 
 		public static void LogException( WebException ex, HttpWebResponse response, string jsonResponse, Mark mark )
 		{
+			// mask sensitive fields on a log exception json content just in case
 			string maskedJsonResponse = MaskPersonalInfoInJson( jsonResponse );
 			Trace( ex, mark, "Failed response\tRequest: {0}\tMessage: {1}\tStatus: {2}\tJsonResponse: {3}",
 				response.ResponseUri, ex.Message, response.StatusCode, maskedJsonResponse );

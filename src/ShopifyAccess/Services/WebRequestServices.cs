@@ -85,7 +85,8 @@ namespace ShopifyAccess.Services
 			} ).Result;
 		}
 
-		public ResponsePage< T > GetResponsePage< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark, int timeout )
+		public ResponsePage< T > GetResponsePage< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark, 
+			int timeout, bool removePersonalInfoFromLog = false )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
@@ -106,7 +107,7 @@ namespace ShopifyAccess.Services
 					var response = await this.HttpClient.GetAsync( uri, linkedCancellationTokenSource.Token ).ConfigureAwait( false );
 					var content = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
 					RefreshLastNetworkActivityTime();
-					return ParsePagedResponse< T >( content, response.Headers, uri, mark, timeout );
+					return ParsePagedResponse< T >( content, response.Headers, uri, mark, timeout, removePersonalInfoFromLog );
 				}
 			} ).Result;
 		}
@@ -137,7 +138,8 @@ namespace ShopifyAccess.Services
 			} ).ConfigureAwait( false );
 		}
 
-		public async Task< ResponsePage< T > > GetResponsePageAsync< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark, int timeout )
+		public async Task< ResponsePage< T > > GetResponsePageAsync< T >( ShopifyCommand command, string endpoint, CancellationToken token, 
+			Mark mark, int timeout, bool removePersonalInfoFromLog = false )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
@@ -158,7 +160,7 @@ namespace ShopifyAccess.Services
 					var response = await this.HttpClient.GetAsync( uri, linkedCancellationTokenSource.Token ).ConfigureAwait( false );
 					var content = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
 					RefreshLastNetworkActivityTime();
-					return ParsePagedResponse< T >( content, response.Headers, uri, mark, timeout );
+					return ParsePagedResponse< T >( content, response.Headers, uri, mark, timeout, removePersonalInfoFromLog );
 				}
 			} ).ConfigureAwait( false );
 			
@@ -303,11 +305,12 @@ namespace ShopifyAccess.Services
 			return !string.IsNullOrEmpty( content ) ? content.FromJson< T >() : default( T );
 		}
 
-		private static ResponsePage< T > ParsePagedResponse< T >( string content, HttpHeaders headers, Uri uri, Mark mark, int timeout )
+		private static ResponsePage< T > ParsePagedResponse< T >( string content, HttpHeaders headers, Uri uri, 
+			Mark mark, int timeout, bool removePersonalInfoFromLog = false )
 		{
 			var limit = GetLimitFromHeader( headers );
 			var nextPageLink = PagedResponseService.GetNextPageQueryStrFromHeader( headers );
-			ShopifyLogger.LogGetResponse( uri, limit, nextPageLink, content, mark, timeout );
+			ShopifyLogger.LogGetResponse( uri, limit, nextPageLink, content, mark, timeout, removePersonalInfoFromLog );
 
 			var result = !string.IsNullOrEmpty( content ) ? content.FromJson< T >() : default(T);
 
