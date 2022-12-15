@@ -1,12 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using Netco.Logging;
+using Newtonsoft.Json.Linq;
 using ShopifyAccess.Models;
 
 namespace ShopifyAccess.Misc
 {
 	public static class ShopifyLogger
 	{
+		/// <summary>
+		/// We should not log PII (personally identifiable information) (see GUARD-2660)
+		/// </summary>
+		private static readonly HashSet<string> personalFieldNames = new HashSet<string>(new[]
+		{
+			// ShopifyOrder.ShopifyCustomer.Email
+			"email",
+			// ShopifyOrder.ShopifyBillingAddress or ShopifyOrder.ShopifyShippingAddress
+			"name", "address1", "address2", "city", "company", "country", "province",
+			"first_name", "last_name", "phone", "country_code", "latitude", "longitude",
+			"province_code", "country_name"
+		});
+
 		public static ILogger Log{ get; private set; }
 
 		static ShopifyLogger()
@@ -33,12 +49,14 @@ namespace ShopifyAccess.Misc
 
 		public static void LogGetResponse( Uri requestUri, string limit, string jsonResponse, Mark mark, int timeout )
 		{
-			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tResponse: {3}", requestUri, timeout, limit, jsonResponse );
+			string maskedJsonResponse = MaskPersonalInfoInJson( jsonResponse );
+			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tResponse: {3}", requestUri, timeout, limit, maskedJsonResponse );
 		}
 
 		public static void LogGetResponse( Uri requestUri, string limit, string nextPage, string jsonResponse, Mark mark, int timeout )
 		{
-			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tNext Page: {3}\tResponse: {4}", requestUri, timeout, limit, nextPage, jsonResponse );
+			string maskedJsonResponse = MaskPersonalInfoInJson( jsonResponse );
+			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tNext Page: {3}\tResponse: {4}", requestUri, timeout, limit, nextPage, maskedJsonResponse );
 		}
 
 		public static void LogUpdateRequest( Uri requestUri, string jsonContent, Mark mark, int timeout )
@@ -68,8 +86,24 @@ namespace ShopifyAccess.Misc
 
 		public static void LogException( WebException ex, HttpWebResponse response, string jsonResponse, Mark mark )
 		{
+			string maskedJsonResponse = MaskPersonalInfoInJson( jsonResponse );
 			Trace( ex, mark, "Failed response\tRequest: {0}\tMessage: {1}\tStatus: {2}\tJsonResponse: {3}",
-				response.ResponseUri, ex.Message, response.StatusCode, jsonResponse );
+				response.ResponseUri, ex.Message, response.StatusCode, maskedJsonResponse );
+		}
+
+		/// <summary>This will mask personal info in the json string</summary>
+		/// <param name="replaceWith">Text to replace personal information with</param>
+		public static string MaskPersonalInfoInJson(string jsonString, string replaceWith = "***")
+		{
+			var jObj = JObject.Parse(jsonString);
+			foreach (var p in jObj.Descendants()
+										.OfType<JProperty>()
+										.Where(p => personalFieldNames.Contains(p.Name)))
+			{
+				p.Value = replaceWith;
+			}
+
+			return jObj.ToString();
 		}
 	}
 }

@@ -83,6 +83,7 @@
     <Compile Include="EndpointsBuilderTests.cs" />
     <Compile Include="ExtensionsTests.cs" />
     <Compile Include="Locations\LocationListTests.cs" />
+    <Compile Include="Misc\ShopifyLoggerTests.cs" />
     <Compile Include="OperationTimeoutTests.cs" />
     <Compile Include="Orders\OrderMapperTests.cs" />
     <Compile Include="Orders\OrdersListTests.cs" />
