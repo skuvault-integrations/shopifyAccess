@@ -41,3 +41,7 @@ deployment
 
 #Exceptions
 !ReleaseNotes/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
