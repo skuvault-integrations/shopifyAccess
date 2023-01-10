@@ -82,6 +82,7 @@
     <Compile Include="Cancellation\CancellationTokenTests.cs" />
     <Compile Include="EndpointsBuilderTests.cs" />
     <Compile Include="ExtensionsTests.cs" />
+    <Compile Include="GraphQl\Services\ReportGeneratorTests.cs" />
     <Compile Include="Locations\LocationListTests.cs" />
     <Compile Include="OperationTimeoutTests.cs" />
     <Compile Include="Orders\OrderMapperTests.cs" />

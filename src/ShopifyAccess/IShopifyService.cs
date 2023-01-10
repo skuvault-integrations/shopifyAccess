@@ -111,6 +111,14 @@ namespace ShopifyAccess
 		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null );
 
 		/// <summary>
+		/// Get all existing product variants with inventory levels
+		/// </summary>
+		/// <param name="token">CancellationToken</param>
+		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
+		/// <returns>Product variants with inventory levels</returns>
+		Task< ShopifyProducts > GetProductVariantsInventoryReportAsync( CancellationToken token, Mark mark = null );
+
+		/// <summary>
 		/// Update variants (inventory items). This method is obsolete. DON'T USE IT
 		/// </summary>
 		/// <param name="token">Cancellation token</param>

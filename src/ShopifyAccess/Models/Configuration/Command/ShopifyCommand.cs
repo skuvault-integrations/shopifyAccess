@@ -17,6 +17,7 @@
 		public static readonly ShopifyCommand GetLocations = new ShopifyCommand( "/locations.json", ApiVersion.V2019_10 );
 		public static readonly ShopifyCommand GetUsers = new ShopifyCommand( "/users.json", ApiVersion.V2019_10 );
 		public static readonly ShopifyCommand GetUser = new ShopifyCommand( "/admin/users/" );
+		public static readonly ShopifyCommand GraphGl = new ShopifyCommand( "/admin/api/graphql.json" );
 
 		/// <summary>
 		/// Create Shopify command using the oldest supported api version

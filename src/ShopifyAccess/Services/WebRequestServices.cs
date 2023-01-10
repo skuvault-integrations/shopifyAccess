@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -244,7 +245,7 @@ namespace ShopifyAccess.Services
 			ParseResponse< T >( responseContent, response.Headers, url, mark, timeout );
 		}
 
-		public async Task PostDataAsync< T >( ShopifyCommand command, string jsonContent, CancellationToken token, Mark mark, int timeout )
+		public async Task< T > PostDataAsync< T >( ShopifyCommand command, string jsonContent, CancellationToken token, Mark mark, int timeout )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
@@ -267,7 +268,8 @@ namespace ShopifyAccess.Services
 			}
 			var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
 			RefreshLastNetworkActivityTime();
-			ParseResponse< T >( responseContent, response.Headers, url, mark, timeout );
+			var result = ParseResponse< T >( responseContent, response.Headers, url, mark, timeout );
+			return result;
 		}
 
 		public string RequestPermanentToken( string code, Mark mark )

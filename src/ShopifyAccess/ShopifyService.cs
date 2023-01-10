@@ -20,7 +20,7 @@ using ShopifyAccess.Services.Utils;
 
 namespace ShopifyAccess
 {
-	public sealed class ShopifyService: IShopifyService
+	public sealed partial class ShopifyService: IShopifyService
 	{
 		private readonly WebRequestServices _webRequestServices;
 		private const int RequestMaxLimit = 250;
