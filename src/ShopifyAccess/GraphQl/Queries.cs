@@ -1,10 +1,11 @@
-﻿using ServiceStack;
+﻿using System;
+using ServiceStack;
 
 namespace ShopifyAccess.GraphQl
 {
 	internal class Queries
 	{
-		private const string CurrentBulkOperation = 
+		private const string CurrentBulkOperation =
 			@"query {
 			  currentBulkOperation {
 			    id
@@ -19,15 +20,71 @@ namespace ShopifyAccess.GraphQl
 			  }
 			}";
 
-		public static string GetCurrentBulkOperationQuery()
+		private const string GetProductVariantsWithInventoryLevelsReport =
+			@"mutation {
+			  bulkOperationRunQuery(
+			    query: """"""
+					{
+						productVariants{
+							edges{
+								node {
+									id
+										sku
+									inventoryItem {
+										id
+										inventoryLevels{
+											edges{
+												node {
+													available
+													location {
+														id
+															name
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				""""""
+			  ) {
+			    bulkOperation {
+			      id
+			      status
+			    }
+			    userErrors {
+			      field
+			      message
+			    }
+			  }
+			}";
+
+		public static string GetCurrentBulkOperationRequest()
 		{
-			var query = new { query = PrepareRequest( CurrentBulkOperation ) };
-			return query.ToJson();
+			var request = new { query = PrepareRequest( CurrentBulkOperation ) };
+			return request.ToJson();
 		}
 		
-		private static string PrepareRequest(string request)
+		public static string GetReportRequest(ReportType type)
 		{
-			return request.Replace('\t', ' ');
+			var query = string.Empty;
+			switch( type )
+			{
+				case ReportType.ProductVariantsWithInventoryLevels:
+					query = GetProductVariantsWithInventoryLevelsReport;
+					break;
+				default:
+					throw new ArgumentOutOfRangeException( nameof(type), type, null );
+			}
+			var request = new { query = PrepareRequest( query ) };
+			return request.ToJson();
+		}
+
+		private static string PrepareRequest( string request )
+		{
+			return request.Replace( '\t', ' ' );
 		}
 	}
 }

@@ -14,9 +14,6 @@ namespace ShopifyAccess.GraphQl.Models.BulkOperation
 	{
 		[ DataMember( Name = "bulkOperationRunQuery" ) ]
 		public BulkOperationRunQuery BulkOperationRunQuery{ get; set; }
-
-		[ DataMember( Name = "userErrors" ) ]
-		public string[] UserErrors{ get; set; }
 	}
 
 	[ DataContract ]

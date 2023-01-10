@@ -1,10 +1,8 @@
 ﻿using System.Configuration;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
-using ShopifyAccess.GraphQl.Services;
-using ShopifyAccess.Models;
+using ShopifyAccess.GraphQl;
 using ShopifyAccess.Services;
 
 namespace ShopifyAccessTests.GraphQl.Services
@@ -12,7 +10,7 @@ namespace ShopifyAccessTests.GraphQl.Services
 	[ TestFixture ]
 	public class ReportGeneratorTests: BaseTests
 	{
-		private ReportGenerator ReportGenerator;
+		private TestReportGenerator TestReportGenerator;
 
 		[ SetUp ]
 		public void InitReportGeneratorTests()
@@ -20,22 +18,31 @@ namespace ShopifyAccessTests.GraphQl.Services
 			if( this.Config != null )
 			{
 				var webRequestServices = new WebRequestServices( this.Config );
-				this.ReportGenerator = new ReportGenerator( webRequestServices );
+				this.TestReportGenerator = new TestReportGenerator( webRequestServices );
 			}
 			else
 			{
-				throw new ConfigurationException();
+				throw new ConfigurationErrorsException();
 			}
 		}
 
 		[ Test ]
+		public async Task GenerateRequestAsync_ReturnsBulkOperationStatus()
+		{
+			// Arrange
+			// Act
+			var currentBulkOperation = await this.TestReportGenerator.GenerateRequestAsync( ReportType.ProductVariantsWithInventoryLevels );
+
+			// Assert
+			currentBulkOperation.Status.Should().Be( "CREATED" );
+		}
+		
+		[ Test ]
 		public async Task GetCurrentBulkOperationAsync_ReturnsLastOperationStatus()
 		{
 			// Arrange
-			var mark = Mark.Create;
-
 			// Act
-			var currentBulkOperation = await this.ReportGenerator.GetCurrentBulkOperationAsync( CancellationToken.None, mark );
+			var currentBulkOperation = await this.TestReportGenerator.GetCurrentBulkOperationAsync();
 
 			// Assert
 			currentBulkOperation.Status.Should().Be( "COMPLETED" );

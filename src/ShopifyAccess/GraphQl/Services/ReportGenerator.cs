@@ -7,12 +7,12 @@ using ShopifyAccess.Services;
 
 namespace ShopifyAccess.GraphQl.Services
 {
-	internal sealed class ReportGenerator: IReportGenerator
+	internal class ReportGenerator: IReportGenerator
 	{
 		private const int Timeout = 10000;
 		private readonly WebRequestServices _webRequestServices;
-		
-		public ReportGenerator(WebRequestServices webRequestServices)
+
+		public ReportGenerator( WebRequestServices webRequestServices )
 		{
 			this._webRequestServices = webRequestServices;
 		}
@@ -21,20 +21,31 @@ namespace ShopifyAccess.GraphQl.Services
 		{
 			mark = mark.CreateNewIfBlank();
 			// Send request to generate report
-			
+
 			// poll for status
 			// GetCurrentBulkOperationAsync
-			
+
 			// Download and Parse
 			return null;
 		}
 
-		private async Task< CurrentBulkOperation > GetCurrentBulkOperationAsync(CancellationToken cancellationToken, Mark mark)
+		protected async Task< BulkOperation > GenerateRequestAsync( ReportType type, CancellationToken cancellationToken, Mark mark )
 		{
-			var query = Queries.GetCurrentBulkOperationQuery();
+			var request = Queries.GetReportRequest( type );
 
 			// ToDo: Add policy, throttling etc.
-			var result = await this._webRequestServices.PostDataAsync< CurrentBulkOperationResponse >( ShopifyCommand.GraphGl, query, cancellationToken, mark, Timeout );
+			var result = await this._webRequestServices.PostDataAsync< BulkOperationRunQueryResponse >( ShopifyCommand.GraphGl, request, cancellationToken, mark, Timeout );
+
+			// ToDo: log UserErrors
+			return result.Data?.BulkOperationRunQuery?.BulkOperation;
+		}
+
+		protected async Task< CurrentBulkOperation > GetCurrentBulkOperationAsync( CancellationToken cancellationToken, Mark mark )
+		{
+			var request = Queries.GetCurrentBulkOperationRequest();
+
+			// ToDo: Add policy, throttling etc.
+			var result = await this._webRequestServices.PostDataAsync< CurrentBulkOperationResponse >( ShopifyCommand.GraphGl, request, cancellationToken, mark, Timeout );
 			return result.Data?.CurrentBulkOperation;
 		}
 	}
