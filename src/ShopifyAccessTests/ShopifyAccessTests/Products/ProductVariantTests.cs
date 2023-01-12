@@ -157,5 +157,47 @@ namespace ShopifyAccessTests.Products
 			};
 			return inventoryLevels;
 		}
+
+		[ Test ]
+		[ Explicit ]
+		public async Task GetProductVariantsInventoryReportAsync_ReturnsCorrectReport()
+		{
+			// Arrange
+			var products = await this.Service.GetProductsInventoryAsync( CancellationToken.None );
+			var productVariants = products.ToListVariants();
+
+			// Act
+			var productVariantsReport = await this.Service.GetProductVariantsInventoryReportAsync( CancellationToken.None );
+
+			// Assert
+			this.ValidateIfEqual( productVariantsReport, productVariants );
+			// This implementation is better but it works slow.:
+			//
+			// var fieldsToCompare = new HashSet< string >() { "Id", "Sku", "InventoryItemId", "InventoryLevels", "LocationId", "Available" };
+			// productVariantsReport.ShouldBeEquivalentTo( productVariants, o => o.Including(
+			// 	subjectInfo => fieldsToCompare.Contains( subjectInfo.SelectedMemberInfo.Name ) ) );
+		}
+
+		private void ValidateIfEqual( List< ShopifyProductVariant > productVariantsReport, List< ShopifyProductVariant > productVariants )
+		{
+			productVariantsReport.Should().HaveCount( productVariants.Count );
+			productVariantsReport.Sort( ( x, y ) => Math.Sign( x.Id - y.Id ) );
+			productVariants.Sort( ( x, y ) => Math.Sign( x.Id - y.Id ) );
+			for( var i = 0; i < productVariantsReport.Count; i++ )
+			{
+				var v1 = productVariantsReport[ i ];
+				var v2 = productVariants[ i ];
+				v1.Id.ShouldBeEquivalentTo( v2.Id );
+				v1.InventoryItemId.ShouldBeEquivalentTo( v2.InventoryItemId );
+				v1.Sku.ShouldBeEquivalentTo( v2.Sku );
+				v1.InventoryLevels.InventoryLevels.ShouldBeEquivalentTo( v2.InventoryLevels.InventoryLevels,
+					o => o.Excluding( info => info.SelectedMemberInfo.Name.Equals( "UpdatedAt" ) ) );
+			}
+		}
+
+		private int Comparison( ShopifyProductVariant x, ShopifyProductVariant y )
+		{
+			return 0;
+		}
 	}
 }

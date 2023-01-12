@@ -29,16 +29,17 @@ namespace ShopifyAccess.GraphQl
 							edges{
 								node {
 									id
-										sku
+									sku
 									inventoryItem {
 										id
+										tracked
 										inventoryLevels{
 											edges{
 												node {
 													available
 													location {
 														id
-															name
+														name
 													}
 												}
 											}

@@ -4,12 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CuttingEdge.Conditions;
 using ServiceStack;
+using ShopifyAccess.GraphQl.Models;
 using ShopifyAccess.Misc;
 using ShopifyAccess.Models;
 using ShopifyAccess.Models.Configuration.Authorization;
@@ -270,6 +270,37 @@ namespace ShopifyAccess.Services
 			RefreshLastNetworkActivityTime();
 			var result = ParseResponse< T >( responseContent, response.Headers, url, mark, timeout );
 			return result;
+		}
+
+		public async Task< Report > GetReportDocumentAsync( string url, Func< Stream, Report > parseMethod, CancellationToken cancellationToken, Mark mark, int timeout )
+		{
+			Condition.Requires( mark, "mark" ).IsNotNull();
+
+			if( cancellationToken.IsCancellationRequested )
+			{
+				this.LogAndThrowTaskCanceledException( mark );
+			}
+
+			var uri = new Uri( url, UriKind.Absolute );
+			ShopifyLogger.LogGetRequest( uri, mark, timeout );
+
+			return await this.ParseExceptionAsync( mark, timeout, async () =>
+			{
+				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( cancellationToken ) )
+				{
+					linkedCancellationTokenSource.CancelAfter( timeout );
+					this.RefreshLastNetworkActivityTime();
+					using( var response = await this.HttpClient.GetAsync( uri, HttpCompletionOption.ResponseHeadersRead, linkedCancellationTokenSource.Token ).ConfigureAwait( false ) )
+					{
+						response.EnsureSuccessStatusCode();
+
+						using( var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait( false ) )
+						{
+							return parseMethod( stream );
+						}
+					}
+				}
+			} ).ConfigureAwait( false );
 		}
 
 		public string RequestPermanentToken( string code, Mark mark )

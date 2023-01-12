@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +15,6 @@ using ShopifyAccess.Models.Product;
 using ShopifyAccess.Models.ProductVariant;
 using ShopifyAccess.Models.User;
 using ShopifyAccess.Services;
-using ShopifyAccess.Services.Utils;
 
 namespace ShopifyAccess
 {
