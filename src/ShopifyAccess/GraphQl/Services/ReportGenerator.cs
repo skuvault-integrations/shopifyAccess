@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using CuttingEdge.Conditions;
 using ShopifyAccess.GraphQl.Misc;
 using ShopifyAccess.GraphQl.Models;
 using ShopifyAccess.GraphQl.Models.BulkOperation;
@@ -37,58 +38,118 @@ namespace ShopifyAccess.GraphQl.Services
 		{
 			mark = mark.CreateNewIfBlank();
 
-			// Send request to generate report
-			var createReportOperation = await this.GenerateReportAsync( reportType, cancellationToken, mark ).ConfigureAwait( false );
-			ThrowIfBulkOperationError( createReportOperation, mark );
+			ShopifyLogger.LogOperationStart( this._shopName, mark );
 
-			// poll for status
-			var reportInfo = await this.WaitForReportProcessingAsync( cancellationToken, mark ).ConfigureAwait( false );
-			ThrowIfCurrentBulkOperationError( reportInfo, createReportOperation, mark );
+			try
+			{
+				// Send request to generate report
+				var createReportOperation = await this.GenerateReportAsync( reportType, cancellationToken, mark ).ConfigureAwait( false );
+				this.ThrowOnCreateBulkOperationError( createReportOperation, mark );
 
-			// Download and Parse
-			var document = await this.GetReportDocumentAsync< T >( reportType, reportInfo.Url, cancellationToken, mark, timeout ).ConfigureAwait( false );
-			return document.As< T >();
+				// poll for status
+				var reportInfo = await this.WaitForReportProcessingAsync( createReportOperation.Id, cancellationToken, mark ).ConfigureAwait( false );
+				this.ThrowOnGetBulkOperationResultError( reportInfo, mark );
+
+				// Download and Parse
+				var document = await this.GetReportDocumentAsync( reportType, reportInfo.Url, cancellationToken, mark, timeout ).ConfigureAwait( false );
+				return document.As< T >();
+			}
+			finally
+			{
+				ShopifyLogger.LogOperationEnd( this._shopName, mark );
+			}
 		}
 
 		protected async Task< BulkOperation > GenerateReportAsync( ReportType type, CancellationToken cancellationToken, Mark mark )
 		{
-			var request = Queries.GetReportRequest( type );
+			ShopifyLogger.LogOperationStart( this._shopName, mark );
 
-			var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
-				async () => await this._webRequestServices.PostDataAsync< BulkOperationRunQueryResponse >( ShopifyCommand.GraphGl, request, cancellationToken, mark, GraphQlRequestTimeout ).ConfigureAwait( false )
-			).ConfigureAwait( false );
+			try
+			{
+				var request = Queries.GetReportRequest( type );
 
-			return result.Data?.BulkOperationRunQuery?.BulkOperation;
+				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
+					async () => await this._webRequestServices.PostDataAsync< BulkOperationRunQueryResponse >( ShopifyCommand.GraphGl, request, cancellationToken, mark, GraphQlRequestTimeout ).ConfigureAwait( false )
+				).ConfigureAwait( false );
+
+				return result.Data?.BulkOperationRunQuery?.BulkOperation;
+			}
+			finally
+			{
+				ShopifyLogger.LogOperationEnd( this._shopName, mark );
+			}
 		}
 
 		protected async Task< CurrentBulkOperation > GetCurrentBulkOperationAsync( CancellationToken cancellationToken, Mark mark )
 		{
-			var request = Queries.GetCurrentBulkOperationRequest();
+			ShopifyLogger.LogOperationStart( this._shopName, mark );
 
-			var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
-				async () => await this._webRequestServices.PostDataAsync< CurrentBulkOperationResponse >( ShopifyCommand.GraphGl, request, cancellationToken, mark, GraphQlRequestTimeout ).ConfigureAwait( false )
-			).ConfigureAwait( false );
+			try
+			{
+				var request = Queries.GetCurrentBulkOperationStatusRequest();
 
-			return result.Data?.CurrentBulkOperation;
+				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
+					async () => await this._webRequestServices.PostDataAsync< GetCurrentBulkOperationResponse >( ShopifyCommand.GraphGl, request, cancellationToken, mark, GraphQlRequestTimeout ).ConfigureAwait( false )
+				).ConfigureAwait( false );
+
+				return result.Data?.CurrentBulkOperation;
+			}
+			finally
+			{
+				ShopifyLogger.LogOperationEnd( this._shopName, mark );
+			}
 		}
 
-		protected async Task< Report > GetReportDocumentAsync< T >( ReportType reportType, string url, CancellationToken cancellationToken, Mark mark, int timeout ) where T : class
+		protected async Task< CurrentBulkOperation > GetBulkOperationByIdAsync( string gid, CancellationToken cancellationToken, Mark mark )
 		{
-			var parser = GetReportParser( reportType );
+			Condition.Requires( gid, nameof(gid) ).IsNotNullOrEmpty();
 
-			var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
-				async () => await this._webRequestServices.GetReportDocumentAsync( url, parser, cancellationToken, mark, timeout ).ConfigureAwait( false )
-			).ConfigureAwait( false );
+			ShopifyLogger.LogOperationStart( this._shopName, mark );
+			try
+			{
+				var request = Queries.GetBulkOperationStatusByIdRequest( gid );
 
-			return result;
+				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
+					async () => await this._webRequestServices.PostDataAsync< GetBulkOperationByIdResponse >( ShopifyCommand.GraphGl, request, cancellationToken, mark, GraphQlRequestTimeout ).ConfigureAwait( false )
+				).ConfigureAwait( false );
+
+				return result.Data?.BulkOperation;
+			}
+			finally
+			{
+				ShopifyLogger.LogOperationEnd( this._shopName, mark );
+			}
 		}
 
-		private async Task< CurrentBulkOperation > WaitForReportProcessingAsync( CancellationToken cancellationToken, Mark mark )
+		protected async Task< Report > GetReportDocumentAsync( ReportType reportType, string url, CancellationToken cancellationToken, Mark mark, int timeout )
+		{
+			Condition.Requires( url, nameof(url) ).IsNotNullOrEmpty();
+
+			ShopifyLogger.LogOperationStart( this._shopName, mark );
+
+			try
+			{
+				var parser = GetReportParser( reportType );
+
+				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
+					async () => await this._webRequestServices.GetReportDocumentAsync( url, parser, cancellationToken, mark, timeout ).ConfigureAwait( false )
+				).ConfigureAwait( false );
+
+				return result;
+			}
+			finally
+			{
+				ShopifyLogger.LogOperationEnd( this._shopName, mark );
+			}
+		}
+
+		private async Task< CurrentBulkOperation > WaitForReportProcessingAsync( string reportGid, CancellationToken cancellationToken, Mark mark )
 		{
 			var pollingRequestCount = 0;
 			CurrentBulkOperation reportInfo;
 
-			// ToDo: Add logs
+			ShopifyLogger.LogOperationStart( this._shopName, mark );
+
 			try
 			{
 				do
@@ -96,9 +157,10 @@ namespace ShopifyAccess.GraphQl.Services
 					cancellationToken.ThrowIfCancellationRequested();
 
 					var delayMs = TimeSpan.FromMilliseconds( GetReportStatusPollingIntervalMs( pollingRequestCount ) );
+					ShopifyLogger.LogOperation( this._shopName, mark, "Waiting for report #" + pollingRequestCount + " / " + ( int )delayMs.TotalSeconds + " seconds" );
 					await Task.Delay( delayMs, cancellationToken ).ConfigureAwait( false );
 
-					reportInfo = await this.GetCurrentBulkOperationAsync( cancellationToken, mark ).ConfigureAwait( false );
+					reportInfo = await this.GetBulkOperationByIdAsync( reportGid, cancellationToken, mark ).ConfigureAwait( false );
 					var isFinalReportStatus = IsFinalReportStatus( reportInfo );
 					if( isFinalReportStatus )
 					{
@@ -108,7 +170,7 @@ namespace ShopifyAccess.GraphQl.Services
 			}
 			finally
 			{
-				// ToDo: Add logs with pollingRequestCount
+				ShopifyLogger.LogOperationEnd( this._shopName, mark );
 			}
 
 			return reportInfo;
@@ -125,7 +187,7 @@ namespace ShopifyAccess.GraphQl.Services
 			}
 		}
 
-		private static void ThrowIfBulkOperationError( BulkOperation operation, Mark mark )
+		private void ThrowOnCreateBulkOperationError( BulkOperation operation, Mark mark )
 		{
 			if( Enum.TryParse< BulkOperationStatus >( operation?.Status, true, out var status ) )
 			{
@@ -135,24 +197,22 @@ namespace ShopifyAccess.GraphQl.Services
 				}
 			}
 
-			// ToDo: Add logs;
-			// ToDo: Format exception;
-			throw new Exception();
+			ShopifyLogger.LogOperation( this._shopName, mark, "Unexpected report status: " + operation?.Status );
+			throw new SystemException( "Unexpected report status: " + operation?.Status );
 		}
 
-		private static void ThrowIfCurrentBulkOperationError( CurrentBulkOperation reportInfo, BulkOperation operation, Mark mark )
+		private void ThrowOnGetBulkOperationResultError( CurrentBulkOperation reportInfo, Mark mark )
 		{
 			if( Enum.TryParse< BulkOperationStatus >( reportInfo?.Status, true, out var status ) )
 			{
-				if( status == BulkOperationStatus.Completed && reportInfo.Id.Equals( operation.Id ) )
+				if( status == BulkOperationStatus.Completed )
 				{
 					return;
 				}
 			}
 
-			// ToDo: Add logs;
-			// ToDo: Format exception;
-			throw new Exception();
+			ShopifyLogger.LogOperation( this._shopName, mark, "Unexpected report status: " + reportInfo?.Status );
+			throw new SystemException( "Unexpected report status: " + reportInfo?.Status );
 		}
 
 		private static bool IsFinalReportStatus( CurrentBulkOperation reportInfo )

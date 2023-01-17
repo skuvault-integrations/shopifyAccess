@@ -3,7 +3,7 @@
 namespace ShopifyAccess.GraphQl.Models.BulkOperation
 {
 	[ DataContract ]
-	public class CurrentBulkOperationResponse
+	public class GetCurrentBulkOperationResponse
 	{
 		[ DataMember( Name = "data" ) ]
 		public CurrentBulkOperationData Data{ get; set; }

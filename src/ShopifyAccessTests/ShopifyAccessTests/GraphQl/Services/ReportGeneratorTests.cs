@@ -21,7 +21,7 @@ namespace ShopifyAccessTests.GraphQl.Services
 			if( this.Config != null )
 			{
 				var webRequestServices = new WebRequestServices( this.Config );
-				this.TestReportGenerator = new TestReportGenerator( this.Config .ShopName, webRequestServices );
+				this.TestReportGenerator = new TestReportGenerator( this.Config.ShopName, webRequestServices );
 			}
 			else
 			{
@@ -56,6 +56,20 @@ namespace ShopifyAccessTests.GraphQl.Services
 
 		[ Test ]
 		[ Explicit ]
+		public async Task GetBulkOperationStatusByIdAsync_ReturnsCurrentBulkOperationStatus_WhenCurrentBulkOperationGidProvided()
+		{
+			// Arrange
+			var currentBulkOperation = await this.TestReportGenerator.GetCurrentBulkOperationAsync();
+
+			// Act
+			var bulkOperationById = await this.TestReportGenerator.GetBulkOperationByIdAsync( currentBulkOperation.Id );
+
+			// Assert
+			bulkOperationById.ShouldBeEquivalentTo( currentBulkOperation );
+		}
+
+		[ Test ]
+		[ Explicit ]
 		public async Task GetReportDocumentAsync_ReturnsReportLines()
 		{
 			// Arrange
@@ -63,12 +77,12 @@ namespace ShopifyAccessTests.GraphQl.Services
 			var url = currentBulkOperation.Url;
 
 			// Act
-			var reportLines = await this.TestReportGenerator.GetReportDocumentAsync< ProductVariant >( ReportType.ProductVariantsWithInventoryLevels, url );
+			var reportLines = await this.TestReportGenerator.GetReportDocumentAsync( ReportType.ProductVariantsWithInventoryLevels, url );
 
 			// Assert
 			reportLines.Should().NotBeEmpty();
 		}
-		
+
 		[ Test ]
 		[ Explicit ]
 		public async Task GetReportAsync_ReturnsReportLines()

@@ -3,8 +3,11 @@ using ServiceStack;
 
 namespace ShopifyAccess.GraphQl
 {
-	internal class Queries
+	internal static class Queries
 	{
+		/// <summary>
+		/// Get last bulk operation status
+		/// </summary>
 		private const string CurrentBulkOperation =
 			@"query {
 			  currentBulkOperation {
@@ -20,6 +23,29 @@ namespace ShopifyAccess.GraphQl
 			  }
 			}";
 
+		/// <summary>
+		/// Get bulk operation status by gid
+		/// </summary>
+		private const string BulkOperationById =
+			@"query {
+				node(id: ""{gid}"") {
+					... on BulkOperation {
+					    id
+					    status
+					    errorCode
+					    createdAt
+					    completedAt
+					    objectCount
+					    fileSize
+					    url
+					    partialDataUrl
+					  }
+				}
+			}";
+
+		/// <summary>
+		/// Create Product Variants with inventory levels bulk export operation
+		/// </summary>
 		private const string GetProductVariantsWithInventoryLevelsReport =
 			@"mutation {
 			  bulkOperationRunQuery(
@@ -62,13 +88,20 @@ namespace ShopifyAccess.GraphQl
 			  }
 			}";
 
-		public static string GetCurrentBulkOperationRequest()
+		public static string GetCurrentBulkOperationStatusRequest()
 		{
 			var request = new { query = PrepareRequest( CurrentBulkOperation ) };
 			return request.ToJson();
 		}
-		
-		public static string GetReportRequest(ReportType type)
+
+		public static string GetBulkOperationStatusByIdRequest( string gid )
+		{
+			var query = BulkOperationById.Replace( "{gid}", gid );
+			var request = new { query = PrepareRequest( query ) };
+			return request.ToJson();
+		}
+
+		public static string GetReportRequest( ReportType type )
 		{
 			var query = string.Empty;
 			switch( type )
@@ -79,6 +112,7 @@ namespace ShopifyAccess.GraphQl
 				default:
 					throw new ArgumentOutOfRangeException( nameof(type), type, null );
 			}
+
 			var request = new { query = PrepareRequest( query ) };
 			return request.ToJson();
 		}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Runtime.CompilerServices;
 using Netco.Logging;
 using ShopifyAccess.Models;
 
@@ -70,6 +71,21 @@ namespace ShopifyAccess.Misc
 		{
 			Trace( ex, mark, "Failed response\tRequest: {0}\tMessage: {1}\tStatus: {2}\tJsonResponse: {3}",
 				response.ResponseUri, ex.Message, response.StatusCode, jsonResponse );
+		}
+
+		public static void LogOperationStart( string shopName, Mark mark, [ CallerMemberName ] string callerMethodName = null )
+		{
+			Trace( mark, "Shop: {0}. Start {1}", shopName, callerMethodName );
+		}
+
+		public static void LogOperationEnd( string shopName, Mark mark, [ CallerMemberName ] string callerMethodName = null )
+		{
+			Trace( mark, "Shop: {0}. End {1}", shopName, callerMethodName );
+		}
+		
+		public static void LogOperation( string shopName, Mark mark, string message, [ CallerMemberName ] string callerMethodName = null )
+		{
+			Trace( mark, "Shop: {0}. {1}: {2}", shopName, callerMethodName, message );
 		}
 	}
 }

@@ -25,9 +25,14 @@ namespace ShopifyAccessTests.GraphQl.Services
 			return await this.GetCurrentBulkOperationAsync( CancellationToken.None, Mark.Create );
 		}
 
-		public async Task< Report > GetReportDocumentAsync< T >( ReportType type, string url ) where T : class
+		public async Task< CurrentBulkOperation > GetBulkOperationByIdAsync( string gid )
 		{
-			return await this.GetReportDocumentAsync< T >( type, url, CancellationToken.None, Mark.Create, 100000 );
+			return await this.GetBulkOperationByIdAsync( gid, CancellationToken.None, Mark.Create );
+		}
+
+		public async Task< Report > GetReportDocumentAsync( ReportType type, string url )
+		{
+			return await this.GetReportDocumentAsync( type, url, CancellationToken.None, Mark.Create, 100000 );
 		}
 	}
 }

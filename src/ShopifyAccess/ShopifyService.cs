@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CuttingEdge.Conditions;
 using Netco.Extensions;
 using ServiceStack;
+using ShopifyAccess.GraphQl.Services;
 using ShopifyAccess.Misc;
 using ShopifyAccess.Models;
 using ShopifyAccess.Models.Configuration.Command;
@@ -21,6 +22,7 @@ namespace ShopifyAccess
 	public sealed partial class ShopifyService: IShopifyService
 	{
 		private readonly WebRequestServices _webRequestServices;
+		private readonly IReportGenerator _reportGenerator;
 		private const int RequestMaxLimit = 250;
 		private const int RequestInventoryLevelsMaxLimit = 50;
 		private readonly string _shopName;
@@ -50,6 +52,7 @@ namespace ShopifyAccess
 			Condition.Requires( operationsTimeouts, "operationsTimeouts" ).IsNotNull();
 
 			this._webRequestServices = new WebRequestServices( config );
+			this._reportGenerator = new ReportGenerator( this._shopName, this._webRequestServices);
 			this._shopName = config.ShopName;
 			this._timeouts = operationsTimeouts;
 		}

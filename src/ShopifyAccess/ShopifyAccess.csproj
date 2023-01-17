@@ -65,8 +65,9 @@
     <Compile Include="GraphQl\Misc\GraphQlObjectIdsParser.cs" />
     <Compile Include="GraphQl\Misc\ProductVariantConverter.cs" />
     <Compile Include="GraphQl\Misc\ProductVariantsWithInventoryLevelsParser.cs" />
+    <Compile Include="GraphQl\Models\BulkOperation\GetBulkOperationByIdResponse.cs" />
     <Compile Include="GraphQl\Models\BulkOperation\BulkOperationRunQueryResponse.cs" />
-    <Compile Include="GraphQl\Models\BulkOperation\CurrentBulkOperationResponse.cs" />
+    <Compile Include="GraphQl\Models\BulkOperation\GetCurrentBulkOperationResponse.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsWithInventoryLevelsReport\InventoryItem.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsWithInventoryLevelsReport\InventoryLevel.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsWithInventoryLevelsReport\Location.cs" />
