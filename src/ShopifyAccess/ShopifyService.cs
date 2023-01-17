@@ -52,7 +52,7 @@ namespace ShopifyAccess
 			Condition.Requires( operationsTimeouts, "operationsTimeouts" ).IsNotNull();
 
 			this._webRequestServices = new WebRequestServices( config );
-			this._reportGenerator = new ReportGenerator( this._shopName, this._webRequestServices);
+			this._reportGenerator = new ReportGenerator( config.ShopName, this._webRequestServices);
 			this._shopName = config.ShopName;
 			this._timeouts = operationsTimeouts;
 		}
