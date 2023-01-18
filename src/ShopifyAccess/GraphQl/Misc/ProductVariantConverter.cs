@@ -13,7 +13,7 @@ namespace ShopifyAccess.GraphQl.Misc
 			var inventoryItemId = GraphQlObjectIdsParser.GetInventoryItemId( variant.InventoryItem?.InventoryItemId );
 			return new ShopifyProductVariant()
 			{
-				Id = GraphQlObjectIdsParser.GetProductVariantId( variant.ProductVariantId ),
+				Id = GraphQlId.ProductVariant.GetId( variant.ProductVariantId ),
 				Sku = variant.Sku,
 				InventoryItemId = inventoryItemId,
 				InventoryLevels = GetShopifyInventoryLevels( variant.InventoryLevels, inventoryItemId )
