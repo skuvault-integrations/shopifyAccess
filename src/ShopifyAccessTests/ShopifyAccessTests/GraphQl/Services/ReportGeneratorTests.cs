@@ -65,7 +65,7 @@ namespace ShopifyAccessTests.GraphQl.Services
 			var bulkOperationById = await this.TestReportGenerator.GetBulkOperationByIdAsync( currentBulkOperation.Id );
 
 			// Assert
-			bulkOperationById.ShouldBeEquivalentTo( currentBulkOperation );
+			bulkOperationById.Should().BeEquivalentTo( currentBulkOperation );
 		}
 
 		[ Test ]

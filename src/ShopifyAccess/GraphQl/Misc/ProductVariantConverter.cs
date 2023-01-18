@@ -10,10 +10,10 @@ namespace ShopifyAccess.GraphQl.Misc
 	{
 		public static ShopifyProductVariant ToShopifyProductVariant( this ProductVariant variant )
 		{
-			var inventoryItemId = GraphQlObjectIdsParser.GetInventoryItemId( variant.InventoryItem?.InventoryItemId );
+			var inventoryItemId = GraphQlIdParser.InventoryItem.GetId( variant.InventoryItem?.InventoryItemId );
 			return new ShopifyProductVariant()
 			{
-				Id = GraphQlId.ProductVariant.GetId( variant.ProductVariantId ),
+				Id = GraphQlIdParser.ProductVariant.GetId( variant.ProductVariantId ),
 				Sku = variant.Sku,
 				InventoryItemId = inventoryItemId,
 				InventoryLevels = GetShopifyInventoryLevels( variant.InventoryLevels, inventoryItemId )
@@ -27,7 +27,7 @@ namespace ShopifyAccess.GraphQl.Misc
 			{
 				InventoryItemId = inventoryItemId,
 				Available = inv.Available,
-				LocationId = GraphQlObjectIdsParser.GetLocationId( inv.Location?.LocationId )
+				LocationId = GraphQlIdParser.Location.GetId( inv.Location?.LocationId )
 			} ) );
 			return result;
 		}

@@ -171,11 +171,11 @@ namespace ShopifyAccessTests.Products
 
 			// Assert
 			this.ValidateIfEqual( productVariantsReport, productVariants );
-			// This implementation is better but it works slow.:
+			// This implementation is better but it works slow:
 			//
 			// var fieldsToCompare = new HashSet< string >() { "Id", "Sku", "InventoryItemId", "InventoryLevels", "LocationId", "Available" };
-			// productVariantsReport.ShouldBeEquivalentTo( productVariants, o => o.Including(
-			// 	subjectInfo => fieldsToCompare.Contains( subjectInfo.SelectedMemberInfo.Name ) ) );
+			// productVariantsReport.Should().BeEquivalentTo( productVariants, o => o.Including(
+			// 	memberInfo => fieldsToCompare.Contains( memberInfo.Name ) ) );
 		}
 
 		private void ValidateIfEqual( List< ShopifyProductVariant > productVariantsReport, List< ShopifyProductVariant > productVariants )
@@ -187,11 +187,11 @@ namespace ShopifyAccessTests.Products
 			{
 				var v1 = productVariantsReport[ i ];
 				var v2 = productVariants[ i ];
-				v1.Id.ShouldBeEquivalentTo( v2.Id );
-				v1.InventoryItemId.ShouldBeEquivalentTo( v2.InventoryItemId );
-				v1.Sku.ShouldBeEquivalentTo( v2.Sku );
-				v1.InventoryLevels.InventoryLevels.ShouldBeEquivalentTo( v2.InventoryLevels.InventoryLevels,
-					o => o.Excluding( info => info.SelectedMemberInfo.Name.Equals( "UpdatedAt" ) ) );
+				v1.Id.Should().Be( v2.Id );
+				v1.InventoryItemId.Should().Be( v2.InventoryItemId );
+				v1.Sku.Should().BeEquivalentTo( v2.Sku );
+				v1.InventoryLevels.InventoryLevels.Should().BeEquivalentTo( v2.InventoryLevels.InventoryLevels,
+					o => o.Excluding( memberInfo => memberInfo.Name.Equals( "UpdatedAt" ) ) );
 			}
 		}
 
