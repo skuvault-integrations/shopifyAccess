@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
 using ShopifyAccess.GraphQl;
-using ShopifyAccess.GraphQl.Misc;
+using ShopifyAccess.GraphQl.Models.ProductVariantsInventoryReport.Extensions;
 using ShopifyAccess.Models;
 using ShopifyAccess.Services;
 
@@ -35,10 +35,10 @@ namespace ShopifyAccessTests.GraphQl.Services
 		{
 			// Arrange
 			// Act
-			var currentBulkOperation = await this.TestReportGenerator.GenerateRequestAsync( ReportType.ProductVariantsWithInventoryLevels );
+			var currentBulkOperation = await this.TestReportGenerator.GenerateRequestAsync( ReportType.ProductVariantsInventory );
 
 			// Assert
-			currentBulkOperation.Status.Should().Be( "CREATED" );
+			currentBulkOperation.Status.Should().Be( BulkOperationStatus.Created.ToString().ToUpperInvariant() );
 		}
 
 		[ Test ]
@@ -50,7 +50,7 @@ namespace ShopifyAccessTests.GraphQl.Services
 			var currentBulkOperation = await this.TestReportGenerator.GetCurrentBulkOperationAsync();
 
 			// Assert
-			currentBulkOperation.Status.Should().Be( "COMPLETED" );
+			currentBulkOperation.Status.Should().Be( BulkOperationStatus.Completed.ToString().ToUpperInvariant() );
 			currentBulkOperation.ErrorCode.Should().BeNull();
 		}
 
@@ -77,7 +77,7 @@ namespace ShopifyAccessTests.GraphQl.Services
 			var url = currentBulkOperation.Url;
 
 			// Act
-			var reportLines = await this.TestReportGenerator.GetReportDocumentAsync( ProductVariantsWithInventoryLevelsParser.Parse, url );
+			var reportLines = await this.TestReportGenerator.GetReportDocumentAsync( ProductVariantsInventoryReportParser.Parse, url );
 
 			// Assert
 			reportLines.Should().NotBeEmpty();
@@ -89,11 +89,10 @@ namespace ShopifyAccessTests.GraphQl.Services
 		{
 			// Arrange
 			// Act
-			var reportLines = await this.TestReportGenerator.GetReportAsync( ReportType.ProductVariantsWithInventoryLevels,
-				ProductVariantsWithInventoryLevelsParser.Parse,
+			var reportLines = await this.TestReportGenerator.GetReportAsync( ReportType.ProductVariantsInventory,
+				ProductVariantsInventoryReportParser.Parse,
 				10000,
-				CancellationToken.None,
-				Mark.Create );
+				Mark.Create, CancellationToken.None );
 
 			// Assert
 			reportLines.Should().NotBeEmpty();

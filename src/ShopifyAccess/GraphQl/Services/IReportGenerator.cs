@@ -16,14 +16,13 @@ namespace ShopifyAccess.GraphQl.Services
 		/// <param name="reportType">Type of report</param>
 		/// <param name="parseMethod">Function to parse report</param>
 		/// <param name="timeout">Timeout</param>
-		/// <param name="cancellationToken">Cancellation token</param>
 		/// <param name="mark">Mark</param>
+		/// <param name="cancellationToken">Cancellation token</param>
 		/// <returns><see cref="CurrentBulkOperation" /> for the generated report.</returns>
-		Task< IEnumerable< T > > GetReportAsync< T >(
-			ReportType reportType,
+		Task< IEnumerable< T > > GetReportAsync< T >( ReportType reportType,
 			Func< Stream, IEnumerable< T > > parseMethod,
 			int timeout,
-			CancellationToken cancellationToken,
-			Mark mark = null ) where T : class;
+			Mark mark,
+			CancellationToken cancellationToken ) where T : class;
 	}
 }

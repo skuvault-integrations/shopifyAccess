@@ -84,9 +84,9 @@
     <Compile Include="Cancellation\CancellationTokenTests.cs" />
     <Compile Include="EndpointsBuilderTests.cs" />
     <Compile Include="ExtensionsTests.cs" />
-    <Compile Include="GraphQl\Misc\GraphQlIdParserTests.cs" />
-    <Compile Include="GraphQl\Misc\ProductVariantConverterTests.cs" />
-    <Compile Include="GraphQl\Misc\ProductVariantsWithInventoryLevelsParserTests.cs" />
+    <Compile Include="GraphQl\Helpers\GraphQlIdParserTests.cs" />
+    <Compile Include="GraphQl\Models\ProductVariantsInventoryReport\Extensions\ProductVariantsInventoryReportParserTests.cs" />
+    <Compile Include="GraphQl\Models\ProductVariantsInventoryReport\ProductVariantTests.cs" />
     <Compile Include="GraphQl\Services\ReportGeneratorTests.cs" />
     <Compile Include="GraphQl\Services\TestReportGenerator.cs" />
     <Compile Include="Locations\LocationListTests.cs" />

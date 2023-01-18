@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using CuttingEdge.Conditions;
 using Netco.Extensions;
 using ServiceStack;
+using ShopifyAccess.GraphQl;
+using ShopifyAccess.GraphQl.Models.ProductVariantsInventoryReport;
+using ShopifyAccess.GraphQl.Models.ProductVariantsInventoryReport.Extensions;
 using ShopifyAccess.GraphQl.Services;
 using ShopifyAccess.Misc;
 using ShopifyAccess.Models;
@@ -19,7 +22,7 @@ using ShopifyAccess.Services;
 
 namespace ShopifyAccess
 {
-	public sealed partial class ShopifyService: IShopifyService
+	public sealed class ShopifyService: IShopifyService
 	{
 		private readonly WebRequestServices _webRequestServices;
 		private readonly IReportGenerator _reportGenerator;
@@ -349,6 +352,32 @@ namespace ShopifyAccess
 			}
 
 			return productVariants;
+		}
+
+		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportAsync( CancellationToken token, Mark mark = null )
+		{
+			mark = mark.CreateNewIfBlank();
+
+			ShopifyLogger.LogOperationStart( this._shopName, mark );
+
+			try
+			{
+				var data = await this._reportGenerator.GetReportAsync(
+					ReportType.ProductVariantsInventory,
+					ProductVariantsInventoryReportParser.Parse,
+					this._timeouts[ ShopifyOperationEnum.GetProductsInventory ],
+					mark, token ).ConfigureAwait( false );
+				return new List< ShopifyProductVariant >( data.Where( FilterProductVariants ).Select( variant => variant.ToShopifyProductVariant() ) );
+			}
+			finally
+			{
+				ShopifyLogger.LogOperationEnd( this._shopName, mark );
+			}
+		}
+
+		private static bool FilterProductVariants( ProductVariant variant )
+		{
+			return variant.InventoryItem.Tracked && !string.IsNullOrEmpty( variant.Sku );
 		}
 
 		private int GetProductsCount( Mark mark, CancellationToken token )

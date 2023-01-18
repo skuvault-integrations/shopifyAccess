@@ -2,6 +2,9 @@
 
 namespace ShopifyAccess.GraphQl.Models.BulkOperation
 {
+	/// <summary>
+	/// While the operation is running, we can poll to see its progress using the currentBulkOperation command
+	/// </summary>
 	[ DataContract ]
 	public class GetCurrentBulkOperationResponse
 	{

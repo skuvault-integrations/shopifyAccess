@@ -20,22 +20,22 @@ namespace ShopifyAccessTests.GraphQl.Services
 
 		public async Task< BulkOperation > GenerateRequestAsync( ReportType type )
 		{
-			return await this.GenerateReportAsync( type, CancellationToken.None, Mark.Create );
+			return await this.GenerateReportAsync( type, Mark.Create, CancellationToken.None );
 		}
 
 		public async Task< CurrentBulkOperation > GetCurrentBulkOperationAsync()
 		{
-			return await this.GetCurrentBulkOperationAsync( CancellationToken.None, Mark.Create );
+			return await this.GetCurrentBulkOperationAsync( Mark.Create, CancellationToken.None );
 		}
 
 		public async Task< CurrentBulkOperation > GetBulkOperationByIdAsync( string gid )
 		{
-			return await this.GetBulkOperationByIdAsync( gid, CancellationToken.None, Mark.Create );
+			return await this.GetBulkOperationByIdAsync( gid, Mark.Create, CancellationToken.None );
 		}
 
 		public async Task< IEnumerable< T > > GetReportDocumentAsync< T >( Func< Stream, IEnumerable< T > > parseMethod, string url ) where T : class
 		{
-			return await this.GetReportDocumentAsync( url, parseMethod, CancellationToken.None, Mark.Create, 100000 );
+			return await this.GetReportDocumentAsync( url, parseMethod, 100000, Mark.Create, CancellationToken.None );
 		}
 	}
 }

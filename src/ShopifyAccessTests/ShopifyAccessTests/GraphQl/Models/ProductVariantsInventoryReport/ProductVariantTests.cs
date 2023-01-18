@@ -1,12 +1,11 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
-using ShopifyAccess.GraphQl.Misc;
-using ShopifyAccess.GraphQl.Models.ProductVariantsWithInventoryLevelsReport;
+using ShopifyAccess.GraphQl.Models.ProductVariantsInventoryReport;
 
-namespace ShopifyAccessTests.GraphQl.Misc
+namespace ShopifyAccessTests.GraphQl.Models.ProductVariantsInventoryReport
 {
 	[ TestFixture ]
-	public class ProductVariantConverterTests
+	public class ProductVariantTests
 	{
 		private const int InventoryItemId = 777;
 		private const int ProductVariantId = 888;

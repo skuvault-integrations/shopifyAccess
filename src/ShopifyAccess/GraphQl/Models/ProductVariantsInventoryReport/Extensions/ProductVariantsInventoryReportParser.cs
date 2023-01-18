@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using ServiceStack;
-using ShopifyAccess.GraphQl.Models.ProductVariantsWithInventoryLevelsReport;
 
-namespace ShopifyAccess.GraphQl.Misc
+namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventoryReport.Extensions
 {
-	internal static class ProductVariantsWithInventoryLevelsParser
+	internal static class ProductVariantsInventoryReportParser
 	{
 		public static IEnumerable< ProductVariant > Parse( Stream stream )
 		{

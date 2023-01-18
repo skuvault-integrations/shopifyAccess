@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ShopifyAccess.GraphQl.Misc
+namespace ShopifyAccess.GraphQl.Helpers
 {
 	internal sealed class GraphQlIdParser
 	{

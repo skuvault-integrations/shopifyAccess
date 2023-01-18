@@ -2,6 +2,6 @@
 {
 	public enum ReportType
 	{
-		ProductVariantsWithInventoryLevels
+		ProductVariantsInventory
 	}
 }

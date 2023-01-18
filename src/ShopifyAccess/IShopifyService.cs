@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Threading;
 using System.Threading.Tasks;
 using ShopifyAccess.Models;
@@ -112,6 +111,7 @@ namespace ShopifyAccess
 
 		/// <summary>
 		/// Get all existing product variants with inventory levels
+		/// This method uses GraphQl API to get data
 		/// </summary>
 		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>

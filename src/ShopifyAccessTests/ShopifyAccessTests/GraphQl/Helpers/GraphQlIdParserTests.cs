@@ -1,9 +1,9 @@
 ﻿using System;
 using FluentAssertions;
 using NUnit.Framework;
-using ShopifyAccess.GraphQl.Misc;
+using ShopifyAccess.GraphQl.Helpers;
 
-namespace ShopifyAccessTests.GraphQl.Misc
+namespace ShopifyAccessTests.GraphQl.Helpers
 {
 	[ TestFixture ]
 	public class GraphQlIdParserTests
