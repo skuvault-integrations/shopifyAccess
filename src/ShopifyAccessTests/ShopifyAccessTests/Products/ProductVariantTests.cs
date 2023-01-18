@@ -170,12 +170,7 @@ namespace ShopifyAccessTests.Products
 			var productVariantsReport = await this.Service.GetProductVariantsInventoryReportAsync( CancellationToken.None );
 
 			// Assert
-			this.ValidateIfEqual( productVariantsReport, productVariants );
-			// This implementation is better but it works slow:
-			//
-			// var fieldsToCompare = new HashSet< string >() { "Id", "Sku", "InventoryItemId", "InventoryLevels", "LocationId", "Available" };
-			// productVariantsReport.Should().BeEquivalentTo( productVariants, o => o.Including(
-			// 	memberInfo => fieldsToCompare.Contains( memberInfo.Name ) ) );
+			 this.ValidateIfEqual( productVariantsReport, productVariants );
 		}
 
 		private void ValidateIfEqual( List< ShopifyProductVariant > productVariantsReport, List< ShopifyProductVariant > productVariants )
@@ -193,11 +188,6 @@ namespace ShopifyAccessTests.Products
 				v1.InventoryLevels.InventoryLevels.Should().BeEquivalentTo( v2.InventoryLevels.InventoryLevels,
 					o => o.Excluding( memberInfo => memberInfo.Name.Equals( "UpdatedAt" ) ) );
 			}
-		}
-
-		private int Comparison( ShopifyProductVariant x, ShopifyProductVariant y )
-		{
-			return 0;
 		}
 	}
 }

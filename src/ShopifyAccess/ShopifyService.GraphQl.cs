@@ -21,7 +21,12 @@ namespace ShopifyAccess
 
 			try
 			{
-				var data = await this._reportGenerator.GetReportAsync< ProductVariant >( ReportType.ProductVariantsWithInventoryLevels, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ], token, mark ).ConfigureAwait( false );
+				var data = await this._reportGenerator.GetReportAsync(
+					ReportType.ProductVariantsWithInventoryLevels,
+					ProductVariantsWithInventoryLevelsParser.Parse,
+					this._timeouts[ ShopifyOperationEnum.GetProductsInventory ],
+					token,
+					mark ).ConfigureAwait( false );
 				return new List< ShopifyProductVariant >( data.Where( FilterProductVariants ).Select( variant => variant.ToShopifyProductVariant() ) );
 			}
 			finally

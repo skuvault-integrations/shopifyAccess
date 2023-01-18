@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
 using ShopifyAccess.GraphQl;
-using ShopifyAccess.GraphQl.Models.ProductVariantsWithInventoryLevelsReport;
+using ShopifyAccess.GraphQl.Misc;
 using ShopifyAccess.Models;
 using ShopifyAccess.Services;
 
@@ -77,7 +77,7 @@ namespace ShopifyAccessTests.GraphQl.Services
 			var url = currentBulkOperation.Url;
 
 			// Act
-			var reportLines = await this.TestReportGenerator.GetReportDocumentAsync( ReportType.ProductVariantsWithInventoryLevels, url );
+			var reportLines = await this.TestReportGenerator.GetReportDocumentAsync( ProductVariantsWithInventoryLevelsParser.Parse, url );
 
 			// Assert
 			reportLines.Should().NotBeEmpty();
@@ -89,7 +89,11 @@ namespace ShopifyAccessTests.GraphQl.Services
 		{
 			// Arrange
 			// Act
-			var reportLines = await this.TestReportGenerator.GetReportAsync< ProductVariant >( ReportType.ProductVariantsWithInventoryLevels, 10000, CancellationToken.None, Mark.Create );
+			var reportLines = await this.TestReportGenerator.GetReportAsync( ReportType.ProductVariantsWithInventoryLevels,
+				ProductVariantsWithInventoryLevelsParser.Parse,
+				10000,
+				CancellationToken.None,
+				Mark.Create );
 
 			// Assert
 			reportLines.Should().NotBeEmpty();

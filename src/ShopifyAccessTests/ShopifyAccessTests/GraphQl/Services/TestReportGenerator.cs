@@ -1,4 +1,7 @@
-﻿using System.Threading;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using ShopifyAccess.GraphQl;
 using ShopifyAccess.GraphQl.Models;
@@ -30,9 +33,9 @@ namespace ShopifyAccessTests.GraphQl.Services
 			return await this.GetBulkOperationByIdAsync( gid, CancellationToken.None, Mark.Create );
 		}
 
-		public async Task< Report > GetReportDocumentAsync( ReportType type, string url )
+		public async Task< IEnumerable< T > > GetReportDocumentAsync< T >( Func< Stream, IEnumerable< T > > parseMethod, string url ) where T : class
 		{
-			return await this.GetReportDocumentAsync( type, url, CancellationToken.None, Mark.Create, 100000 );
+			return await this.GetReportDocumentAsync( url, parseMethod, CancellationToken.None, Mark.Create, 100000 );
 		}
 	}
 }

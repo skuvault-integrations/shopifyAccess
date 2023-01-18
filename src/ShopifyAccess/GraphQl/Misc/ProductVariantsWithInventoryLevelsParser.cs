@@ -1,15 +1,15 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using ServiceStack;
-using ShopifyAccess.GraphQl.Models;
 using ShopifyAccess.GraphQl.Models.ProductVariantsWithInventoryLevelsReport;
 
 namespace ShopifyAccess.GraphQl.Misc
 {
 	internal static class ProductVariantsWithInventoryLevelsParser
 	{
-		public static Report Parse( Stream stream )
+		public static IEnumerable< ProductVariant > Parse( Stream stream )
 		{
-			var result = new Report();
+			var result = new List< ProductVariant >();
 			ProductVariant lastProductVariant = null;
 
 			foreach( var line in stream.ReadLines() )

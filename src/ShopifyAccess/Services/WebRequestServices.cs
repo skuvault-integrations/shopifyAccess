@@ -9,7 +9,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using CuttingEdge.Conditions;
 using ServiceStack;
-using ShopifyAccess.GraphQl.Models;
 using ShopifyAccess.Misc;
 using ShopifyAccess.Models;
 using ShopifyAccess.Models.Configuration.Authorization;
@@ -272,7 +271,7 @@ namespace ShopifyAccess.Services
 			return result;
 		}
 
-		public async Task< Report > GetReportDocumentAsync( string url, Func< Stream, Report > parseMethod, CancellationToken cancellationToken, Mark mark, int timeout )
+		public async Task< IEnumerable< T > > GetReportDocumentAsync< T >( string url, Func< Stream, IEnumerable< T > > parseMethod, CancellationToken cancellationToken, Mark mark, int timeout ) where T : class
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 

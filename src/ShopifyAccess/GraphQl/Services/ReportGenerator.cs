@@ -4,8 +4,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CuttingEdge.Conditions;
-using ShopifyAccess.GraphQl.Misc;
-using ShopifyAccess.GraphQl.Models;
 using ShopifyAccess.GraphQl.Models.BulkOperation;
 using ShopifyAccess.Misc;
 using ShopifyAccess.Models;
@@ -34,7 +32,7 @@ namespace ShopifyAccess.GraphQl.Services
 			this._shopName = shopName;
 		}
 
-		public async Task< IEnumerable< T > > GetReportAsync< T >( ReportType reportType, int timeout, CancellationToken cancellationToken, Mark mark = null ) where T : class
+		public async Task< IEnumerable< T > > GetReportAsync< T >( ReportType reportType, Func< Stream, IEnumerable< T > > parseMethod, int timeout, CancellationToken cancellationToken, Mark mark = null ) where T : class
 		{
 			mark = mark.CreateNewIfBlank();
 
@@ -51,8 +49,8 @@ namespace ShopifyAccess.GraphQl.Services
 				this.ThrowOnGetBulkOperationResultError( reportInfo, mark );
 
 				// Download and Parse
-				var document = await this.GetReportDocumentAsync( reportType, reportInfo.Url, cancellationToken, mark, timeout ).ConfigureAwait( false );
-				return document.As< T >();
+				var document = await this.GetReportDocumentAsync( reportInfo.Url, parseMethod, cancellationToken, mark, timeout ).ConfigureAwait( false );
+				return document;
 			}
 			finally
 			{
@@ -121,7 +119,7 @@ namespace ShopifyAccess.GraphQl.Services
 			}
 		}
 
-		protected async Task< Report > GetReportDocumentAsync( ReportType reportType, string url, CancellationToken cancellationToken, Mark mark, int timeout )
+		protected async Task< IEnumerable< T > > GetReportDocumentAsync< T >( string url, Func< Stream, IEnumerable< T > > parseMethod, CancellationToken cancellationToken, Mark mark, int timeout ) where T : class
 		{
 			Condition.Requires( url, nameof(url) ).IsNotNullOrEmpty();
 
@@ -129,10 +127,8 @@ namespace ShopifyAccess.GraphQl.Services
 
 			try
 			{
-				var parser = GetReportParser( reportType );
-
 				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
-					async () => await this._webRequestServices.GetReportDocumentAsync( url, parser, cancellationToken, mark, timeout ).ConfigureAwait( false )
+					async () => await this._webRequestServices.GetReportDocumentAsync( url, parseMethod, cancellationToken, mark, timeout ).ConfigureAwait( false )
 				).ConfigureAwait( false );
 
 				return result;
@@ -174,17 +170,6 @@ namespace ShopifyAccess.GraphQl.Services
 			}
 
 			return reportInfo;
-		}
-
-		private static Func< Stream, Report > GetReportParser( ReportType type )
-		{
-			switch( type )
-			{
-				case ReportType.ProductVariantsWithInventoryLevels:
-					return ProductVariantsWithInventoryLevelsParser.Parse;
-				default:
-					throw new ArgumentOutOfRangeException( nameof(type), type, null );
-			}
 		}
 
 		private void ThrowOnCreateBulkOperationError( BulkOperation operation, Mark mark )

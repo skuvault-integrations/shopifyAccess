@@ -72,7 +72,6 @@
     <Compile Include="GraphQl\Models\ProductVariantsWithInventoryLevelsReport\InventoryLevel.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsWithInventoryLevelsReport\Location.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsWithInventoryLevelsReport\ProductVariant.cs" />
-    <Compile Include="GraphQl\Models\Report.cs" />
     <Compile Include="GraphQl\Queries.cs" />
     <Compile Include="GraphQl\ReportType.cs" />
     <Compile Include="GraphQl\Services\IReportGenerator.cs" />
