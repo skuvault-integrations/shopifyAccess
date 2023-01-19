@@ -1,30 +1,30 @@
 ﻿using System.Runtime.Serialization;
 
-namespace ShopifyAccess.GraphQl.Models.BulkOperation
+namespace ShopifyAccess.GraphQl.Models.Responses
 {
 	[ DataContract ]
-	public class BulkOperationRunQueryResponse
+	internal class BulkOperationRunQueryResponse: BaseGraphQlResponse
 	{
 		[ DataMember( Name = "data" ) ]
 		public BulkOperationRunQueryData Data{ get; set; }
 	}
 
 	[ DataContract ]
-	public class BulkOperationRunQueryData
+	internal class BulkOperationRunQueryData
 	{
 		[ DataMember( Name = "bulkOperationRunQuery" ) ]
 		public BulkOperationRunQuery BulkOperationRunQuery{ get; set; }
 	}
 
 	[ DataContract ]
-	public class BulkOperationRunQuery
+	internal class BulkOperationRunQuery
 	{
 		[ DataMember( Name = "bulkOperation" ) ]
 		public BulkOperation BulkOperation{ get; set; }
 	}
 
 	[ DataContract ]
-	public class BulkOperation
+	internal class BulkOperation
 	{
 		[ DataMember( Name = "id" ) ]
 		public string Id{ get; set; }

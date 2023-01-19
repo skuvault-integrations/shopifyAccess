@@ -88,7 +88,6 @@
     <Compile Include="GraphQl\Models\ProductVariantsInventoryReport\Extensions\ProductVariantsInventoryReportParserTests.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventoryReport\ProductVariantTests.cs" />
     <Compile Include="GraphQl\Services\ReportGeneratorTests.cs" />
-    <Compile Include="GraphQl\Services\TestReportGenerator.cs" />
     <Compile Include="Locations\LocationListTests.cs" />
     <Compile Include="OperationTimeoutTests.cs" />
     <Compile Include="Orders\OrderMapperTests.cs" />

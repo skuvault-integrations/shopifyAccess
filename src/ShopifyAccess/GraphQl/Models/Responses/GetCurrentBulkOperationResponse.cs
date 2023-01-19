@@ -1,26 +1,26 @@
 ﻿using System.Runtime.Serialization;
 
-namespace ShopifyAccess.GraphQl.Models.BulkOperation
+namespace ShopifyAccess.GraphQl.Models.Responses
 {
 	/// <summary>
 	/// While the operation is running, we can poll to see its progress using the currentBulkOperation command
 	/// </summary>
 	[ DataContract ]
-	public class GetCurrentBulkOperationResponse
+	internal class GetCurrentBulkOperationResponse: BaseGraphQlResponse
 	{
 		[ DataMember( Name = "data" ) ]
 		public CurrentBulkOperationData Data{ get; set; }
 	}
 
 	[ DataContract ]
-	public class CurrentBulkOperationData
+	internal class CurrentBulkOperationData
 	{
 		[ DataMember( Name = "currentBulkOperation" ) ]
 		public CurrentBulkOperation CurrentBulkOperation{ get; set; }
 	}
 
 	[ DataContract ]
-	public class CurrentBulkOperation
+	internal class CurrentBulkOperation
 	{
 		[ DataMember( Name = "id" ) ]
 		public string Id{ get; set; }
@@ -33,5 +33,11 @@ namespace ShopifyAccess.GraphQl.Models.BulkOperation
 
 		[ DataMember( Name = "url" ) ]
 		public string Url{ get; set; }
+
+		[ DataMember( Name = "objectCount" ) ]
+		public string ObjectCount{ get; set; }
+
+		[ DataMember( Name = "fileSize" ) ]
+		public string FileSize{ get; set; }
 	}
 }

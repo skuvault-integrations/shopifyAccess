@@ -5,6 +5,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using ShopifyAccess.GraphQl;
 using ShopifyAccess.GraphQl.Models.ProductVariantsInventoryReport.Extensions;
+using ShopifyAccess.GraphQl.Services;
 using ShopifyAccess.Models;
 using ShopifyAccess.Services;
 
@@ -13,7 +14,7 @@ namespace ShopifyAccessTests.GraphQl.Services
 	[ TestFixture ]
 	public class ReportGeneratorTests: BaseTests
 	{
-		private TestReportGenerator TestReportGenerator;
+		private ReportGenerator ReportGenerator;
 
 		[ SetUp ]
 		public void InitReportGeneratorTests()
@@ -21,7 +22,7 @@ namespace ShopifyAccessTests.GraphQl.Services
 			if( this.Config != null )
 			{
 				var webRequestServices = new WebRequestServices( this.Config );
-				this.TestReportGenerator = new TestReportGenerator( this.Config.ShopName, webRequestServices );
+				this.ReportGenerator = new ReportGenerator( this.Config.ShopName, webRequestServices );
 			}
 			else
 			{
@@ -35,7 +36,7 @@ namespace ShopifyAccessTests.GraphQl.Services
 		{
 			// Arrange
 			// Act
-			var currentBulkOperation = await this.TestReportGenerator.GenerateRequestAsync( ReportType.ProductVariantsInventory );
+			var currentBulkOperation = await this.ReportGenerator.GenerateReportAsync( ReportType.ProductVariantsInventory, Mark.Create, CancellationToken.None );
 
 			// Assert
 			currentBulkOperation.Status.Should().Be( BulkOperationStatus.Created.ToString().ToUpperInvariant() );
@@ -47,7 +48,7 @@ namespace ShopifyAccessTests.GraphQl.Services
 		{
 			// Arrange
 			// Act
-			var currentBulkOperation = await this.TestReportGenerator.GetCurrentBulkOperationAsync();
+			var currentBulkOperation = await this.ReportGenerator.GetCurrentBulkOperationAsync( Mark.Create, CancellationToken.None );
 
 			// Assert
 			currentBulkOperation.Status.Should().Be( BulkOperationStatus.Completed.ToString().ToUpperInvariant() );
@@ -59,10 +60,10 @@ namespace ShopifyAccessTests.GraphQl.Services
 		public async Task GetBulkOperationStatusByIdAsync_ReturnsCurrentBulkOperationStatus_WhenCurrentBulkOperationGidProvided()
 		{
 			// Arrange
-			var currentBulkOperation = await this.TestReportGenerator.GetCurrentBulkOperationAsync();
+			var currentBulkOperation = await this.ReportGenerator.GetCurrentBulkOperationAsync( Mark.Create, CancellationToken.None );
 
 			// Act
-			var bulkOperationById = await this.TestReportGenerator.GetBulkOperationByIdAsync( currentBulkOperation.Id );
+			var bulkOperationById = await this.ReportGenerator.GetBulkOperationByIdAsync( currentBulkOperation.Id, Mark.Create, CancellationToken.None );
 
 			// Assert
 			bulkOperationById.Should().BeEquivalentTo( currentBulkOperation );
@@ -73,11 +74,12 @@ namespace ShopifyAccessTests.GraphQl.Services
 		public async Task GetReportDocumentAsync_ReturnsReportLines()
 		{
 			// Arrange
-			var currentBulkOperation = await this.TestReportGenerator.GetCurrentBulkOperationAsync();
+			var currentBulkOperation = await this.ReportGenerator.GetCurrentBulkOperationAsync( Mark.Create, CancellationToken.None );
 			var url = currentBulkOperation.Url;
+			var timeout = 100000;
 
 			// Act
-			var reportLines = await this.TestReportGenerator.GetReportDocumentAsync( ProductVariantsInventoryReportParser.Parse, url );
+			var reportLines = await this.ReportGenerator.GetReportDocumentAsync( url, ProductVariantsInventoryReportParser.Parse, timeout, Mark.Create, CancellationToken.None );
 
 			// Assert
 			reportLines.Should().NotBeEmpty();
@@ -88,10 +90,12 @@ namespace ShopifyAccessTests.GraphQl.Services
 		public async Task GetReportAsync_ReturnsReportLines()
 		{
 			// Arrange
+			var timeout = 100000;
+
 			// Act
-			var reportLines = await this.TestReportGenerator.GetReportAsync( ReportType.ProductVariantsInventory,
+			var reportLines = await this.ReportGenerator.GetReportAsync( ReportType.ProductVariantsInventory,
 				ProductVariantsInventoryReportParser.Parse,
-				10000,
+				timeout,
 				Mark.Create, CancellationToken.None );
 
 			// Assert

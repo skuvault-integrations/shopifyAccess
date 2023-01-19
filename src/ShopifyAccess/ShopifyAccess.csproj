@@ -63,9 +63,10 @@
     </Compile>
     <Compile Include="GraphQl\BulkOperationStatus.cs" />
     <Compile Include="GraphQl\Helpers\GraphQlIdParser.cs" />
-    <Compile Include="GraphQl\Models\BulkOperation\GetBulkOperationByIdResponse.cs" />
-    <Compile Include="GraphQl\Models\BulkOperation\BulkOperationRunQueryResponse.cs" />
-    <Compile Include="GraphQl\Models\BulkOperation\GetCurrentBulkOperationResponse.cs" />
+    <Compile Include="GraphQl\Models\BaseGraphQlResponse.cs" />
+    <Compile Include="GraphQl\Models\Responses\GetBulkOperationByIdResponse.cs" />
+    <Compile Include="GraphQl\Models\Responses\BulkOperationRunQueryResponse.cs" />
+    <Compile Include="GraphQl\Models\Responses\GetCurrentBulkOperationResponse.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventoryReport\Extensions\ProductVariantsInventoryReportParser.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventoryReport\InventoryItem.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventoryReport\InventoryLevel.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="GraphQl\ReportType.cs" />
     <Compile Include="GraphQl\Services\IReportGenerator.cs" />
     <Compile Include="GraphQl\Services\ReportGenerator.cs" />
+    <Compile Include="GraphQl\ShopifyGraphQlThrottler.cs" />
     <Compile Include="IShopifyService.cs" />
     <Compile Include="Misc\ActionPolicies.cs" />
     <Compile Include="Misc\Extensions.cs" />

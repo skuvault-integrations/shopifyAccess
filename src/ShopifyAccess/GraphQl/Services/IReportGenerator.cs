@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using ShopifyAccess.GraphQl.Models.BulkOperation;
+using ShopifyAccess.GraphQl.Models.Responses;
 using ShopifyAccess.Models;
 
 namespace ShopifyAccess.GraphQl.Services
@@ -18,7 +18,7 @@ namespace ShopifyAccess.GraphQl.Services
 		/// <param name="timeout">Timeout</param>
 		/// <param name="mark">Mark</param>
 		/// <param name="cancellationToken">Cancellation token</param>
-		/// <returns><see cref="CurrentBulkOperation" /> for the generated report.</returns>
+		/// <returns>Collection of report lines</returns>
 		Task< IEnumerable< T > > GetReportAsync< T >( ReportType reportType,
 			Func< Stream, IEnumerable< T > > parseMethod,
 			int timeout,
