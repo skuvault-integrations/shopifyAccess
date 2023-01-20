@@ -29,13 +29,13 @@ namespace ShopifyAccess.GraphQl
 		/// <exception cref="T:Netco.ThrottlerServices.ThrottlerException">When throttle max retry count reached</exception>
 		public async Task< TResult > ExecuteAsync< TResult >( Func< Task< TResult > > funcToThrottle, Mark mark ) where TResult: BaseGraphQlResponse
 		{
-			var retryCount = 0;
+			var retryCount = 1;
 			while( true )
 			{
 				var response = await funcToThrottle().ConfigureAwait( false );
 				if( response.Errors == null || response.Errors.Length == 0 )
 				{
-					await this.WaitIfNeededAsync( response ).ConfigureAwait( false );
+					await WaitIfNeededAsync( response ).ConfigureAwait( false );
 					return response;
 				}
 
@@ -53,7 +53,7 @@ namespace ShopifyAccess.GraphQl
 					throw exception;
 				}
 
-				await this.WaitIfNeededAsync( response ).ConfigureAwait( false );
+				await WaitIfNeededAsync( response ).ConfigureAwait( false );
 				++retryCount;
 			}
 		}
@@ -62,7 +62,8 @@ namespace ShopifyAccess.GraphQl
 		/// Wait for a time needed to restore the quota to execute request
 		/// </summary>
 		/// <param name="response">GraphQl Response</param>
-		private async Task WaitIfNeededAsync( BaseGraphQlResponse response )
+		/// <returns>Delay in ms</returns>
+		public static async Task<int> WaitIfNeededAsync( BaseGraphQlResponse response )
 		{
 			var remainingQuota = response.Extensions.Cost.ThrottleStatus.CurrentlyAvailable;
 			var requestedQuota = response.Extensions.Cost.RequestedQueryCost;
@@ -70,12 +71,14 @@ namespace ShopifyAccess.GraphQl
 
 			if( remainingQuota > requestedQuota )
 			{
-				return;
+				return 0;
 			}
 
 			restoreRete = restoreRete > 0 ? restoreRete : 50; // 50 is default restore rate for GraphQl requests
 			var delayInSeconds = ( int )Math.Ceiling( 1.0 * ( requestedQuota - remainingQuota ) / restoreRete );
-			await Task.Delay( delayInSeconds * 1000 );
+			var delayInMs = delayInSeconds * 1000;
+			await Task.Delay( delayInMs );
+			return delayInMs;
 		}
 	}
 }
