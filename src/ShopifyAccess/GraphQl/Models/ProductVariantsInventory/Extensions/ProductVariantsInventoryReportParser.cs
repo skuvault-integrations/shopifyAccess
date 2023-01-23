@@ -2,7 +2,7 @@
 using System.IO;
 using ServiceStack;
 
-namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventoryReport.Extensions
+namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions
 {
 	internal static class ProductVariantsInventoryReportParser
 	{
@@ -24,7 +24,7 @@ namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventoryReport.Extensions
 				// By this article: https://shopify.dev/api/usage/bulk-operations/queries#the-jsonl-data-format
 				// The order of each connection type is preserved and all nested connections appear after their parents in the file
 				// So we can apply new inventory level to the last product variant. Don't need to check __parent id
-				lastProductVariant?.InventoryLevels.Add( inventoryLevel );
+				lastProductVariant?.InventoryItem.InventoryLevelsNodes.Nodes.Add( inventoryLevel );
 			}
 
 			return result;

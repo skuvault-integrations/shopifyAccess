@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventoryReport
+namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventory
 {
 	[ DataContract ]
 	internal class InventoryItem
@@ -14,5 +14,8 @@ namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventoryReport
 		/// </summary>
 		[ DataMember( Name = "tracked" ) ]
 		public bool Tracked{ get; set; }
+
+		[ DataMember( Name = "inventoryLevels" ) ]
+		public InventoryLevelsNodes InventoryLevelsNodes{ get; set; } = new InventoryLevelsNodes();
 	}
 }

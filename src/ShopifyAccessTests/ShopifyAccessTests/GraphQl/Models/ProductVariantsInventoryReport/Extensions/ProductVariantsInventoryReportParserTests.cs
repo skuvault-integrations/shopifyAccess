@@ -2,7 +2,7 @@
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
-using ShopifyAccess.GraphQl.Models.ProductVariantsInventoryReport.Extensions;
+using ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions;
 
 namespace ShopifyAccessTests.GraphQl.Models.ProductVariantsInventoryReport.Extensions
 {
@@ -32,21 +32,21 @@ namespace ShopifyAccessTests.GraphQl.Models.ProductVariantsInventoryReport.Exten
 			productVariants[ 0 ].Sku.Should().Be( "testsku1" );
 			productVariants[ 0 ].InventoryItem.Tracked.Should().BeTrue();
 			productVariants[ 0 ].InventoryItem.InventoryItemId.Should().Be( "gid://shopify/InventoryItem/2860696897" );
-			productVariants[ 0 ].InventoryLevels.Should().HaveCount( 2 );
-			productVariants[ 0 ].InventoryLevels[ 0 ].Available.Should().Be( 10 );
-			productVariants[ 0 ].InventoryLevels[ 0 ].Location.LocationId.Should().Be( "gid://shopify/Location/43176333" );
-			productVariants[ 0 ].InventoryLevels[ 1 ].Available.Should().Be( 20 );
-			productVariants[ 0 ].InventoryLevels[ 1 ].Location.LocationId.Should().Be( "gid://shopify/Location/1836161" );
+			productVariants[ 0 ].InventoryItem.InventoryLevelsNodes.Nodes.Should().HaveCount( 2 );
+			productVariants[ 0 ].InventoryItem.InventoryLevelsNodes.Nodes[ 0 ].Available.Should().Be( 10 );
+			productVariants[ 0 ].InventoryItem.InventoryLevelsNodes.Nodes[ 0 ].Location.LocationId.Should().Be( "gid://shopify/Location/43176333" );
+			productVariants[ 0 ].InventoryItem.InventoryLevelsNodes.Nodes[ 1 ].Available.Should().Be( 20 );
+			productVariants[ 0 ].InventoryItem.InventoryLevelsNodes.Nodes[ 1 ].Location.LocationId.Should().Be( "gid://shopify/Location/1836161" );
 
 			productVariants[ 1 ].ProductVariantId.Should().Be( "gid://shopify/ProductVariant/337095346" );
 			productVariants[ 1 ].Sku.Should().Be( "testsku2" );
 			productVariants[ 1 ].InventoryItem.Tracked.Should().BeFalse();
 			productVariants[ 1 ].InventoryItem.InventoryItemId.Should().Be( "gid://shopify/InventoryItem/2860696961" );
-			productVariants[ 1 ].InventoryLevels.Should().HaveCount( 2 );
-			productVariants[ 1 ].InventoryLevels[ 0 ].Available.Should().Be( 30 );
-			productVariants[ 1 ].InventoryLevels[ 0 ].Location.LocationId.Should().Be( "gid://shopify/Location/17468227646" );
-			productVariants[ 1 ].InventoryLevels[ 1 ].Available.Should().Be( 40 );
-			productVariants[ 1 ].InventoryLevels[ 1 ].Location.LocationId.Should().Be( "gid://shopify/Location/36696031294" );
+			productVariants[ 1 ].InventoryItem.InventoryLevelsNodes.Nodes.Should().HaveCount( 2 );
+			productVariants[ 1 ].InventoryItem.InventoryLevelsNodes.Nodes[ 0 ].Available.Should().Be( 30 );
+			productVariants[ 1 ].InventoryItem.InventoryLevelsNodes.Nodes[ 0 ].Location.LocationId.Should().Be( "gid://shopify/Location/17468227646" );
+			productVariants[ 1 ].InventoryItem.InventoryLevelsNodes.Nodes[ 1 ].Available.Should().Be( 40 );
+			productVariants[ 1 ].InventoryItem.InventoryLevelsNodes.Nodes[ 1 ].Location.LocationId.Should().Be( "gid://shopify/Location/36696031294" );
 		}
 
 		private Stream GetStreamFromString( string s )

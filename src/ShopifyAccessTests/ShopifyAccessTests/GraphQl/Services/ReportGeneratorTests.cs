@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
 using ShopifyAccess.GraphQl;
-using ShopifyAccess.GraphQl.Models.ProductVariantsInventoryReport.Extensions;
+using ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions;
 using ShopifyAccess.GraphQl.Services;
 using ShopifyAccess.Models;
 using ShopifyAccess.Services;

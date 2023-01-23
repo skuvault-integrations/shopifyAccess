@@ -18,6 +18,21 @@ namespace ShopifyAccess.GraphQl.Queries
 			return request.ToJson();
 		}
 
+		public static string GetProductVariantInventoryBySkuRequest( string sku, string after, int locationsCount )
+		{
+			var query = PrepareRequest( GetProductVariantInventoryQuery.Query );
+			var escapedSku = sku.ToJson();
+			var variables = new
+			{
+				query = $"sku:{escapedSku}",
+				locationsCount,
+				after
+			};
+
+			var request = new { query = PrepareRequest( query ), variables };
+			return request.ToJson();
+		}
+		
 		public static string GetReportRequest( ReportType type )
 		{
 			var query = string.Empty;

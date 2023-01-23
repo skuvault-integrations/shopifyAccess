@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using NUnit.Framework;
-using ShopifyAccess.GraphQl.Models.ProductVariantsInventoryReport;
+using ShopifyAccess.GraphQl.Models.ProductVariantsInventory;
 
 namespace ShopifyAccessTests.GraphQl.Models.ProductVariantsInventoryReport
 {
@@ -34,7 +34,7 @@ namespace ShopifyAccessTests.GraphQl.Models.ProductVariantsInventoryReport
 			var locationId = 222;
 			var inventoryLevel = GetInventoryLevel( available, locationId );
 			var productVariant = GetProductVariant();
-			productVariant.InventoryLevels.Add( inventoryLevel );
+			productVariant.InventoryItem.InventoryLevelsNodes.Nodes.Add( inventoryLevel );
 
 			// Act
 			var result = productVariant.ToShopifyProductVariant();
@@ -54,7 +54,7 @@ namespace ShopifyAccessTests.GraphQl.Models.ProductVariantsInventoryReport
 			var inventoryLevel2 = GetInventoryLevel( 2, 2 );
 			var inventoryLevel3 = GetInventoryLevel( 3, 3 );
 			var productVariant = GetProductVariant();
-			productVariant.InventoryLevels.AddRange( new[] { inventoryLevel1, inventoryLevel2, inventoryLevel3 } );
+			productVariant.InventoryItem.InventoryLevelsNodes.Nodes.AddRange( new[] { inventoryLevel1, inventoryLevel2, inventoryLevel3 } );
 
 			// Act
 			var result = productVariant.ToShopifyProductVariant();

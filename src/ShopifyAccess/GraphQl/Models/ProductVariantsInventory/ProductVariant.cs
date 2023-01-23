@@ -5,7 +5,7 @@ using ShopifyAccess.GraphQl.Helpers;
 using ShopifyAccess.Models.Product;
 using ShopifyAccess.Models.ProductVariant;
 
-namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventoryReport
+namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventory
 {
 	[ DataContract ]
 	internal class ProductVariant
@@ -17,9 +17,7 @@ namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventoryReport
 		public string Sku{ get; set; }
 
 		[ DataMember( Name = "inventoryItem" ) ]
-		public InventoryItem InventoryItem{ get; set; }
-
-		public readonly List< InventoryLevel > InventoryLevels = new List< InventoryLevel >();
+		public InventoryItem InventoryItem{ get; set; } = new InventoryItem();
 
 		public ShopifyProductVariant ToShopifyProductVariant()
 		{
@@ -29,7 +27,7 @@ namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventoryReport
 				Id = GraphQlIdParser.ProductVariant.GetId( this.ProductVariantId ),
 				Sku = this.Sku,
 				InventoryItemId = inventoryItemId,
-				InventoryLevels = GetShopifyInventoryLevels( this.InventoryLevels, inventoryItemId )
+				InventoryLevels = GetShopifyInventoryLevels( this.InventoryItem.InventoryLevelsNodes.Nodes, inventoryItemId )
 			};
 		}
 

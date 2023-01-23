@@ -73,9 +73,9 @@ namespace ShopifyAccess.Misc
 				response.ResponseUri, ex.Message, response.StatusCode, jsonResponse );
 		}
 
-		public static void LogOperationStart( string shopName, Mark mark, [ CallerMemberName ] string callerMethodName = null )
+		public static void LogOperationStart( string shopName, Mark mark, string message = null, [ CallerMemberName ] string callerMethodName = null )
 		{
-			Trace( mark, "Shop: {0}. Start {1}", shopName, callerMethodName );
+			Trace( mark, "Shop: {0}. Start {1}. {2}", shopName, callerMethodName, message ?? string.Empty );
 		}
 
 		public static void LogOperationEnd( string shopName, Mark mark, [ CallerMemberName ] string callerMethodName = null )

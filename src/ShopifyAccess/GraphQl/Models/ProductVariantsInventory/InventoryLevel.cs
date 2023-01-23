@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventoryReport
+namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventory
 {
 	[ DataContract ]
 	internal class InventoryLevel

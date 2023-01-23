@@ -39,9 +39,9 @@ namespace ShopifyAccess.GraphQl
 					return response;
 				}
 
-				if( response.Errors[ 0 ].Extensions.Code != ThrottledErrorCode )
+				if( response.Errors[ 0 ].Extensions?.Code != ThrottledErrorCode )
 				{
-					var exception = new SystemException( $"{response.Errors[ 0 ].Message}, Error code: {response.Errors[ 0 ].Extensions.Code}" );
+					var exception = new SystemException( $"{response.Errors[ 0 ].Message}, Error code: {response.Errors[ 0 ].Extensions?.Code}" );
 					ShopifyLogger.LogException( exception, mark, this._shopName );
 					throw exception;
 				}

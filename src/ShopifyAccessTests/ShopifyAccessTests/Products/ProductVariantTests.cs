@@ -173,6 +173,86 @@ namespace ShopifyAccessTests.Products
 			 this.ValidateIfEqual( productVariantsReport, productVariants );
 		}
 
+		[ Test ]
+		[ Explicit ]
+		public async Task GetProductVariantsBySkusAsync_ReturnsCorrectData_WhenSingleSku_AndSkuContainsSpecialCharacters()
+		{
+			// Arrange
+			var skus = new[] { "AUTO_TEST 2649 1 ' \" \\ ! @ # $ % ^" };
+			var products = await this.Service.GetProductVariantsInventoryBySkusAsync( skus, CancellationToken.None );
+
+			// Act
+			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None );
+
+			// Assert
+			productVariants.Should().NotBeEmpty();
+			this.ValidateIfEqual( productVariants, products );
+		}
+
+		[ Test ]
+		[ Explicit ]
+		public async Task GetProductVariantsBySkuAsync_ReturnsCorrectData_WhenSingleSku_AndMoreThanOneVariantForTheSku()
+		{
+			// Arrange
+			var skus = new[] { "testSKU1" };
+			var products = await this.Service.GetProductVariantsInventoryBySkusAsync( skus, CancellationToken.None );
+
+			// Act
+			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None );
+
+			// Assert
+			productVariants.Count.Should().BeGreaterThan( 1 );
+			this.ValidateIfEqual( productVariants, products );
+		}
+
+		[ Test ]
+		[ Explicit ]
+		public async Task GetProductVariantsBySkuAsync_ReturnsEmptyList_WhenWrongSku()
+		{
+			// Arrange
+			var skus = new[] { "wrong SKU" };
+
+			// Act
+			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None );
+
+			// Assert
+			productVariants.Should().BeEmpty();
+		}
+
+		[ Test ]
+		[ Explicit ]
+		public async Task GetProductVariantsBySkuAsync_ReturnsCorrectData_WhenMultipleSkuRequested()
+		{
+			// Arrange
+			var skus = new[] { "testsku1", "testsku2", "testsku3" };
+			var products = await this.Service.GetProductVariantsInventoryBySkusAsync( skus, CancellationToken.None );
+
+			// Act
+			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None );
+
+			// Assert
+			productVariants.Count.Should().BeGreaterThan( 1 );
+			this.ValidateIfEqual( productVariants, products );
+		}
+
+		[ Test ]
+		[ Explicit ]
+		public async Task GetProductVariantsBySkuAsync_ReturnsCorrectData_WhenAllSkusRequested()
+		{
+			// Arrange
+			var countToCompare = 60;
+			var products = await this.Service.GetProductsInventoryAsync( CancellationToken.None );
+			products.Products = products.Products.Take( countToCompare ).ToList();
+			var productVariants = products.ToListVariants();
+			var skus = productVariants.Select( v => v.Sku );
+
+			// Act
+			var productVariantsFromReport = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None );
+
+			// Assert
+			this.ValidateIfEqual( productVariantsFromReport, productVariants );
+		}
+
 		private void ValidateIfEqual( List< ShopifyProductVariant > productVariantsReport, List< ShopifyProductVariant > productVariants )
 		{
 			productVariantsReport.Should().HaveCount( productVariants.Count );

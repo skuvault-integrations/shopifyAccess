@@ -133,9 +133,13 @@ namespace ShopifyAccess.GraphQl.Services
 
 		public async Task< IEnumerable< T > > GetReportDocumentAsync< T >( string url, Func< Stream, IEnumerable< T > > parseMethod, int timeout, Mark mark, CancellationToken cancellationToken ) where T : class
 		{
-			Condition.Requires( url, nameof(url) ).IsNotNullOrEmpty();
-
 			ShopifyLogger.LogOperationStart( this._shopName, mark );
+
+			if( string.IsNullOrWhiteSpace( url ) )
+			{
+				ShopifyLogger.LogOperation( this._shopName, mark, "URL is empty, an empty array will be returned" );
+				return Array.Empty< T >();
+			}
 
 			try
 			{
