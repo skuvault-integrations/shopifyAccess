@@ -6,8 +6,6 @@
 
 		public static readonly ShopifyCommand Unknown = new ShopifyCommand( string.Empty );
 		public static readonly ShopifyCommand GetAccessToken = new ShopifyCommand( "/admin/oauth/access_token" );
-		public static readonly ShopifyCommand GetAllOrders = new ShopifyCommand( "/admin/orders.json" );
-		public static readonly ShopifyCommand UpdateProductVariant = new ShopifyCommand( "/admin/variants/" ); // WARN: Obsolete!!! Please use UpdateInventoryLevels
 		public static readonly ShopifyCommand UpdateInventoryLevels = new ShopifyCommand( "/inventory_levels/set.json", ApiVersion.V2019_10 );
 		public static readonly ShopifyCommand GetProducts = new ShopifyCommand( "/products.json", ApiVersion.V2019_10 );
 		public static readonly ShopifyCommand GetProductsCount = new ShopifyCommand( "/products/count.json", ApiVersion.V2019_10 );
@@ -16,7 +14,6 @@
 		public static readonly ShopifyCommand GetOrders = new ShopifyCommand( "/orders.json", ApiVersion.V2019_10 );
 		public static readonly ShopifyCommand GetLocations = new ShopifyCommand( "/locations.json", ApiVersion.V2019_10 );
 		public static readonly ShopifyCommand GetUsers = new ShopifyCommand( "/users.json", ApiVersion.V2019_10 );
-		public static readonly ShopifyCommand GetUser = new ShopifyCommand( "/admin/users/" );
 
 		/// <summary>
 		/// Create Shopify command using the oldest supported api version

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +15,6 @@ using ShopifyAccess.Models.Product;
 using ShopifyAccess.Models.ProductVariant;
 using ShopifyAccess.Models.User;
 using ShopifyAccess.Services;
-using ShopifyAccess.Services.Utils;
 
 namespace ShopifyAccess
 {
@@ -572,51 +570,6 @@ namespace ShopifyAccess
 		#endregion
 
 		#region Update variants
-		public void UpdateProductVariants( IEnumerable< ShopifyProductVariantForUpdate > variants, CancellationToken token, Mark mark = null )
-		{
-			mark = mark.CreateNewIfBlank();
-			foreach( var variant in variants )
-			{
-				this.UpdateProductVariantQuantity( variant, token, mark );
-			}
-		}
-		
-		public async Task UpdateProductVariantsAsync( IEnumerable< ShopifyProductVariantForUpdate > variants, CancellationToken token, Mark mark = null )
-		{
-			mark = mark.CreateNewIfBlank();
-			foreach( var variant in variants )
-			{
-				await this.UpdateProductVariantQuantityAsync( variant, token, mark );
-			}
-		}
-
-		private void UpdateProductVariantQuantity( ShopifyProductVariantForUpdate variant, CancellationToken token, Mark mark )
-		{
-			var endpoint = EndpointsBuilder.CreateProductVariantUpdateEndpoint( variant.Id );
-			//just simpliest way to serialize with the root name.
-			var jsonContent = new { variant }.ToJson();
-
-			ActionPolicies.SubmitPolicy( mark, this._shopName ).Do( () =>
-				this._productUpdateThrottler.Execute( () =>
-				{
-					this._webRequestServices.PutData( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent, token, mark, this._timeouts[ ShopifyOperationEnum.UpdateProductVariantQuantity ] );
-					return true;
-				} ) );
-		}
-
-		private async Task UpdateProductVariantQuantityAsync( ShopifyProductVariantForUpdate variant, CancellationToken token, Mark mark )
-		{
-			var endpoint = EndpointsBuilder.CreateProductVariantUpdateEndpoint( variant.Id );
-			var jsonContent = new { variant }.ToJson();
-
-			await ActionPolicies.SubmitPolicyAsync( mark, this._shopName ).Do( async () =>
-				await this._productUpdateThrottlerAsync.ExecuteAsync( async () =>
-				{
-					await this._webRequestServices.PutDataAsync( ShopifyCommand.UpdateProductVariant, endpoint, jsonContent, token, mark, this._timeouts[ ShopifyOperationEnum.UpdateProductVariantQuantity ] );
-					return true;
-				} ) );
-		}
-		
 		public void UpdateInventoryLevels( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, CancellationToken token, Mark mark = null )
 		{
 			mark = mark.CreateNewIfBlank();
@@ -675,24 +628,6 @@ namespace ShopifyAccess
 				() => this._throttlerAsync.ExecuteAsync(
 					() => this._webRequestServices.GetResponseAsync< ShopifyUsers >( ShopifyCommand.GetUsers, "", token, mark, this._timeouts[ ShopifyOperationEnum.GetUsers ] ) ) );
 			return users;
-		}
-
-		public ShopifyUser GetUser( long id, CancellationToken token, Mark mark = null )
-		{
-			mark = mark.CreateNewIfBlank();
-			var user = ActionPolicies.GetPolicy( mark, this._shopName ).Get(
-				() => this._throttler.Execute(
-					() => this._webRequestServices.GetResponse< ShopifyUserWrapper >( ShopifyCommand.GetUser, EndpointsBuilder.CreateGetUserEndpoint( id ), token, mark, this._timeouts[ ShopifyOperationEnum.GetUser ] ) ) );
-			return user.User;
-		}
-
-		public async Task< ShopifyUser > GetUserAsync( long id, CancellationToken token, Mark mark = null )
-		{
-			mark = mark.CreateNewIfBlank();
-			var user = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
-				() => this._throttlerAsync.ExecuteAsync(
-					() => this._webRequestServices.GetResponseAsync< ShopifyUserWrapper >( ShopifyCommand.GetUser, EndpointsBuilder.CreateGetUserEndpoint( id ), token, mark, this._timeouts[ ShopifyOperationEnum.GetUser ] ) ) );
-			return user.User;
 		}
 
 		public bool IsShopifyPlusAccount(  CancellationToken token, Mark mark = null )

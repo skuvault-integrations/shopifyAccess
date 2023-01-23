@@ -56,13 +56,6 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
-		public void ProductVariantQuantityUpdated()
-		{
-			var variantToUpdate = new ShopifyProductVariantForUpdate { Id = 337095344, Quantity = 2 };
-			this.Service.UpdateProductVariants( new List< ShopifyProductVariantForUpdate > { variantToUpdate }, CancellationToken.None );
-		}
-
-		[ Test ]
 		public void GetAndUpdateProductQuantity()
 		{
 			const string sku = "testSku1";
