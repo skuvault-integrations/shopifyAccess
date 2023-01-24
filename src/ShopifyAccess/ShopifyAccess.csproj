@@ -66,6 +66,8 @@
     <Compile Include="Misc\Extensions.cs" />
     <Compile Include="Misc\ShopifyLogger.cs" />
     <Compile Include="Misc\ShopifyThrottler.cs" />
+    <Compile Include="Models\Configuration\Command\ShopifyApiVersion.cs" />
+    <Compile Include="Models\Configuration\Command\ShopifyCommandFactory.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyOrderCommandEndpoint.cs" />
     <Compile Include="Models\Configuration\Authorization\Scope.cs" />
     <Compile Include="Models\Configuration\Authorization\Scopes.cs" />
