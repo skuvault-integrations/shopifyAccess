@@ -221,23 +221,7 @@ namespace ShopifyAccessTests.Products
 
 		[ Test ]
 		[ Explicit ]
-		public async Task GetProductVariantsBySkuAsync_ReturnsCorrectData_WhenMultipleSkuRequested()
-		{
-			// Arrange
-			var skus = new[] { "testsku1", "testsku2", "testsku3" };
-			var products = await this.Service.GetProductVariantsInventoryBySkusAsync( skus, CancellationToken.None );
-
-			// Act
-			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None );
-
-			// Assert
-			productVariants.Count.Should().BeGreaterThan( 1 );
-			this.ValidateIfEqual( productVariants, products );
-		}
-
-		[ Test ]
-		[ Explicit ]
-		public async Task GetProductVariantsBySkuAsync_ReturnsCorrectData_WhenAllSkusRequested()
+		public async Task GetProductVariantsBySkuAsync_ReturnsCorrectData_WhenMultipleSkusRequested()
 		{
 			// Arrange
 			var countToCompare = 60;

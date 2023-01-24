@@ -15,7 +15,7 @@ namespace ShopifyAccess.GraphQl.Services
 {
 	internal class ReportGenerator: IReportGenerator
 	{
-		private const int GraphQlRequestTimeout = 10000;
+		private const int GraphQlRequestTimeoutMs = 30 * 1000;
 		private readonly WebRequestServices _webRequestServices;
 		private readonly ShopifyGraphQlThrottler _throttler;
 		private readonly string _shopName;
@@ -74,7 +74,7 @@ namespace ShopifyAccess.GraphQl.Services
 
 				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
 					() => this._throttler.ExecuteAsync(
-						() => this._webRequestServices.PostDataAsync< BulkOperationRunQueryResponse >( ShopifyCommand.GraphGl, request, cancellationToken, mark, GraphQlRequestTimeout )
+						() => this._webRequestServices.PostDataAsync< BulkOperationRunQueryResponse >( ShopifyCommand.GraphGl, request, cancellationToken, mark, GraphQlRequestTimeoutMs )
 						, mark )
 				).ConfigureAwait( false );
 
@@ -96,7 +96,7 @@ namespace ShopifyAccess.GraphQl.Services
 
 				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
 					() => this._throttler.ExecuteAsync(
-						() => this._webRequestServices.PostDataAsync< GetCurrentBulkOperationResponse >( ShopifyCommand.GraphGl, request, cancellationToken, mark, GraphQlRequestTimeout ),
+						() => this._webRequestServices.PostDataAsync< GetCurrentBulkOperationResponse >( ShopifyCommand.GraphGl, request, cancellationToken, mark, GraphQlRequestTimeoutMs ),
 						mark )
 				).ConfigureAwait( false );
 
@@ -119,7 +119,7 @@ namespace ShopifyAccess.GraphQl.Services
 
 				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
 					() => this._throttler.ExecuteAsync(
-						() => this._webRequestServices.PostDataAsync< GetBulkOperationByIdResponse >( ShopifyCommand.GraphGl, request, cancellationToken, mark, GraphQlRequestTimeout )
+						() => this._webRequestServices.PostDataAsync< GetBulkOperationByIdResponse >( ShopifyCommand.GraphGl, request, cancellationToken, mark, GraphQlRequestTimeoutMs )
 						, mark )
 				).ConfigureAwait( false );
 
