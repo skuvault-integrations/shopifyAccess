@@ -5,6 +5,8 @@ namespace ShopifyAccess.GraphQl.Queries
 {
 	internal static class QueryBuilder
 	{
+		private const int MaxLocationsCount = 250;
+
 		public static string GetCurrentBulkOperationStatusRequest()
 		{
 			var request = new { query = PrepareRequest( CurrentBulkOperationQuery.Query ) };
@@ -20,6 +22,11 @@ namespace ShopifyAccess.GraphQl.Queries
 
 		public static string GetProductVariantInventoryBySkuRequest( string sku, string after, int locationsCount )
 		{
+			if( locationsCount > MaxLocationsCount )
+			{
+				throw new ArgumentOutOfRangeException( nameof(locationsCount), locationsCount, "LocationsCount should not be more than " + MaxLocationsCount );
+			}
+
 			var query = PrepareRequest( GetProductVariantInventoryQuery.Query );
 			var escapedSku = sku.ToJson();
 			var variables = new
@@ -32,7 +39,7 @@ namespace ShopifyAccess.GraphQl.Queries
 			var request = new { query = PrepareRequest( query ), variables };
 			return request.ToJson();
 		}
-		
+
 		public static string GetReportRequest( ReportType type )
 		{
 			var query = string.Empty;
