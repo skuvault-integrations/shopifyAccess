@@ -21,8 +21,8 @@ namespace ShopifyAccessTests.Locations
 		[ Test ]
 		public void LocationsNotLoaded_IncorrectToken()
 		{
-			var config = new ShopifyCommandConfig( this.Config.ShopName, "blabla" );
-			var service = this.ShopifyFactory.CreateService( config );
+			var clientCredentials = new ShopifyClientCredentials( this._clientCredentials.ShopName, "blabla" );
+			var service = this.ShopifyFactory.CreateService( clientCredentials );
 			ShopifyLocations locations = null;
 			try
 			{
@@ -37,8 +37,8 @@ namespace ShopifyAccessTests.Locations
 		[ Test ]
 		public void LocationsNotLoaded_IncorrectShopName()
 		{
-			var config = new ShopifyCommandConfig( "blabla", this.Config.AccessToken );
-			var service = this.ShopifyFactory.CreateService( config );
+			var clientCredentials = new ShopifyClientCredentials( "blabla", this._clientCredentials.AccessToken );
+			var service = this.ShopifyFactory.CreateService( clientCredentials );
 			ShopifyLocations locations = null;
 			try
 			{

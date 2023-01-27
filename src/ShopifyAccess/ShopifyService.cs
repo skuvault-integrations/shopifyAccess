@@ -53,16 +53,16 @@ namespace ShopifyAccess
 			}
 		}
 
-		public ShopifyService( ShopifyCommandConfig config, ShopifyTimeouts operationsTimeouts, ShopifyCommandFactory shopifyCommandFactory )
+		public ShopifyService( ShopifyClientCredentials clientCredentials, ShopifyTimeouts operationsTimeouts, ShopifyCommandFactory shopifyCommandFactory )
 		{
-			Condition.Requires( config, "config" ).IsNotNull();
+			Condition.Requires( clientCredentials, "clientCredentials" ).IsNotNull();
 			Condition.Requires( operationsTimeouts, "operationsTimeouts" ).IsNotNull();
 
-			this._webRequestServices = new WebRequestServices( config );
+			this._webRequestServices = new WebRequestServices( clientCredentials );
 			this._shopifyCommandFactory = shopifyCommandFactory;
-			this._reportGenerator = new ReportGenerator( config.ShopName, this._webRequestServices, this._shopifyCommandFactory );
-			this._graphQlThrottler = new ShopifyGraphQlThrottler( config.ShopName );
-			this._shopName = config.ShopName;
+			this._reportGenerator = new ReportGenerator( clientCredentials.ShopName, this._webRequestServices, this._shopifyCommandFactory );
+			this._graphQlThrottler = new ShopifyGraphQlThrottler( clientCredentials.ShopName );
+			this._shopName = clientCredentials.ShopName;
 			this._timeouts = operationsTimeouts;
 		}
 

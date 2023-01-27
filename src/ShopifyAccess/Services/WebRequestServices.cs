@@ -19,30 +19,30 @@ namespace ShopifyAccess.Services
 {
 	internal sealed class WebRequestServices
 	{
-		private readonly ShopifyAuthorizationConfig _authorizationConfig;
-		private readonly ShopifyCommandConfig _commandConfig;
+		private readonly ShopifyAuthorizationConfig _authorizationAuthorizationConfig;
+		private readonly ShopifyClientCredentials _clientCredentials;
 		
 		public HttpClient HttpClient { get; private set; }
 		public DateTime? LastNetworkActivityTime { get; private set; }
 		private const int MaxHttpRequestTimeoutInMinutes = 30;
 
 		#region Constructors
-		public WebRequestServices( ShopifyAuthorizationConfig config )
+		public WebRequestServices( ShopifyAuthorizationConfig authorizationConfig )
 		{
-			Condition.Requires( config, "config" ).IsNotNull();
+			Condition.Requires( authorizationConfig, "authorizationConfig" ).IsNotNull();
 
-			this._authorizationConfig = config;
-			this._commandConfig = new ShopifyCommandConfig( config.ShopName, "authorization" );
-			this.HttpClient = this.CreateHttpClient( this._commandConfig.AccessToken );
+			this._authorizationAuthorizationConfig = authorizationConfig;
+			this._clientCredentials = new ShopifyClientCredentials( authorizationConfig.ShopName, "authorization" );
+			this.HttpClient = this.CreateHttpClient( this._clientCredentials.AccessToken );
 		}
 
-		public WebRequestServices( ShopifyCommandConfig config )
+		public WebRequestServices( ShopifyClientCredentials clientCredentials )
 		{
-			Condition.Requires( config, "config" ).IsNotNull();
+			Condition.Requires( clientCredentials, "clientCredentials" ).IsNotNull();
 
-			this._commandConfig = config;
-			this.HttpClient = this.CreateHttpClient( this._commandConfig.AccessToken );
-			var servicePoint = ServicePointManager.FindServicePoint( new Uri( this._commandConfig.Host ) );
+			this._clientCredentials = clientCredentials;
+			this.HttpClient = this.CreateHttpClient( this._clientCredentials.AccessToken );
+			var servicePoint = ServicePointManager.FindServicePoint( new Uri( this._clientCredentials.Host ) );
 			servicePoint.ConnectionLimit = 1000;
 		}
 
@@ -307,8 +307,8 @@ namespace ShopifyAccess.Services
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
 			var command = ShopifyCommand.GetAccessToken;
-			var url = new Uri( string.Concat( this._authorizationConfig.Host, command.Command ) );
-			var tokenRequestPostContent = string.Format( "client_id={0}&client_secret={1}&code={2}", this._authorizationConfig.ApiKey, this._authorizationConfig.Secret, code );
+			var url = new Uri( string.Concat( this._authorizationAuthorizationConfig.Host, command.Command ) );
+			var tokenRequestPostContent = string.Format( "client_id={0}&client_secret={1}&code={2}", this._authorizationAuthorizationConfig.ApiKey, this._authorizationAuthorizationConfig.Secret, code );
 			var content = new StringContent( tokenRequestPostContent, Encoding.UTF8, "application/x-www-form-urlencoded" );	
 
 			RefreshLastNetworkActivityTime();
@@ -369,7 +369,7 @@ namespace ShopifyAccess.Services
 			}
 			catch( TaskCanceledException )
 			{
-				ShopifyLogger.LogTimeoutException( mark, this._commandConfig.ShopName, timeout );
+				ShopifyLogger.LogTimeoutException( mark, this._clientCredentials.ShopName, timeout );
 				throw;
 			}
 		}
@@ -386,7 +386,7 @@ namespace ShopifyAccess.Services
 			}
 			catch( TaskCanceledException )
 			{
-				ShopifyLogger.LogTimeoutException( mark, this._commandConfig.ShopName, timeout );
+				ShopifyLogger.LogTimeoutException( mark, this._clientCredentials.ShopName, timeout );
 				throw;
 			}
 		}
@@ -396,7 +396,7 @@ namespace ShopifyAccess.Services
 			if( ex.Response == null || ex.Status != WebExceptionStatus.ProtocolError ||
 			    ex.Response.ContentType == null || ex.Response.ContentType.Contains( "text/html" ) )
 			{
-				ShopifyLogger.LogWebException( ex, mark, this._commandConfig.ShopName );
+				ShopifyLogger.LogWebException( ex, mark, this._clientCredentials.ShopName );
 				return ex;
 			}
 
@@ -414,7 +414,7 @@ namespace ShopifyAccess.Services
 		private void LogAndThrowTaskCanceledException( Mark mark )
 		{
 			var taskCanceledException = new TaskCanceledException();
-			ShopifyLogger.LogException( taskCanceledException, mark, this._commandConfig.ShopName );
+			ShopifyLogger.LogException( taskCanceledException, mark, this._clientCredentials.ShopName );
 			throw taskCanceledException;
 		}
 		#endregion
@@ -423,7 +423,7 @@ namespace ShopifyAccess.Services
 
 		private Uri CreateRequestUri( ShopifyCommand command, string endpoint )
 		{
-			return new Uri( string.Concat( this._commandConfig.Host, command.Command, endpoint ) );
+			return new Uri( string.Concat( this._clientCredentials.Host, command.Command, endpoint ) );
 		}
 		#endregion
 

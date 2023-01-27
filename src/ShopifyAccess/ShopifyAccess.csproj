@@ -95,12 +95,12 @@
     <Compile Include="Models\Configuration\Command\ShopifyOrderCommandEndpoint.cs" />
     <Compile Include="Models\Configuration\Authorization\Scope.cs" />
     <Compile Include="Models\Configuration\Authorization\Scopes.cs" />
-    <Compile Include="Models\Configuration\Command\ShopifyCommandConfig.cs" />
+    <Compile Include="Models\Configuration\Command\ShopifyClientCredentials.cs" />
     <Compile Include="Models\Configuration\Authorization\ShopifyAuthorizationConfig.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyCommandEndpointConfig.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyCommandEndpointName.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyProductCommandEndpointName.cs" />
-    <Compile Include="Models\Configuration\ShopifyConfigBase.cs" />
+    <Compile Include="Models\Configuration\ShopifyShop.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyCommand.cs" />
     <Compile Include="Models\Location\ShopifyLocation.cs" />
     <Compile Include="Models\Location\ShopifyLocations.cs" />

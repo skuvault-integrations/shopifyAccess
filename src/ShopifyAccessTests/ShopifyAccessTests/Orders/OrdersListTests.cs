@@ -31,8 +31,8 @@ namespace ShopifyAccessTests.Orders
 		[ Test ]
 		public void OrdersNotLoaded_IncorrectToken()
 		{
-			var config = new ShopifyCommandConfig( this.Config.ShopName, "blabla" );
-			var service = this.ShopifyFactory.CreateService( config );
+			var clientCredentials = new ShopifyClientCredentials( this._clientCredentials.ShopName, "blabla" );
+			var service = this.ShopifyFactory.CreateService( clientCredentials );
 			ShopifyOrders orders = null;
 			try
 			{
@@ -47,8 +47,8 @@ namespace ShopifyAccessTests.Orders
 		[ Test ]
 		public void OrdersNotLoaded_IncorrectShopName()
 		{
-			var config = new ShopifyCommandConfig( "blabla", this.Config.AccessToken );
-			var service = this.ShopifyFactory.CreateService( config );
+			var clientCredentials = new ShopifyClientCredentials( "blabla", this._clientCredentials.AccessToken );
+			var service = this.ShopifyFactory.CreateService( clientCredentials );
 			ShopifyOrders orders = null;
 			try
 			{

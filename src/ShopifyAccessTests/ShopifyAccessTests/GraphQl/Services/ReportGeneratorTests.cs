@@ -20,11 +20,11 @@ namespace ShopifyAccessTests.GraphQl.Services
 		[ SetUp ]
 		public void InitReportGeneratorTests()
 		{
-			if( this.Config != null )
+			if( this._clientCredentials != null )
 			{
-				var webRequestServices = new WebRequestServices( this.Config );
+				var webRequestServices = new WebRequestServices( this._clientCredentials );
 				var shopifyCommandFactory = new ShopifyCommandFactory( BaseTests.ApiVersion );
-				this.ReportGenerator = new ReportGenerator( this.Config.ShopName, webRequestServices, shopifyCommandFactory );
+				this.ReportGenerator = new ReportGenerator( this._clientCredentials.ShopName, webRequestServices, shopifyCommandFactory );
 			}
 			else
 			{

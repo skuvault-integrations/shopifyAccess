@@ -26,7 +26,7 @@ namespace ShopifyAccessTests.Cancellation
 		public void RequestTimesOut()
 		{
 			const int reallyShortTime = 1;
-			var service = this.ShopifyFactory.CreateService( this.Config, new ShopifyTimeouts( reallyShortTime ) );
+			var service = this.ShopifyFactory.CreateService( this._clientCredentials, new ShopifyTimeouts( reallyShortTime ) );
 			var cancellationTokenSource = new CancellationTokenSource();
 
 			Assert.ThrowsAsync< TaskCanceledException >( async () => 

@@ -5,7 +5,7 @@ using ShopifyAccess.Services;
 
 namespace ShopifyAccess.Models.Configuration.Authorization
 {
-	public class ShopifyAuthorizationConfig : ShopifyConfigBase
+	public class ShopifyAuthorizationConfig : ShopifyShop
 	{
 		public string ApiKey { get; private set; }
 		public string Secret { get; private set; }
