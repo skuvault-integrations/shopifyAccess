@@ -33,6 +33,7 @@ _TeamCity*/
 *.docstates
 _rltm*
 ShopifyCredentials.csv
+license.txt
 
 #Ignore common build files
 build/*

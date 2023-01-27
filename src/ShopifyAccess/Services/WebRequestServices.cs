@@ -244,7 +244,7 @@ namespace ShopifyAccess.Services
 			ParseResponse< T >( responseContent, response.Headers, url, mark, timeout );
 		}
 
-		public async Task PostDataAsync< T >( ShopifyCommand command, string jsonContent, CancellationToken token, Mark mark, int timeout )
+		public async Task< T > PostDataAsync< T >( ShopifyCommand command, string jsonContent, CancellationToken token, Mark mark, int timeout )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
@@ -267,7 +267,39 @@ namespace ShopifyAccess.Services
 			}
 			var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
 			RefreshLastNetworkActivityTime();
-			ParseResponse< T >( responseContent, response.Headers, url, mark, timeout );
+			var result = ParseResponse< T >( responseContent, response.Headers, url, mark, timeout );
+			return result;
+		}
+
+		public async Task< IEnumerable< T > > GetReportDocumentAsync< T >( string url, Func< Stream, IEnumerable< T > > parseMethod, CancellationToken cancellationToken, Mark mark, int timeout ) where T : class
+		{
+			Condition.Requires( mark, "mark" ).IsNotNull();
+
+			if( cancellationToken.IsCancellationRequested )
+			{
+				this.LogAndThrowTaskCanceledException( mark );
+			}
+
+			var uri = new Uri( url, UriKind.Absolute );
+			ShopifyLogger.LogGetRequest( uri, mark, timeout );
+
+			return await this.ParseExceptionAsync( mark, timeout, async () =>
+			{
+				using( var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource( cancellationToken ) )
+				{
+					linkedCancellationTokenSource.CancelAfter( timeout );
+					this.RefreshLastNetworkActivityTime();
+					using( var response = await this.HttpClient.GetAsync( uri, HttpCompletionOption.ResponseHeadersRead, linkedCancellationTokenSource.Token ).ConfigureAwait( false ) )
+					{
+						response.EnsureSuccessStatusCode();
+
+						using( var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait( false ) )
+						{
+							return parseMethod( stream );
+						}
+					}
+				}
+			} ).ConfigureAwait( false );
 		}
 
 		public string RequestPermanentToken( string code, Mark mark )

@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 using CuttingEdge.Conditions;
 using Netco.Extensions;
 using ServiceStack;
+using ShopifyAccess.GraphQl;
+using ShopifyAccess.GraphQl.Models.ProductVariantsInventory;
+using ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions;
+using ShopifyAccess.GraphQl.Models.Responses;
+using ShopifyAccess.GraphQl.Queries;
+using ShopifyAccess.GraphQl.Services;
 using ShopifyAccess.Misc;
 using ShopifyAccess.Models;
 using ShopifyAccess.Models.Configuration.Command;
@@ -21,12 +27,14 @@ namespace ShopifyAccess
 	public sealed class ShopifyService: IShopifyService
 	{
 		private readonly WebRequestServices _webRequestServices;
+		private readonly IReportGenerator _reportGenerator;
 		private const int RequestMaxLimit = 250;
 		private const int RequestInventoryLevelsMaxLimit = 50;
 		private readonly string _shopName;
 		// One throttler for all requests because used same limit for all API
 		private readonly ShopifyThrottler _throttler = new ShopifyThrottler();
 		private readonly ShopifyThrottlerAsync _throttlerAsync = new ShopifyThrottlerAsync();
+		private readonly ShopifyGraphQlThrottler _graphQlThrottler;
 
 		// Separate throttler for updating to save limit for other syncs
 		private readonly ShopifyThrottler _productUpdateThrottler = new ShopifyThrottler( 30 );
@@ -51,9 +59,11 @@ namespace ShopifyAccess
 			Condition.Requires( operationsTimeouts, "operationsTimeouts" ).IsNotNull();
 
 			this._webRequestServices = new WebRequestServices( config );
+			this._shopifyCommandFactory = shopifyCommandFactory;
+			this._reportGenerator = new ReportGenerator( config.ShopName, this._webRequestServices, this._shopifyCommandFactory );
+			this._graphQlThrottler = new ShopifyGraphQlThrottler( config.ShopName );
 			this._shopName = config.ShopName;
 			this._timeouts = operationsTimeouts;
-			this._shopifyCommandFactory = shopifyCommandFactory;
 		}
 
 		#region GetOrders
@@ -348,6 +358,100 @@ namespace ShopifyAccess
 			}
 
 			return productVariants;
+		}
+
+		private async Task< List< ProductVariant > > GetProductVariantsInventoryReportBySkuAsync( string sku, int locationsCount, Mark mark, CancellationToken token )
+		{
+			mark = mark.CreateNewIfBlank();
+
+			ShopifyLogger.LogOperationStart( this._shopName, mark, $"Sku: '{sku}'" );
+
+			try
+			{
+				string nextCursor = null;
+
+				var result = new List< ProductVariant >();
+				do
+				{
+					var request = QueryBuilder.GetProductVariantInventoryBySkuRequest( sku, nextCursor, locationsCount );
+
+					var response = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
+						() => this._graphQlThrottler.ExecuteAsync(
+							() => this._webRequestServices.PostDataAsync< GetProductVariantsInventoryResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, token, mark, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] )
+							, mark )
+					).ConfigureAwait( false );
+
+					result.AddRange( response.Data.ProductVariants.Nodes );
+
+					if( response.Data.ProductVariants.PageInfo.HasNextPage )
+					{
+						nextCursor = response.Data.ProductVariants.PageInfo.EndCursor;
+					}
+					else
+					{
+						break;
+					}
+				} while( true );
+
+				return result;
+			}
+			finally
+			{
+				ShopifyLogger.LogOperationEnd( this._shopName, mark );
+			}
+		}
+
+		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null )
+		{
+			mark = mark.CreateNewIfBlank();
+
+			ShopifyLogger.LogOperationStart( this._shopName, mark );
+
+			try
+			{
+				var locations = await this.GetLocationsAsync( token, mark ).ConfigureAwait( false );
+				var locationsCount = locations.Locations.Count;
+				var correctedSkus = skus.Select( s => s.ToLowerInvariant() ).Distinct();
+
+				var result = new List< ProductVariant >();
+				foreach( var sku in correctedSkus )
+				{
+					var productVariantsBySku = await this.GetProductVariantsInventoryReportBySkuAsync( sku, locationsCount, mark, token );
+					result.AddRange( productVariantsBySku );
+				}
+
+				return new List< ShopifyProductVariant >( result.Where( FilterProductVariants ).Select( variant => variant.ToShopifyProductVariant() ) );
+			}
+			finally
+			{
+				ShopifyLogger.LogOperationEnd( this._shopName, mark );
+			}
+		}
+
+		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportAsync( CancellationToken token, Mark mark = null )
+		{
+			mark = mark.CreateNewIfBlank();
+
+			ShopifyLogger.LogOperationStart( this._shopName, mark );
+
+			try
+			{
+				var data = await this._reportGenerator.GetReportAsync(
+					ReportType.ProductVariantsInventory,
+					ProductVariantsInventoryReportParser.Parse,
+					this._timeouts[ ShopifyOperationEnum.GetProductsInventory ],
+					mark, token ).ConfigureAwait( false );
+				return new List< ShopifyProductVariant >( data.Where( FilterProductVariants ).Select( variant => variant.ToShopifyProductVariant() ) );
+			}
+			finally
+			{
+				ShopifyLogger.LogOperationEnd( this._shopName, mark );
+			}
+		}
+
+		private static bool FilterProductVariants( ProductVariant variant )
+		{
+			return variant.InventoryItem.Tracked && !string.IsNullOrEmpty( variant.Sku );
 		}
 
 		private int GetProductsCount( Mark mark, CancellationToken token )

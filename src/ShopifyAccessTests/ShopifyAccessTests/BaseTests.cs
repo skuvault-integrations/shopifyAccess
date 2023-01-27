@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using LINQtoCSV;
 using Netco.Logging;
@@ -27,6 +28,15 @@ namespace ShopifyAccessTests
 			{
 				this.Config = new ShopifyCommandConfig( testConfig.ShopName, testConfig.AccessToken );
 				this.Service = this.ShopifyFactory.CreateService( this.Config );
+			}
+
+			// Some tests could fail with the "The free-quota limit on '20 ServiceStack.Text Types' has been reached" exception
+			// Need to add ServiceStack license to this file
+			const string serviceStackLicenseFilePath = @"..\..\Files\license.txt";
+			if( File.Exists( serviceStackLicenseFilePath ) )
+			{
+				var licenseKey = File.ReadAllText( serviceStackLicenseFilePath );
+				Environment.SetEnvironmentVariable( "SERVICESTACK_LICENSE", licenseKey );
 			}
 		}
 	}

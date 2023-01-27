@@ -13,6 +13,7 @@ namespace ShopifyAccess.Models.Configuration.Command
 		public ShopifyCommand CreateGetOrdersCommand() => new ShopifyCommand( "/orders.json", this._apiVersion );
 		public ShopifyCommand CreateGetLocationsCommand() => new ShopifyCommand( "/locations.json", this._apiVersion );
 		public ShopifyCommand CreateGetUsersCommand() => new ShopifyCommand( "/users.json", this._apiVersion );
+		public ShopifyCommand CreateGraphQlCommand() => new ShopifyCommand( "/graphql.json", this._apiVersion );
 
 		public ShopifyCommandFactory( ShopifyApiVersion apiVersion )
 		{

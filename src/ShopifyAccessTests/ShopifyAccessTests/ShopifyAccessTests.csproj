@@ -37,13 +37,8 @@
       <HintPath>..\..\packages\CuttingEdge.Conditions.1.2.0.0\lib\NET35\CuttingEdge.Conditions.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FluentAssertions, Version=4.17.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\FluentAssertions.4.17.0\lib\net45\FluentAssertions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="FluentAssertions.Core, Version=4.17.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\FluentAssertions.4.17.0\lib\net45\FluentAssertions.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="FluentAssertions, Version=6.9.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\FluentAssertions.6.9.0\lib\netstandard2.0\FluentAssertions.dll</HintPath>
     </Reference>
     <Reference Include="LINQtoCSV, Version=1.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\LINQtoCSV.1.5.0.0\lib\net35\LINQtoCSV.dll</HintPath>
@@ -66,8 +61,15 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Runtime.CompilerServices.Unsafe.4.5.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Threading.Tasks.Extensions.4.5.0\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -82,6 +84,12 @@
     <Compile Include="Cancellation\CancellationTokenTests.cs" />
     <Compile Include="EndpointsBuilderTests.cs" />
     <Compile Include="ExtensionsTests.cs" />
+    <Compile Include="GraphQl\Helpers\GraphQlIdParserTests.cs" />
+    <Compile Include="GraphQl\Models\ProductVariantsInventoryReport\Extensions\ProductVariantsInventoryReportParserTests.cs" />
+    <Compile Include="GraphQl\Models\ProductVariantsInventoryReport\ProductVariantTests.cs" />
+    <Compile Include="GraphQl\Queries\QueryBuilderTests.cs" />
+    <Compile Include="GraphQl\Services\ReportGeneratorTests.cs" />
+    <Compile Include="GraphQl\ShopifyGraphQlThrottlerTests.cs" />
     <Compile Include="Locations\LocationListTests.cs" />
     <Compile Include="OperationTimeoutTests.cs" />
     <Compile Include="Orders\OrderMapperTests.cs" />

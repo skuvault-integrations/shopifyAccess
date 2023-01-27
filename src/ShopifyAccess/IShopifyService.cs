@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Threading;
 using System.Threading.Tasks;
 using ShopifyAccess.Models;
@@ -109,6 +108,25 @@ namespace ShopifyAccess
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns>List of variants (inventory items)</returns>
 		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null );
+
+		/// <summary>
+		/// Get all existing product variants with inventory levels
+		/// This method uses GraphQl API to get data
+		/// </summary>
+		/// <param name="token">CancellationToken</param>
+		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
+		/// <returns>Product variants with inventory levels</returns>
+		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportAsync( CancellationToken token, Mark mark = null );
+
+		/// <summary>
+		/// Get the list of product variants for specified SKUs
+		/// This method uses GraphQl API to get data
+		/// </summary>
+		/// <param name="skus">List of SKU for search</param>
+		/// <param name="token">CancellationToken</param>
+		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
+		/// <returns>List of variants (inventory items)</returns>
+		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		///     Update inventory levels (inventory items)
