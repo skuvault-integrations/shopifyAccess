@@ -23,7 +23,7 @@ namespace ShopifyAccessTests.GraphQl.Services
 			if( this.Config != null )
 			{
 				var webRequestServices = new WebRequestServices( this.Config );
-				var shopifyCommandFactory = new ShopifyCommandFactory( ShopifyApiVersion.V2022_07 );
+				var shopifyCommandFactory = new ShopifyCommandFactory( BaseTests.ApiVersion );
 				this.ReportGenerator = new ReportGenerator( this.Config.ShopName, webRequestServices, shopifyCommandFactory );
 			}
 			else
