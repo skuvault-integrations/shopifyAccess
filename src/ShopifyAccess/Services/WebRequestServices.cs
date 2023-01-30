@@ -19,7 +19,7 @@ namespace ShopifyAccess.Services
 {
 	internal sealed class WebRequestServices
 	{
-		private readonly ShopifyAuthorizationConfig _authorizationAuthorizationConfig;
+		private readonly ShopifyAuthorizationConfig _authorizationConfig;
 		private readonly ShopifyClientCredentials _clientCredentials;
 		
 		public HttpClient HttpClient { get; private set; }
@@ -31,7 +31,7 @@ namespace ShopifyAccess.Services
 		{
 			Condition.Requires( authorizationConfig, "authorizationConfig" ).IsNotNull();
 
-			this._authorizationAuthorizationConfig = authorizationConfig;
+			this._authorizationConfig = authorizationConfig;
 			this._clientCredentials = new ShopifyClientCredentials( authorizationConfig.ShopName, "authorization" );
 			this.HttpClient = this.CreateHttpClient( this._clientCredentials.AccessToken );
 		}
@@ -307,8 +307,8 @@ namespace ShopifyAccess.Services
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
 			var command = ShopifyCommand.GetAccessToken;
-			var url = new Uri( string.Concat( this._authorizationAuthorizationConfig.Host, command.Command ) );
-			var tokenRequestPostContent = string.Format( "client_id={0}&client_secret={1}&code={2}", this._authorizationAuthorizationConfig.ApiKey, this._authorizationAuthorizationConfig.Secret, code );
+			var url = new Uri( string.Concat( this._authorizationConfig.Host, command.Command ) );
+			var tokenRequestPostContent = string.Format( "client_id={0}&client_secret={1}&code={2}", this._authorizationConfig.ApiKey, this._authorizationConfig.Secret, code );
 			var content = new StringContent( tokenRequestPostContent, Encoding.UTF8, "application/x-www-form-urlencoded" );	
 
 			RefreshLastNetworkActivityTime();

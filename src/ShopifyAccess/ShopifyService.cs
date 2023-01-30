@@ -57,6 +57,7 @@ namespace ShopifyAccess
 		{
 			Condition.Requires( clientCredentials, "clientCredentials" ).IsNotNull();
 			Condition.Requires( operationsTimeouts, "operationsTimeouts" ).IsNotNull();
+			Condition.Requires( shopifyCommandFactory, "shopifyCommandFactory" ).IsNotNull();
 
 			this._webRequestServices = new WebRequestServices( clientCredentials );
 			this._shopifyCommandFactory = shopifyCommandFactory;
