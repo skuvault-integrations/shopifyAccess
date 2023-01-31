@@ -4,7 +4,6 @@ namespace ShopifyAccess.Models.Configuration.Command
 	{
 		private readonly ShopifyApiVersion _apiVersion;
 
-		public ShopifyCommand CreateUnknownCommand() => new ShopifyCommand( string.Empty );
 		public ShopifyCommand CreateUpdateInventoryLevelsCommand() => new ShopifyCommand( "/inventory_levels/set.json", this._apiVersion );
 		public ShopifyCommand CreateGetProductsCommand() => new ShopifyCommand( "/products.json", this._apiVersion );
 		public ShopifyCommand CreateGetProductsCountCommand() => new ShopifyCommand( "/products/count.json", this._apiVersion );

@@ -11,7 +11,7 @@
 		/// Create Shopify command using the oldest supported api version
 		/// </summary>
 		/// <param name="command"></param>
-		internal ShopifyCommand( string command )
+		private ShopifyCommand( string command )
 		{
 			this.Command = command;
 		}
