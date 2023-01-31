@@ -49,7 +49,7 @@ namespace ShopifyAccess.Models.Configuration.Authorization
 			return uri;
 		}
 
-		//TODO Tech debt:
+		//TODO GUARD-2753 Tech debt:
 		//Problem: This method bypasses the ShopifyService and calls WebRequestServices directly to call the Shopify API.
 		//Every other call to the Shopify API goes through ShopifyService (instantiated via ShopifyFactory). Plus, this class is not a service or a client.
 		//It shouldn't call the API.
