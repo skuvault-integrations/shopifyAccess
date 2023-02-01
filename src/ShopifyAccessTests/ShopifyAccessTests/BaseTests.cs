@@ -11,8 +11,9 @@ namespace ShopifyAccessTests
 {
 	public class BaseTests
 	{
-		protected readonly IShopifyFactory ShopifyFactory = new ShopifyFactory();
-		protected ShopifyCommandConfig Config;
+		protected static readonly ShopifyApiVersion ApiVersion = ShopifyApiVersion.V2022_07;
+		protected readonly IShopifyFactory ShopifyFactory = new ShopifyFactory( ApiVersion );
+		protected ShopifyClientCredentials _clientCredentials;
 		protected IShopifyService Service;
 
 		[ SetUp ]
@@ -26,8 +27,8 @@ namespace ShopifyAccessTests
 			var testConfig = cc.Read< TestCommandConfig >( credentialsFilePath, new CsvFileDescription { FirstLineHasColumnNames = true } ).FirstOrDefault();
 			if( testConfig != null )
 			{
-				this.Config = new ShopifyCommandConfig( testConfig.ShopName, testConfig.AccessToken );
-				this.Service = this.ShopifyFactory.CreateService( this.Config );
+				this._clientCredentials = new ShopifyClientCredentials( testConfig.ShopName, testConfig.AccessToken );
+				this.Service = this.ShopifyFactory.CreateService( this._clientCredentials );
 			}
 
 			// Some tests could fail with the "The free-quota limit on '20 ServiceStack.Text Types' has been reached" exception

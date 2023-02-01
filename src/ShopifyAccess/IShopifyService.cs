@@ -129,20 +129,6 @@ namespace ShopifyAccess
 		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null );
 
 		/// <summary>
-		/// Update variants (inventory items). This method is obsolete. DON'T USE IT
-		/// </summary>
-		/// <param name="token">Cancellation token</param>
-		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		void UpdateProductVariants( IEnumerable< ShopifyProductVariantForUpdate > variants, CancellationToken token, Mark mark = null );
-
-		/// <summary>
-		/// Update variants (inventory items) async. This method is obsolete. DON'T USE IT
-		/// </summary>
-		/// <param name="token">Cancellation token</param>
-		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		Task UpdateProductVariantsAsync( IEnumerable< ShopifyProductVariantForUpdate > variants, CancellationToken token, Mark mark = null );
-
-		/// <summary>
 		///     Update inventory levels (inventory items)
 		/// </summary>
 		/// <param name="token">Cancellation tokens</param>
@@ -173,22 +159,6 @@ namespace ShopifyAccess
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns></returns>
 		Task< ShopifyUsers > GetUsersAsync( CancellationToken token, Mark mark = null );
-
-		/// <summary>
-		/// Get user
-		/// </summary>
-		/// <param name="token"></param>
-		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		/// <returns></returns>
-		ShopifyUser GetUser( long id, CancellationToken token, Mark mark = null );
-
-		/// <summary>
-		/// Get user async
-		/// </summary>
-		/// <param name="token">CancellationToken</param>
-		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		/// <returns></returns>
-		Task< ShopifyUser > GetUserAsync( long id, CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		/// Is Shopify Plus customer

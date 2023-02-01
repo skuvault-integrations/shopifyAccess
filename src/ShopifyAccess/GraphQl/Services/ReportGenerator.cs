@@ -19,6 +19,7 @@ namespace ShopifyAccess.GraphQl.Services
 		private readonly WebRequestServices _webRequestServices;
 		private readonly ShopifyGraphQlThrottler _throttler;
 		private readonly string _shopName;
+		private readonly ShopifyCommandFactory _shopifyCommandFactory;
 
 		private const int MaxGetReportStatusPollingRequests = 30;
 
@@ -28,10 +29,11 @@ namespace ShopifyAccess.GraphQl.Services
 			return i <= 20 ? 20000 : 30000;
 		}
 
-		public ReportGenerator( string shopName, WebRequestServices webRequestServices )
+		public ReportGenerator( string shopName, WebRequestServices webRequestServices, ShopifyCommandFactory shopifyCommandFactory )
 		{
 			this._shopName = shopName;
 			this._webRequestServices = webRequestServices;
+			this._shopifyCommandFactory = shopifyCommandFactory;
 			this._throttler = new ShopifyGraphQlThrottler( this._shopName );
 		}
 
@@ -74,7 +76,7 @@ namespace ShopifyAccess.GraphQl.Services
 
 				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
 					() => this._throttler.ExecuteAsync(
-						() => this._webRequestServices.PostDataAsync< BulkOperationRunQueryResponse >( ShopifyCommand.GraphGl, request, cancellationToken, mark, GraphQlRequestTimeoutMs )
+						() => this._webRequestServices.PostDataAsync< BulkOperationRunQueryResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, cancellationToken, mark, GraphQlRequestTimeoutMs )
 						, mark )
 				).ConfigureAwait( false );
 
@@ -96,7 +98,7 @@ namespace ShopifyAccess.GraphQl.Services
 
 				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
 					() => this._throttler.ExecuteAsync(
-						() => this._webRequestServices.PostDataAsync< GetCurrentBulkOperationResponse >( ShopifyCommand.GraphGl, request, cancellationToken, mark, GraphQlRequestTimeoutMs ),
+						() => this._webRequestServices.PostDataAsync< GetCurrentBulkOperationResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, cancellationToken, mark, GraphQlRequestTimeoutMs ),
 						mark )
 				).ConfigureAwait( false );
 
@@ -119,7 +121,7 @@ namespace ShopifyAccess.GraphQl.Services
 
 				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
 					() => this._throttler.ExecuteAsync(
-						() => this._webRequestServices.PostDataAsync< GetBulkOperationByIdResponse >( ShopifyCommand.GraphGl, request, cancellationToken, mark, GraphQlRequestTimeoutMs )
+						() => this._webRequestServices.PostDataAsync< GetBulkOperationByIdResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, cancellationToken, mark, GraphQlRequestTimeoutMs )
 						, mark )
 				).ConfigureAwait( false );
 

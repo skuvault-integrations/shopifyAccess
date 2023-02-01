@@ -7,6 +7,7 @@ using ShopifyAccess.GraphQl;
 using ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions;
 using ShopifyAccess.GraphQl.Services;
 using ShopifyAccess.Models;
+using ShopifyAccess.Models.Configuration.Command;
 using ShopifyAccess.Services;
 
 namespace ShopifyAccessTests.GraphQl.Services
@@ -19,10 +20,11 @@ namespace ShopifyAccessTests.GraphQl.Services
 		[ SetUp ]
 		public void InitReportGeneratorTests()
 		{
-			if( this.Config != null )
+			if( this._clientCredentials != null )
 			{
-				var webRequestServices = new WebRequestServices( this.Config );
-				this.ReportGenerator = new ReportGenerator( this.Config.ShopName, webRequestServices );
+				var webRequestServices = new WebRequestServices( this._clientCredentials );
+				var shopifyCommandFactory = new ShopifyCommandFactory( BaseTests.ApiVersion );
+				this.ReportGenerator = new ReportGenerator( this._clientCredentials.ShopName, webRequestServices, shopifyCommandFactory );
 			}
 			else
 			{
