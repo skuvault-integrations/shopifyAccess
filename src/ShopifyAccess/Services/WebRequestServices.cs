@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CuttingEdge.Conditions;
 using ServiceStack;
+using ShopifyAccess.Helpers;
 using ShopifyAccess.Misc;
 using ShopifyAccess.Models;
 using ShopifyAccess.Models.Configuration.Authorization;
@@ -85,7 +86,7 @@ namespace ShopifyAccess.Services
 			} ).Result;
 		}
 
-		public ResponsePage< T > GetResponsePage< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark, int timeout )
+		public ResponsePage< T > GetResponsePage< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark, int timeout ) where T: class
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
@@ -137,7 +138,7 @@ namespace ShopifyAccess.Services
 			} ).ConfigureAwait( false );
 		}
 
-		public async Task< ResponsePage< T > > GetResponsePageAsync< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark, int timeout )
+		public async Task< ResponsePage< T > > GetResponsePageAsync< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark, int timeout ) where T: class
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
@@ -335,13 +336,15 @@ namespace ShopifyAccess.Services
 			return !string.IsNullOrEmpty( content ) ? content.FromJson< T >() : default( T );
 		}
 
-		private static ResponsePage< T > ParsePagedResponse< T >( string content, HttpHeaders headers, Uri uri, Mark mark, int timeout )
+		private static ResponsePage< T > ParsePagedResponse< T >( string content, HttpHeaders headers, Uri uri, Mark mark, int timeout ) where T: class
 		{
 			var limit = GetLimitFromHeader( headers );
 			var nextPageLink = PagedResponseService.GetNextPageQueryStrFromHeader( headers );
-			ShopifyLogger.LogGetResponse( uri, limit, nextPageLink, content, mark, timeout );
 
 			var result = !string.IsNullOrEmpty( content ) ? content.FromJson< T >() : default(T);
+
+			var contentForLogs = LogHelper.ToLogContents( result );
+			ShopifyLogger.LogGetResponse( uri, limit, nextPageLink, contentForLogs, mark, timeout );
 
 			return new ResponsePage< T > 
 			{
