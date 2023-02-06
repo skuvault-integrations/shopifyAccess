@@ -57,20 +57,9 @@ namespace ShopifyAccess.Misc
 			Trace( ex, mark, "Failed response\tShopName: {0}\tMessage: {1}", shopName, ex.Message );
 		}
 
-		public static void LogWebException( WebException ex, Mark mark, string shopName )
+		public static void LogInvalidStatusCode( int statusCode, string message, string shopName, Mark mark )
 		{
-			Trace( ex, mark, "Failed response\tShopName: {0}\tMessage: {1}\tStatus: {2}", shopName, ex.Message, ex.Status );
-		}
-
-		public static void LogTimeoutException( Mark mark, string shopName, int timeout )
-		{
-			Trace( mark, "Request timed out\tTimeout: {0}ms\tShopName: {1}", timeout, shopName );
-		}
-
-		public static void LogException( WebException ex, HttpWebResponse response, string jsonResponse, Mark mark )
-		{
-			Trace( ex, mark, "Failed response\tRequest: {0}\tMessage: {1}\tStatus: {2}\tJsonResponse: {3}",
-				response.ResponseUri, ex.Message, response.StatusCode, jsonResponse );
+			Trace( mark, "Failed response\tShopName: {0}\tMessage: {1}\tStatus: {2}", shopName, message, statusCode );
 		}
 
 		public static void LogOperationStart( string shopName, Mark mark, string message = null, [ CallerMemberName ] string callerMethodName = null )
