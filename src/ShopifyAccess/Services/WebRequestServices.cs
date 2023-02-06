@@ -37,12 +37,12 @@ namespace ShopifyAccess.Services
 			this.HttpClient = this.CreateHttpClient( this._clientCredentials.AccessToken );
 		}
 
-		public WebRequestServices( ShopifyClientCredentials clientCredentials )
+		public WebRequestServices( ShopifyClientCredentials clientCredentials, HttpClient httpClient = null )
 		{
 			Condition.Requires( clientCredentials, "clientCredentials" ).IsNotNull();
 
 			this._clientCredentials = clientCredentials;
-			this.HttpClient = this.CreateHttpClient( this._clientCredentials.AccessToken );
+			this.HttpClient = httpClient ?? this.CreateHttpClient( this._clientCredentials.AccessToken );
 			var servicePoint = ServicePointManager.FindServicePoint( new Uri( this._clientCredentials.Host ) );
 			servicePoint.ConnectionLimit = 1000;
 		}
