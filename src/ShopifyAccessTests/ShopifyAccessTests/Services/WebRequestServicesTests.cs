@@ -24,6 +24,25 @@ namespace ShopifyAccessTests.Services
 
 		#region GetResponse
 		[ Test ]
+		[ TestCase( HttpStatusCode.InternalServerError ) ]
+		[ TestCase( HttpStatusCode.NotImplemented ) ]
+		[ TestCase( HttpStatusCode.BadGateway ) ]
+		[ TestCase( HttpStatusCode.ServiceUnavailable ) ]
+		[ TestCase( HttpStatusCode.GatewayTimeout ) ]
+		public void GetResponse_ThrowsShopifyTransientException_When5xxStatusCode( HttpStatusCode statusCode )
+		{
+			// Arrange
+			var client = GetHttpClient( statusCode, new StringContent( string.Empty ) );
+			var webRequestServices = new WebRequestServices( new ShopifyClientCredentials( "shopName", "accessToken" ), client );
+
+			// Act
+			var action = new Action( () => webRequestServices.GetResponse< string >( this._TestCommand, "", CancellationToken.None, Mark.Create, Timeout ) );
+
+			// Assert
+			action.Should().Throw< ShopifyTransientException >();
+		}
+		
+		[ Test ]
 		public void GetResponse_ThrowsShopifyUnauthorizedException_WhenWrongCredentials()
 		{
 			// Arrange
