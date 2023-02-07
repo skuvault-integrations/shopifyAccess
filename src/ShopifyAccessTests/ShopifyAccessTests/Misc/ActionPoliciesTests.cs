@@ -81,7 +81,7 @@ namespace ShopifyAccessTests.Misc
 			{
 				// First time throw ShopifyUnauthorizedException
 				if( ++counter == 1 )
-					throw new ShopifyUnauthorizedException( "" );
+					throw new ShopifyUnauthorizedException( "", 401 );
 				return false;
 			};
 

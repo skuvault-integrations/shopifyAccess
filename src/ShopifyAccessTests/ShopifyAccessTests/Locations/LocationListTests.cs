@@ -1,5 +1,4 @@
-﻿using System.Net.Http;
-using System.Threading;
+﻿using System.Threading;
 using FluentAssertions;
 using NUnit.Framework;
 using ShopifyAccess.Exceptions;
@@ -39,7 +38,7 @@ namespace ShopifyAccessTests.Locations
 			var service = this.ShopifyFactory.CreateService( clientCredentials );
 
 			// Act, Assert
-			service.Invoking( s => s.GetLocations( CancellationToken.None ) ).Should().Throw< HttpRequestException >();
+			service.Invoking( s => s.GetLocations( CancellationToken.None ) ).Should().Throw< ShopifyUnauthorizedException >();
 		}
 	}
 }

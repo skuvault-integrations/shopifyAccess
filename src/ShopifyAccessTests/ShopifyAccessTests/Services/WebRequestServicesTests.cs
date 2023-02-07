@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -8,7 +9,6 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
 using NUnit.Framework;
-using ServiceStack;
 using ShopifyAccess.Exceptions;
 using ShopifyAccess.Models;
 using ShopifyAccess.Models.Configuration.Command;
@@ -41,7 +41,7 @@ namespace ShopifyAccessTests.Services
 			// Assert
 			action.Should().Throw< ShopifyTransientException >();
 		}
-		
+
 		[ Test ]
 		public void GetResponse_ThrowsShopifyUnauthorizedException_WhenWrongCredentials()
 		{
@@ -320,7 +320,7 @@ namespace ShopifyAccessTests.Services
 			var webRequestServices = new WebRequestServices( new ShopifyClientCredentials( "shopName", "accessToken" ), client );
 
 			// Act
-			Func< Task > action = async () => await webRequestServices.GetReportDocumentAsync( "http://test.com", stream => stream.ReadLines(), CancellationToken.None, Mark.Create, Timeout );
+			Func< Task > action = async () => await webRequestServices.GetReportDocumentAsync( "http://test.com", this.ParseFunc, CancellationToken.None, Mark.Create, Timeout );
 
 			// Assert
 			action.Should().ThrowAsync< ShopifyUnauthorizedException >();
@@ -334,7 +334,7 @@ namespace ShopifyAccessTests.Services
 			var webRequestServices = new WebRequestServices( new ShopifyClientCredentials( "shopName", "accessToken" ), client );
 
 			// Act
-			Func< Task > action = async () => await webRequestServices.GetReportDocumentAsync( "http://test.com", stream => stream.ReadLines(), CancellationToken.None, Mark.Create, Timeout );
+			Func< Task > action = async () => await webRequestServices.GetReportDocumentAsync( "http://test.com", this.ParseFunc, CancellationToken.None, Mark.Create, Timeout );
 
 			// Assert
 			action.Should().ThrowAsync< HttpRequestException >();
@@ -349,12 +349,25 @@ namespace ShopifyAccessTests.Services
 			var webRequestServices = new WebRequestServices( new ShopifyClientCredentials( "shopName", "accessToken" ), client );
 
 			// Act
-			var response = await webRequestServices.GetReportDocumentAsync( "http://test.com", stream => stream.ReadLines().ToArray(), CancellationToken.None, Mark.Create, Timeout );
+			var response = await webRequestServices.GetReportDocumentAsync( "http://test.com", this.ParseFunc, CancellationToken.None, Mark.Create, Timeout );
 
 			// Assert
 			response.Should().BeEquivalentTo( new[] { expectedResponse } );
 		}
 		#endregion
+
+		private IEnumerable< string > ParseFunc( Stream stream )
+		{
+			var result = new List< string >( 1 );
+			using( var reader = new StreamReader( stream ) )
+			{
+				string line;
+				while( ( line = reader.ReadLine() ) != null )
+					result.Add( line );
+			}
+
+			return result;
+		}
 
 		private static HttpClient GetHttpClient( HttpStatusCode statusCode, HttpContent content )
 		{

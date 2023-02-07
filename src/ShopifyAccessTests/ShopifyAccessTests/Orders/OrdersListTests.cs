@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -51,7 +50,7 @@ namespace ShopifyAccessTests.Orders
 
 			// Act, Assert
 			service.Invoking( s => s.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow, CancellationToken.None ) )
-				.Should().Throw< HttpRequestException >();
+				.Should().Throw< ShopifyUnauthorizedException >();
 		}
 	}
 }
