@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using CuttingEdge.Conditions;
 using ServiceStack;
 using ShopifyAccess.Exceptions;
-using ShopifyAccess.Helpers;
 using ShopifyAccess.Misc;
 using ShopifyAccess.Models;
 using ShopifyAccess.Models.Configuration.Authorization;
@@ -210,7 +209,7 @@ namespace ShopifyAccess.Services
 
 			var result = !string.IsNullOrEmpty( content ) ? content.FromJson< T >() : default(T);
 
-			var contentForLogs = LogHelper.ToLogContents( result );
+			var contentForLogs = result.ToLogContents();
 			ShopifyLogger.LogGetResponse( uri, limit, nextPageLink, contentForLogs, mark, timeout );
 
 			return new ResponsePage< T > 
