@@ -32,14 +32,18 @@ namespace ShopifyAccess.Misc
 			Trace( mark, "GET request\tRequest: {0} with timeout {1}ms", requestUri, timeout );
 		}
 
-		public static void LogGetResponse( Uri requestUri, string limit, string jsonResponse, Mark mark, int timeout )
+		public static void LogGetResponse< T >( Uri requestUri, string limit, string jsonResponse, Mark mark, int timeout )
 		{
-			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tResponse: {3}", requestUri, timeout, limit, jsonResponse );
+			var contentForLogs = jsonResponse.ToLogContents< T >();
+			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tResponse: {3}", 
+				requestUri, timeout, limit, contentForLogs );
 		}
 
-		public static void LogGetResponse( Uri requestUri, string limit, string nextPage, string jsonResponse, Mark mark, int timeout )
+		public static void LogGetResponse< T >( Uri requestUri, string limit, string nextPage, string jsonResponse, Mark mark, int timeout )
 		{
-			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tNext Page: {3}\tResponse: {4}", requestUri, timeout, limit, nextPage, jsonResponse );
+			var contentForLogs = jsonResponse.ToLogContents< T >();
+			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tNext Page: {3}\tResponse: {4}", 
+				requestUri, timeout, limit, nextPage, contentForLogs );
 		}
 
 		public static void LogUpdateRequest( Uri requestUri, string jsonContent, Mark mark, int timeout )

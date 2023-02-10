@@ -197,7 +197,7 @@ namespace ShopifyAccess.Services
 		private static T ParseResponse< T >( string content, HttpHeaders headers, Uri uri, Mark mark, int timeout )
 		{
 			var limit = GetLimitFromHeader( headers );
-			ShopifyLogger.LogGetResponse( uri, limit, content, mark, timeout );
+			ShopifyLogger.LogGetResponse< T >( uri, limit, content, mark, timeout );
 
 			return !string.IsNullOrEmpty( content ) ? content.FromJson< T >() : default( T );
 		}
@@ -208,9 +208,8 @@ namespace ShopifyAccess.Services
 			var nextPageLink = PagedResponseService.GetNextPageQueryStrFromHeader( headers );
 
 			var result = !string.IsNullOrEmpty( content ) ? content.FromJson< T >() : default(T);
-
-			var contentForLogs = result.ToLogContents();
-			ShopifyLogger.LogGetResponse( uri, limit, nextPageLink, contentForLogs, mark, timeout );
+			
+			ShopifyLogger.LogGetResponse< T >( uri, limit, nextPageLink, content, mark, timeout );
 
 			return new ResponsePage< T > 
 			{
