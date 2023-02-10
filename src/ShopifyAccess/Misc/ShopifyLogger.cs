@@ -49,7 +49,7 @@ namespace ShopifyAccess.Misc
 		}
 
 		/// <summary>
-		/// Log the response of a GET call for a specific page
+		/// Log the response of a paged GET call
 		/// </summary>
 		/// <param name="requestUri"></param>
 		/// <param name="limit"></param>
