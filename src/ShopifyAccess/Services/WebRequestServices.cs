@@ -206,10 +206,9 @@ namespace ShopifyAccess.Services
 		{
 			var limit = GetLimitFromHeader( headers );
 			var nextPageLink = PagedResponseService.GetNextPageQueryStrFromHeader( headers );
+			ShopifyLogger.LogGetResponse< T >( uri, limit, nextPageLink, content, mark, timeout );
 
 			var result = !string.IsNullOrEmpty( content ) ? content.FromJson< T >() : default(T);
-			
-			ShopifyLogger.LogGetResponse< T >( uri, limit, nextPageLink, content, mark, timeout );
 
 			return new ResponsePage< T > 
 			{
