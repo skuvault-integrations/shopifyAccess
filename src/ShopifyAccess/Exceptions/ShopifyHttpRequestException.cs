@@ -2,24 +2,17 @@
 
 namespace ShopifyAccess.Exceptions
 {
-	internal class ShopifyException: Exception
-	{
-		protected ShopifyException( string message, Exception exception = null ): base( message, exception )
-		{
-		}
-	}
-
 	/// <summary>
-	///	Shopify server exception
+	///	Shopify Http Request Exception
 	/// </summary>
-	internal class ShopifyServerException: ShopifyException
+	internal class ShopifyHttpRequestException: Exception
 	{
 		/// <summary>
 		///	Http response status code
 		/// </summary>
 		private int Code{ get; set; }
 
-		internal ShopifyServerException( string message, int code, Exception exception = null ): base( message, exception )
+		internal ShopifyHttpRequestException( string message, int code, Exception exception = null ): base( message, exception )
 		{
 			this.Code = code;
 		}
@@ -28,7 +21,7 @@ namespace ShopifyAccess.Exceptions
 	/// <summary>
 	///	Unauthorized exception (codes 401 or 403). Can't be reattempted
 	/// </summary>
-	internal class ShopifyUnauthorizedException: ShopifyServerException
+	internal class ShopifyUnauthorizedException: ShopifyHttpRequestException
 	{
 		internal ShopifyUnauthorizedException( string message, int code ): base( message, code )
 		{
@@ -38,7 +31,7 @@ namespace ShopifyAccess.Exceptions
 	/// <summary>
 	///	Transient exception (Codes 408 or 5xx). These exceptions can be reattempted
 	/// </summary>
-	internal class ShopifyTransientException: ShopifyServerException
+	internal class ShopifyTransientException: ShopifyHttpRequestException
 	{
 		internal ShopifyTransientException( string message, int code ): base( message, code )
 		{

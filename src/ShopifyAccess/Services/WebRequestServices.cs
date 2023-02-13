@@ -247,7 +247,7 @@ namespace ShopifyAccess.Services
 			}
 			catch
 			{
-				message = "No response message";
+				message = "Unable to read response contents";
 			}
 
 			ShopifyLogger.LogInvalidStatusCode( ( int )responseStatusCode, message, this._clientCredentials.ShopName, mark );
@@ -258,8 +258,7 @@ namespace ShopifyAccess.Services
 			if( IsTransientHttpStatusCode( responseStatusCode ) )
 				throw new ShopifyTransientException( message, ( int )responseStatusCode );
 
-			// throw HttpRequestException
-			response.EnsureSuccessStatusCode();
+			response.EnsureSuccessStatusCode(); // will throw HttpRequestException
 		}
 
 		private void ThrowIfOperationCanceledException( CancellationToken token, Mark mark )
