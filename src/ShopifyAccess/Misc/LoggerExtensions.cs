@@ -30,7 +30,7 @@ namespace ShopifyAccess.Misc
 			//(?<=foo)	Lookbehind	Asserts but not captures what immediately precedes the current position
 			//(?=foo)	Lookahead	Asserts but not captures what immediately follows the current position
 			//(...?)	Greedy		Get as much as possible
-			var regExBodyHtmlTail = new Regex( @"(?<=""body_html"":"".{" + ( MaxFieldValueLength - 20 ) + "," + MaxFieldValueLength + @"}\w)(.*?)(?="",""vendor"")" );
+			var regExBodyHtmlTail = new Regex( @"(?<=""body_html"":"".{" + ( MaxFieldValueLength - 20 ) + "," + MaxFieldValueLength + @"}\w)(.*?)(?="",""vendor"")", RegexOptions.Compiled );
 			return regExBodyHtmlTail.Replace( contentsJson, TruncationIndicator );
 		}
 	}
