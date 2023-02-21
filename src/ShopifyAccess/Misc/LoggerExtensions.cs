@@ -7,6 +7,14 @@ namespace ShopifyAccess.Misc
 	{
 		internal const int MaxFieldValueLength = 300;
 		internal const string TruncationIndicator = "...";
+		
+		/// <summary>
+		/// RegEx to match "body_html":"{at most MaxFieldValueLength length or within the nearest word boundary (to avoid breaking JSON)}{capture the "tail" of long body_html}","vendor".<br />
+		/// (?&lt;=foo)	Lookbehind	Asserts but not captures what immediately precedes the current position<br />
+		/// (?=foo)	Lookahead	Asserts but not captures what immediately follows the current position<br />
+		/// (...?)	Greedy		Get as much as possible
+		/// </summary>
+		private static readonly Regex _regExBodyHtmlTail = new Regex( @"(?<=""body_html"":"".{" + ( MaxFieldValueLength - 20 ) + "," + MaxFieldValueLength + @"}\w)(.*?)(?="",""vendor"")", RegexOptions.Compiled );
 
 		/// <summary>
 		/// Prepare field values for logs. For example, to truncate long ones or obfuscate sensitive information.
@@ -26,12 +34,7 @@ namespace ShopifyAccess.Misc
 
 		private static string TruncateProductLongFieldValues( string contentsJson )
 		{
-			//RegEx to match "body_html":"{at most MaxFieldValueLength length or within the nearest word boundary (to avoid breaking JSON)}{capture the "tail" of long body_html}","vendor"
-			//(?<=foo)	Lookbehind	Asserts but not captures what immediately precedes the current position
-			//(?=foo)	Lookahead	Asserts but not captures what immediately follows the current position
-			//(...?)	Greedy		Get as much as possible
-			var regExBodyHtmlTail = new Regex( @"(?<=""body_html"":"".{" + ( MaxFieldValueLength - 20 ) + "," + MaxFieldValueLength + @"}\w)(.*?)(?="",""vendor"")", RegexOptions.Compiled );
-			return regExBodyHtmlTail.Replace( contentsJson, TruncationIndicator );
+			return _regExBodyHtmlTail.Replace( contentsJson, TruncationIndicator );
 		}
 	}
 }
