@@ -74,7 +74,7 @@ namespace ShopifyAccess.GraphQl.Services
 			{
 				var request = QueryBuilder.GetReportRequest( type );
 
-				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
+				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName, cancellationToken ).Get(
 					() => this._throttler.ExecuteAsync(
 						() => this._webRequestServices.PostDataAsync< BulkOperationRunQueryResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, cancellationToken, mark, GraphQlRequestTimeoutMs )
 						, mark )
@@ -96,7 +96,7 @@ namespace ShopifyAccess.GraphQl.Services
 			{
 				var request = QueryBuilder.GetCurrentBulkOperationStatusRequest();
 
-				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
+				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName, cancellationToken ).Get(
 					() => this._throttler.ExecuteAsync(
 						() => this._webRequestServices.PostDataAsync< GetCurrentBulkOperationResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, cancellationToken, mark, GraphQlRequestTimeoutMs ),
 						mark )
@@ -119,7 +119,7 @@ namespace ShopifyAccess.GraphQl.Services
 			{
 				var request = QueryBuilder.GetBulkOperationStatusByIdRequest( gid );
 
-				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
+				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName, cancellationToken ).Get(
 					() => this._throttler.ExecuteAsync(
 						() => this._webRequestServices.PostDataAsync< GetBulkOperationByIdResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, cancellationToken, mark, GraphQlRequestTimeoutMs )
 						, mark )
@@ -145,7 +145,7 @@ namespace ShopifyAccess.GraphQl.Services
 
 			try
 			{
-				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName ).Get(
+				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName, cancellationToken ).Get(
 					// Don't need to use throttler here as we just download a .jsonl file by direct URL
 					() => this._webRequestServices.GetReportDocumentAsync( url, parseMethod, cancellationToken, mark, timeout )
 				).ConfigureAwait( false );
