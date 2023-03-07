@@ -311,7 +311,7 @@ namespace ShopifyAccessTests.Services
 		}
 		#endregion
 
-		#region GetReportDocumentAsyncAsync
+		#region GetReportDocumentAsync
 		[ Test ]
 		public void GetReportDocumentAsync_ThrowsShopifyUnauthorizedException_WhenWrongCredentials()
 		{

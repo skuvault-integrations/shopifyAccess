@@ -97,7 +97,7 @@ namespace ShopifyAccessTests.Misc
 			var counter = 0;
 			Func< bool > action = () =>
 			{
-				// First time throw ShopifyUnauthorizedException
+				// First time throw ThrottlerException
 				if( ++counter == 1 )
 					throw new ThrottlerException( "" );
 				return false;
@@ -115,7 +115,7 @@ namespace ShopifyAccessTests.Misc
 			var counter = 0;
 			Func< bool > action = () =>
 			{
-				// First time throw ShopifyUnauthorizedException
+				// First time throw Exception
 				if( ++counter == 1 )
 					throw new Exception();
 				return false;

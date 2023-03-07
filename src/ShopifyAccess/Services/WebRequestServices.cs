@@ -247,7 +247,7 @@ namespace ShopifyAccess.Services
 			}
 			catch
 			{
-				message = "No response message";
+				message = "Unable to read response contents";
 			}
 
 			ShopifyLogger.LogInvalidStatusCode( ( int )responseStatusCode, message, this._clientCredentials.ShopName, mark );
