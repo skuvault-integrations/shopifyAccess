@@ -66,6 +66,9 @@
       <HintPath>..\..\packages\NUnit.3.5.0\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ServiceStack.Text, Version=4.0.60.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ServiceStack.Text.4.0.60\lib\net40\ServiceStack.Text.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -98,6 +101,7 @@
     <Compile Include="GraphQl\ShopifyGraphQlThrottlerTests.cs" />
     <Compile Include="Locations\LocationListTests.cs" />
     <Compile Include="Misc\ActionPoliciesTests.cs" />
+    <Compile Include="Misc\LoggerExtensionsTests.cs" />
     <Compile Include="OperationTimeoutTests.cs" />
     <Compile Include="Orders\OrderMapperTests.cs" />
     <Compile Include="Orders\OrdersListTests.cs" />
