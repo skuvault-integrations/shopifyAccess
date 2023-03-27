@@ -44,6 +44,38 @@ namespace ShopifyAccessTests.Misc
 					.EncodeToMatchReturnedFromShopifyAPI().RemoveTruncationIndicator() ) );
 		}
 
+		//TODO ToLogContents< ShopifyProducts > produces invalid JSON:
+		//1. It erase part of the middle product. Initial JSON had 3 "body_html" (one per product) but the result only has two
+		//2. The "a..." below is abnormal JSON since it's not a field:value part, like "tags":"magento_disabled" AND "vendor":"Global Healing"
+		//		"tags":"magento_disabled","a...","vendor":"Global Healing"
+		//The "..." part is added by the truncation replace.
+		//3. Last product's body_html isn't getting truncated (should be <300 characters in result)
+		//These might have to do with some products having an empty body_html. Apparently, the RegExt can't handle that (gets too greedy).
+		[ Test ]
+		public void ToLogContentsShopifyProducts_WhenSpecificJson_ShouldTruncateOnlyBodyHtml()
+		{
+			const string bodyHtmlThird = "\n\u003cp\u003eSupport your digestive health with our NEW Acid Reflux Relief liquid formula. Foods are known to disrupt your stomach’s pH levels and cause indigestion. Our Acid Reflux Relief combines well-known organic ingredients like apple cider vinegar (ACV) with six other trusted herbs known to soothe occasional heartburn, indigestion, and digestive irritation.\u003c\\/p\u003e\u003cul\u003e\n\u003cli\u003e\u003cp\u003eEases Occasional Heartburn \u0026amp; Acid Reflux\u003c\\/p\u003e\u003c\\/li\u003e\n\u003cli\u003e\u003cp\u003ePromotes Healthy pH of the Stomach\u003c\\/p\u003e\u003c\\/li\u003e\n\u003cli\u003e\u003cp\u003eSupports the Body’s Natural Defense Against Digestive Inflammation\u003c\\/p\u003e\u003c\\/li\u003e\n\u003cli\u003e\u003cp\u003eYear to Love It — One Year Money-Back Guarantee\u003c\\/p\u003e\u003c\\/li\u003e\n\u003c\\/ul\u003e\n\n\n";
+			string problematicProducts =
+				//The 1st two have a blank body_html
+				"{\"products\":[" +
+					"{\"id\":6735860105416,\"title\":\"50 Extra Vegetarian Capsules\",\"body_html\":\"\",\"vendor\":\"Global Healing\",\"product_type\":\"\",\"created_at\":\"2021-04-19T17:34:37-05:00\",\"handle\":\"50-extra-vegetarian-capsules\",\"updated_at\":\"2023-02-21T10:50:19-06:00\",\"published_at\":null,\"template_suffix\":\"\",\"status\":\"archived\",\"published_scope\":\"web\",\"tags\":\"magento_disabled\",\"admin_graphql_api_id\":\"gid:\\/\\/shopify\\/Product\\/6735860105416\",\"variants\":[{\"id\":39867295137992,\"product_id\":6735860105416,\"title\":\"Default Title\",\"price\":\"0.00\",\"sku\":\"50EVC\",\"position\":1,\"inventory_policy\":\"deny\",\"compare_at_price\":null,\"fulfillment_service\":\"manual\",\"inventory_management\":null,\"option1\":\"Default Title\",\"option2\":null,\"option3\":null,\"created_at\":\"2021-04-19T17:34:37-05:00\",\"updated_at\":\"2021-09-15T11:33:49-05:00\",\"taxable\":true,\"barcode\":\"\",\"grams\":57,\"image_id\":null,\"weight\":56.699,\"weight_unit\":\"g\",\"inventory_item_id\":41961859023048,\"inventory_quantity\":0,\"old_inventory_quantity\":0,\"tax_code\":\"P0000000\",\"requires_shipping\":true,\"admin_graphql_api_id\":\"gid:\\/\\/shopify\\/ProductVariant\\/39867295137992\"}],\"options\":[{\"id\":8629704884424,\"product_id\":6735860105416,\"name\":\"Title\",\"position\":1,\"values\":[\"Default Title\"]}],\"images\":[],\"image\":null}," +
+					"{\"id\":6735863185608,\"title\":\"9 Step Body Cleanse Kit\",\"body_html\":\"\",\"vendor\":\"Global Healing\",\"product_type\":\"\",\"created_at\":\"2021-04-19T17:35:13-05:00\",\"handle\":\"9-step-body-cleanse-kit\",\"updated_at\":\"2023-02-21T10:50:21-06:00\",\"published_at\":null,\"template_suffix\":\"\",\"status\":\"archived\",\"published_scope\":\"web\",\"tags\":\"magento_disabled\",\"admin_graphql_api_id\":\"gid:\\/\\/shopify\\/Product\\/6735863185608\",\"variants\":[{\"id\":39867299201224,\"product_id\":6735863185608,\"title\":\"Default Title\",\"price\":\"479.95\",\"sku\":\"9SBCK\",\"position\":1,\"inventory_policy\":\"deny\",\"compare_at_price\":null,\"fulfillment_service\":\"manual\",\"inventory_management\":null,\"option1\":\"Default Title\",\"option2\":null,\"option3\":null,\"created_at\":\"2021-04-19T17:35:13-05:00\",\"updated_at\":\"2021-09-15T11:33:53-05:00\",\"taxable\":true,\"barcode\":\"\",\"grams\":0,\"image_id\":null,\"weight\":0.0,\"weight_unit\":\"g\",\"inventory_item_id\":41961863086280,\"inventory_quantity\":0,\"old_inventory_quantity\":0,\"tax_code\":\"PF050700\",\"requires_shipping\":true,\"admin_graphql_api_id\":\"gid:\\/\\/shopify\\/ProductVariant\\/39867299201224\"}],\"options\":[{\"id\":8629708161224,\"product_id\":6735863185608,\"name\":\"Title\",\"position\":1,\"values\":[\"Default Title\"]}],\"images\":[],\"image\":null}," +
+					"{\"id\":6903246487752,\"title\":\"Acid Reflux Relief\",\"body_html\":\"" + bodyHtmlThird + "\",\"vendor\":\"Global Healing\",\"product_type\":\"Vitamins \u0026 Supplements\",\"created_at\":\"2021-06-17T10:36:45-05:00\",\"handle\":\"acid-reflux\",\"updated_at\":\"2023-03-21T16:50:51-05:00\",\"published_at\":\"2021-06-21T11:16:00-05:00\",\"template_suffix\":\"\",\"status\":\"active\",\"published_scope\":\"global\",\"tags\":\"All Products (A-Z), catalog-enabled, Featured Products, new, Promotion Inclusion, Shop, subscription-10, Supplements\",\"admin_graphql_api_id\":\"gid:\\/\\/shopify\\/Product\\/6903246487752\",\"variants\":[{\"id\":40364440518856,\"product_id\":6903246487752,\"title\":\"Default Title\",\"price\":\"29.95\",\"sku\":\"ARR-2OZ\",\"position\":1,\"inventory_policy\":\"deny\",\"compare_at_price\":null,\"fulfillment_service\":\"manual\",\"inventory_management\":\"shopify\",\"option1\":\"Default Title\",\"option2\":null,\"option3\":null,\"created_at\":\"2021-06-17T10:36:46-05:00\",\"updated_at\":\"2023-03-21T16:50:51-05:00\",\"taxable\":true,\"barcode\":\"811839031673\",\"grams\":213,\"image_id\":null,\"weight\":213.1882,\"weight_unit\":\"g\",\"inventory_item_id\":42459589050568,\"inventory_quantity\":155,\"old_inventory_quantity\":155,\"tax_code\":\"PF050700\",\"requires_shipping\":true,\"admin_graphql_api_id\":\"gid:\\/\\/shopify\\/ProductVariant\\/40364440518856\"}],\"options\":[{\"id\":8813671612616,\"product_id\":6903246487752,\"name\":\"Title\",\"position\":1,\"values\":[\"Default Title\"]}],\"images\":[{\"id\":30454560522440,\"product_id\":6903246487752,\"position\":1,\"created_at\":\"2021-07-16T13:13:56-05:00\",\"updated_at\":\"2022-10-04T17:24:03-05:00\",\"alt\":null,\"width\":3000,\"height\":3000,\"src\":\"https:\\/\\/cdn.shopify.com\\/s\\/files\\/1\\/0539\\/5621\\/4984\\/products\\/3000w_6d3c9c1f-417e-4619-97a2-c1a06103a2e1.png?v=1664922243\",\"variant_ids\":[],\"admin_graphql_api_id\":\"gid:\\/\\/shopify\\/ProductImage\\/30454560522440\"},{\"id\":33524765655240,\"product_id\":6903246487752,\"position\":2,\"created_at\":\"2022-10-04T17:24:10-05:00\",\"updated_at\":\"2022-10-04T17:24:12-05:00\",\"alt\":null,\"width\":3000,\"height\":3000,\"src\":\"https:\\/\\/cdn.shopify.com\\/s\\/files\\/1\\/0539\\/5621\\/4984\\/products\\/3000w_c4246a6e-3c2c-49f7-b8ea-57764f139d32.jpg?v=1664922252\",\"variant_ids\":[],\"admin_graphql_api_id\":\"gid:\\/\\/shopify\\/ProductImage\\/33524765655240\"},{\"id\":30454560784584,\"product_id\":6903246487752,\"position\":3,\"created_at\":\"2021-07-16T13:13:56-05:00\",\"updated_at\":\"2022-10-04T17:24:12-05:00\",\"alt\":null,\"width\":3250,\"height\":3250,\"src\":\"https:\\/\\/cdn.shopify.com\\/s\\/files\\/1\\/0539\\/5621\\/4984\\/products\\/carousel-1_c97100a3-1fbb-4cda-b7c8-dad7709bf1d5.jpg?v=1664922252\",\"variant_ids\":[],\"admin_graphql_api_id\":\"gid:\\/\\/shopify\\/ProductImage\\/30454560784584\"},{\"id\":30454560850120,\"product_id\":6903246487752,\"position\":4,\"created_at\":\"2021-07-16T13:13:56-05:00\",\"updated_at\":\"2022-10-04T17:24:12-05:00\",\"alt\":null,\"width\":2000,\"height\":2000,\"src\":\"https:\\/\\/cdn.shopify.com\\/s\\/files\\/1\\/0539\\/5621\\/4984\\/products\\/carousel-2_a6f4a0ea-3670-47b1-909b-fdff8bf83788.jpg?v=1664922252\",\"variant_ids\":[],\"admin_graphql_api_id\":\"gid:\\/\\/shopify\\/ProductImage\\/30454560850120\"}],\"image\":{\"id\":30454560522440,\"product_id\":6903246487752,\"position\":1,\"created_at\":\"2021-07-16T13:13:56-05:00\",\"updated_at\":\"2022-10-04T17:24:03-05:00\",\"alt\":null,\"width\":3000,\"height\":3000,\"src\":\"https:\\/\\/cdn.shopify.com\\/s\\/files\\/1\\/0539\\/5621\\/4984\\/products\\/3000w_6d3c9c1f-417e-4619-97a2-c1a06103a2e1.png?v=1664922243\",\"variant_ids\":[],\"admin_graphql_api_id\":\"gid:\\/\\/shopify\\/ProductImage\\/30454560522440\"}" + 
+				"]}";
+
+			var resultJson = problematicProducts.ToLogContents< ShopifyProducts >();
+
+			var resultProducts = resultJson.FromJson< ShopifyProducts >().Products;
+			// Assert.That( resultProducts.Count, Is.EqualTo( 3 ));
+			//Should be considerably shorter due to truncation
+			Assert.That( resultJson.Length + 100, Is.LessThan( problematicProducts.Length ) );
+			Assert.That( resultProducts[ 0 ].BodyHtml, Is.Empty );
+			Assert.That( resultProducts[ 1 ].BodyHtml, Is.Empty );
+			Assert.That( resultProducts[ 2 ].BodyHtml.Length, Is.LessThanOrEqualTo( LoggerExtensions.MaxFieldValueLength ) );
+			Assert.True( bodyHtmlThird.StartsWith( resultProducts[ 2 ].BodyHtml
+					.EncodeToMatchReturnedFromShopifyAPI().RemoveTruncationIndicator() ) );
+		}
+
 		/// <summary>
 		/// To test RegexOptions.Compiled option, which should speed up subsequent RegEx calls
 		/// </summary>
@@ -88,7 +120,9 @@ namespace ShopifyAccessTests.Misc
 		/// <returns></returns>
 		internal static string RemoveTruncationIndicator( this string logText )
 		{
-			return logText.Substring( 0, logText.Length - LoggerExtensions.TruncationIndicator.Length - 1 );
+			return logText.Length >= LoggerExtensions.TruncationIndicator.Length 
+				? logText.Substring( 0, logText.Length - LoggerExtensions.TruncationIndicator.Length - 1 )
+				: logText;
 		}
 	}
 }

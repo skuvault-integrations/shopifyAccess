@@ -258,6 +258,8 @@ namespace ShopifyAccess.Services
 			if( IsTransientHttpStatusCode( responseStatusCode ) )
 				throw new ShopifyTransientException( message, ( int )responseStatusCode );
 
+			//TODO This won't log the response contents or the mark, only the status code (in v1). Integration logs just log the request in a separate log entry but the failed response isn't logged at all.
+			//Manually throwing on response.IsSuccessStatusCode might be better, since we can then pass the response message and the mark into the exception
 			response.EnsureSuccessStatusCode(); // will throw HttpRequestException
 		}
 
