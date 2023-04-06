@@ -43,12 +43,20 @@ namespace ShopifyAccess
 		ShopifyLocations GetLocations( CancellationToken token, Mark mark = null );
 
 		/// <summary>
-		/// get locations async
+		/// Get all Shopify locations for the shop
 		/// </summary>
 		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns></returns>
 		Task< ShopifyLocations > GetLocationsAsync( CancellationToken token, Mark mark = null );
+
+		/// <summary>
+		/// Get active Shopify locations for the shop
+		/// </summary>
+		/// <param name="token">CancellationToken</param>
+		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
+		/// <returns></returns>
+		Task< ShopifyLocations > GetActiveLocationsAsync( CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		/// Get all existing products

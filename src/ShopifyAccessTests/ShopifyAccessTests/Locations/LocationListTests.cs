@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
 using ShopifyAccess.Exceptions;
@@ -39,6 +41,15 @@ namespace ShopifyAccessTests.Locations
 
 			// Act, Assert
 			service.Invoking( s => s.GetLocations( CancellationToken.None ) ).Should().Throw< ShopifyUnauthorizedException >();
+		}
+
+		[ Test ]
+		[ Explicit ]
+		public async Task GetActiveLocationsAsync_ReturnsOnlyActiveLocations()
+		{
+			var result = await this.Service.GetActiveLocationsAsync( CancellationToken.None ).ConfigureAwait( false );
+
+			Assert.IsTrue( result.Locations.All( x => x.IsActive ) );
 		}
 	}
 }
