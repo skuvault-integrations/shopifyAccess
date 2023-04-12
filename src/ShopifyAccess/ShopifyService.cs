@@ -106,6 +106,13 @@ namespace ShopifyAccess
 			return locations;
 		}
 
+		public async Task< ShopifyLocations > GetActiveLocationsAsync( CancellationToken token, Mark mark = null )
+		{
+			var allLocations = await this.GetLocationsAsync( token, mark ).ConfigureAwait( false );
+			var activeLocations = allLocations?.Locations?.Where( x => x.IsActive ) ?? new ShopifyLocation[] {};
+			return new ShopifyLocations( activeLocations.ToList() );
+		}
+
 		private ShopifyOrders CollectOrdersFromAllPages( string mainUpdatedOrdersEndpoint, Mark mark, CancellationToken token, int timeout )
 		{
 			var orders = new ShopifyOrders();
