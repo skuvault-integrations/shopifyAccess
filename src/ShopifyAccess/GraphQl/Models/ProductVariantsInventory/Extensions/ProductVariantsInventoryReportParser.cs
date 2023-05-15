@@ -14,7 +14,7 @@ namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions
 
 			foreach( var line in stream.ReadLines() )
 			{
-				var inventoryLevel = ParseAsInventoryLevel( line.Replace("\t", string.Empty) );
+				var inventoryLevel = ParseAsInventoryLevel( line );
 				if( inventoryLevel.ProductVariantId == null )
 				{
 					lastProductVariant = ParseAsProductVariant( line );
