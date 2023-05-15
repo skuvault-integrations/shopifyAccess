@@ -131,26 +131,6 @@ namespace ShopifyAccessTests.Products
 			imagesUrlsQueries.Should().BeEmpty();
 		}
 
-		private async Task< ShopifyInventoryLevel > GetFirstInventoryItem( string sku )
-		{
-			var product = ( await this.Service.GetProductVariantsInventoryBySkusAsync( new List< string > { sku }, CancellationToken.None ) ).First();
-			return product.InventoryLevels.InventoryLevels.First();
-		}
-
-		private static IEnumerable< ShopifyInventoryLevelForUpdate > CreateInventoryLevelForUpdate( ShopifyInventoryLevel inventory, int setQuantity )
-		{
-			IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels = new List< ShopifyInventoryLevelForUpdate >
-			{
-				new ShopifyInventoryLevelForUpdate
-				{
-					InventoryItemId = inventory.InventoryItemId,
-					Quantity = setQuantity,
-					LocationId = inventory.LocationId
-				}
-			};
-			return inventoryLevels;
-		}
-
 		[ Test ]
 		[ Explicit ]
 		public async Task GetProductVariantsInventoryReportAsync_ReturnsCorrectReport()
@@ -163,7 +143,7 @@ namespace ShopifyAccessTests.Products
 			var productVariantsReport = await this.Service.GetProductVariantsInventoryReportAsync( CancellationToken.None );
 
 			// Assert
-			 this.ValidateIfEqual( productVariantsReport, productVariants );
+			this.ValidateIfEqual( productVariantsReport, productVariants );
 		}
 
 		[ Test ]
@@ -228,6 +208,26 @@ namespace ShopifyAccessTests.Products
 
 			// Assert
 			this.ValidateIfEqual( productVariantsFromReport, productVariants );
+		}
+
+		private async Task< ShopifyInventoryLevel > GetFirstInventoryItem( string sku )
+		{
+			var product = ( await this.Service.GetProductVariantsInventoryBySkusAsync( new List< string > { sku }, CancellationToken.None ) ).First();
+			return product.InventoryLevels.InventoryLevels.First();
+		}
+
+		private static IEnumerable< ShopifyInventoryLevelForUpdate > CreateInventoryLevelForUpdate( ShopifyInventoryLevel inventory, int setQuantity )
+		{
+			IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels = new List< ShopifyInventoryLevelForUpdate >
+			{
+				new ShopifyInventoryLevelForUpdate
+				{
+					InventoryItemId = inventory.InventoryItemId,
+					Quantity = setQuantity,
+					LocationId = inventory.LocationId
+				}
+			};
+			return inventoryLevels;
 		}
 
 		private void ValidateIfEqual( List< ShopifyProductVariant > productVariantsReport, List< ShopifyProductVariant > productVariants )

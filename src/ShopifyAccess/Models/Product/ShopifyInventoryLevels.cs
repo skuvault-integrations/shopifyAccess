@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace ShopifyAccess.Models.Product
@@ -25,6 +26,7 @@ namespace ShopifyAccess.Models.Product
 		public long LocationId{ get; set; }
 
 		[ DataMember( Name = "available" ) ]
+		[ JsonProperty( NullValueHandling = NullValueHandling.Ignore ) ]
 		public int Available{ get; set; }
 
 		[ DataMember( Name = "updated_at" ) ]

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json;
 using ServiceStack;
 
 namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions
@@ -13,7 +14,7 @@ namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions
 
 			foreach( var line in stream.ReadLines() )
 			{
-				var inventoryLevel = ParseAsInventoryLevel( line );
+				var inventoryLevel = ParseAsInventoryLevel( line.Replace("\t", string.Empty) );
 				if( inventoryLevel.ProductVariantId == null )
 				{
 					lastProductVariant = ParseAsProductVariant( line );
@@ -31,7 +32,7 @@ namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions
 		}
 
 		private static T ParseLine< T >( string content ) where T : class =>
-			!string.IsNullOrEmpty( content ) ? content.FromJson< T >() : null;
+			!string.IsNullOrEmpty( content ) ? JsonConvert.DeserializeObject< T >( content ) : null;
 
 		private static ProductVariant ParseAsProductVariant( string content ) =>
 			ParseLine< ProductVariant >( content );

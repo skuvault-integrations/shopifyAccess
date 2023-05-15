@@ -23,10 +23,12 @@
 							tracked
 							inventoryLevels(first: $locationsCount) {
 								nodes {
-									available
 									location {
 										id
 										name
+									}
+									quantities(names: [""available""]) {
+										quantity
 									}
 								}
 							}

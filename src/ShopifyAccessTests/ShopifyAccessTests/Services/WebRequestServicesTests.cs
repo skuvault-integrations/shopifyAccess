@@ -21,6 +21,7 @@ namespace ShopifyAccessTests.Services
 	{
 		private readonly ShopifyCommand _TestCommand = new ShopifyCommand( "/test/command.json", ApiVersion );
 		private const int Timeout = 10000;
+		private const string responseOkJson = "\"ok\"";
 
 		#region GetResponse
 		[ Test ]
@@ -74,16 +75,16 @@ namespace ShopifyAccessTests.Services
 		public void GetResponse_ReturnsResponse_WhenCorrectCommand()
 		{
 			// Arrange
-			var expectedResponse = "ok";
-			var client = GetHttpClient( HttpStatusCode.OK, new StringContent( expectedResponse ) );
+			var client = GetHttpClient( HttpStatusCode.OK, new StringContent( responseOkJson ) );
 			var webRequestServices = new WebRequestServices( new ShopifyClientCredentials( "shopName", "accessToken" ), client );
 
 			// Act
 			var response = webRequestServices.GetResponse< string >( this._TestCommand, "", CancellationToken.None, Mark.Create, Timeout );
 
 			// Assert
-			response.Should().Be( expectedResponse );
+			AssertExpectedResponse( response, responseOkJson );
 		}
+
 		#endregion
 
 		#region GetResponseAsync
@@ -119,15 +120,14 @@ namespace ShopifyAccessTests.Services
 		public async Task GetResponseAsync_ReturnsResponse_WhenCorrectCommand()
 		{
 			// Arrange
-			var expectedResponse = "ok";
-			var client = GetHttpClient( HttpStatusCode.OK, new StringContent( expectedResponse ) );
+			var client = GetHttpClient( HttpStatusCode.OK, new StringContent( responseOkJson ) );
 			var webRequestServices = new WebRequestServices( new ShopifyClientCredentials( "shopName", "accessToken" ), client );
 
 			// Act
 			var response = await webRequestServices.GetResponseAsync< string >( this._TestCommand, "", CancellationToken.None, Mark.Create, Timeout );
 
 			// Assert
-			response.Should().Be( expectedResponse );
+			AssertExpectedResponse( response, responseOkJson );
 		}
 		#endregion
 
@@ -164,15 +164,14 @@ namespace ShopifyAccessTests.Services
 		public void GetResponsePage_ReturnsResponse_WhenCorrectCommand()
 		{
 			// Arrange
-			var expectedResponse = "ok";
-			var client = GetHttpClient( HttpStatusCode.OK, new StringContent( expectedResponse ) );
+			var client = GetHttpClient( HttpStatusCode.OK, new StringContent( responseOkJson ) );
 			var webRequestServices = new WebRequestServices( new ShopifyClientCredentials( "shopName", "accessToken" ), client );
 
 			// Act
 			var response = webRequestServices.GetResponsePage< string >( this._TestCommand, "", CancellationToken.None, Mark.Create, Timeout );
 
 			// Assert
-			response.Response.Should().Be( expectedResponse );
+			AssertExpectedResponse( response.Response, responseOkJson );
 		}
 		#endregion
 
@@ -209,15 +208,14 @@ namespace ShopifyAccessTests.Services
 		public async Task GetResponsePageAsync_ReturnsResponse_WhenCorrectCommand()
 		{
 			// Arrange
-			var expectedResponse = "ok";
-			var client = GetHttpClient( HttpStatusCode.OK, new StringContent( expectedResponse ) );
+			var client = GetHttpClient( HttpStatusCode.OK, new StringContent( responseOkJson ) );
 			var webRequestServices = new WebRequestServices( new ShopifyClientCredentials( "shopName", "accessToken" ), client );
 
 			// Act
 			var response = await webRequestServices.GetResponsePageAsync< string >( this._TestCommand, "", CancellationToken.None, Mark.Create, Timeout );
 
 			// Assert
-			response.Response.Should().Be( expectedResponse );
+			AssertExpectedResponse( response.Response, responseOkJson );
 		}
 		#endregion
 
@@ -254,15 +252,14 @@ namespace ShopifyAccessTests.Services
 		public void PostData_ReturnsResponse_WhenCorrectCommand()
 		{
 			// Arrange
-			var expectedResponse = "ok";
-			var client = GetHttpClient( HttpStatusCode.OK, new StringContent( expectedResponse ) );
+			var client = GetHttpClient( HttpStatusCode.OK, new StringContent( responseOkJson ) );
 			var webRequestServices = new WebRequestServices( new ShopifyClientCredentials( "shopName", "accessToken" ), client );
 
 			// Act
 			var response = webRequestServices.PostData< string >( this._TestCommand, "", CancellationToken.None, Mark.Create, Timeout );
 
 			// Assert
-			response.Should().Be( expectedResponse );
+			AssertExpectedResponse( response, responseOkJson );
 		}
 		#endregion
 
@@ -299,15 +296,14 @@ namespace ShopifyAccessTests.Services
 		public async Task PostDataAsync_ReturnsResponse_WhenCorrectCommand()
 		{
 			// Arrange
-			var expectedResponse = "ok";
-			var client = GetHttpClient( HttpStatusCode.OK, new StringContent( expectedResponse ) );
+			var client = GetHttpClient( HttpStatusCode.OK, new StringContent( responseOkJson ) );
 			var webRequestServices = new WebRequestServices( new ShopifyClientCredentials( "shopName", "accessToken" ), client );
 
 			// Act
 			var response = await webRequestServices.PostDataAsync< string >( this._TestCommand, "", CancellationToken.None, Mark.Create, Timeout );
 
 			// Assert
-			response.Should().Be( expectedResponse );
+			AssertExpectedResponse( response, responseOkJson );
 		}
 		#endregion
 
@@ -344,15 +340,14 @@ namespace ShopifyAccessTests.Services
 		public async Task GetReportDocumentAsync_ReturnsResponse_WhenCorrectCommand()
 		{
 			// Arrange
-			var expectedResponse = "ok";
-			var client = GetHttpClient( HttpStatusCode.OK, new StringContent( expectedResponse ) );
+			var client = GetHttpClient( HttpStatusCode.OK, new StringContent( responseOkJson ) );
 			var webRequestServices = new WebRequestServices( new ShopifyClientCredentials( "shopName", "accessToken" ), client );
 
 			// Act
 			var response = await webRequestServices.GetReportDocumentAsync( "http://test.com", this.ParseFunc, CancellationToken.None, Mark.Create, Timeout );
 
 			// Assert
-			response.Should().BeEquivalentTo( new[] { expectedResponse } );
+			response.Should().BeEquivalentTo( new[] { responseOkJson } );
 		}
 		#endregion
 
@@ -390,6 +385,12 @@ namespace ShopifyAccessTests.Services
 				} ) );
 
 			return new HttpClient( httpMessageHandlerMock );
+		}
+
+		private void AssertExpectedResponse( string response, string expectedResponseJson )
+		{
+			var expectedResponse = expectedResponseJson.Replace( "\"", string.Empty );
+			response.Should().Be( expectedResponse );
 		}
 	}
 }
