@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using Netco.Logging;
 using Newtonsoft.Json.Linq;
 using ShopifyAccess.Models;
@@ -13,7 +14,7 @@ namespace ShopifyAccess.Misc
 		/// <summary>
 		/// We should not log PII (personally identifiable information) (see GUARD-2660)
 		/// </summary>
-		private static readonly HashSet<string> personalFieldNames = new HashSet<string>(new[]
+		private static readonly HashSet< string > _personalFieldNames = new HashSet< string >( new[]
 		{
 			// ShopifyOrder.ShopifyCustomer.Email
 			"email",
@@ -21,24 +22,24 @@ namespace ShopifyAccess.Misc
 			"name", "address1", "address2", "city", "company", "country", "province",
 			"first_name", "last_name", "phone", "country_code", "latitude", "longitude",
 			"province_code", "country_name"
-		});
+		} );
 
-		public static ILogger Log{ get; private set; }
+		private static ILogger Log{ get; }
 
 		static ShopifyLogger()
 		{
 			Log = NetcoLogger.GetLogger( "ShopifyLogger" );
 		}
 
-		public static void Trace( Mark mark, string format, params object[] args )
+		private static void Trace( Mark mark, string format, params object[] args )
 		{
-			var markStr = string.Format( "[{0}]\t", mark );
+			var markStr = $"[{mark}]\t";
 			Log.Trace( markStr + format, args );
 		}
 
 		public static void Trace( Exception ex, Mark mark, string format, params object[] args )
 		{
-			var markStr = string.Format( "[{0}]\t", mark );
+			var markStr = $"[{mark}]\t";
 			Log.Trace( ex, markStr + format, args );
 		}
 
@@ -47,16 +48,40 @@ namespace ShopifyAccess.Misc
 			Trace( mark, "GET request\tRequest: {0} with timeout {1}ms", requestUri, timeout );
 		}
 
-		public static void LogGetResponse( Uri requestUri, string limit, string jsonResponse, Mark mark, int timeout, bool maskPersonalInfoInLog = false )
+		/// <summary>
+		/// Log the response of a GET call
+		/// </summary>
+		/// <param name="requestUri"></param>
+		/// <param name="limit"></param>
+		/// <param name="jsonResponse"></param>
+		/// <param name="mark"></param>
+		/// <param name="timeout"></param>
+		/// <typeparam name="TResponseType">The type of object returned in response from Shopify. Needed to transform the response for logging</typeparam>
+		public static void LogGetResponse< TResponseType >( Uri requestUri, string limit, string jsonResponse, Mark mark, int timeout )
 		{
-			jsonResponse = !maskPersonalInfoInLog ? jsonResponse : MaskPersonalInfoInJson( jsonResponse );
-			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tResponse: {3}", requestUri, timeout, limit, jsonResponse );
+			var contentForLogs = jsonResponse.ToLogContents< TResponseType >();
+			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tResponse: {3}", 
+				requestUri, timeout, limit, contentForLogs );
 		}
 
-		public static void LogGetResponse( Uri requestUri, string limit, string nextPage, string jsonResponse, Mark mark, int timeout, bool maskPersonalInfoInLog = false )
+		/// <summary>
+		/// Log the response of a paged GET call
+		/// </summary>
+		/// <param name="requestUri"></param>
+		/// <param name="limit"></param>
+		/// <param name="nextPage"></param>
+		/// <param name="jsonResponse"></param>
+		/// <param name="mark"></param>
+		/// <param name="timeout"></param>
+		/// <param name="maskPersonalInfoInLog"></param>
+		/// <typeparam name="TResponseType">The type of object returned in response from Shopify. Needed to transform the response for logging</typeparam>
+		public static void LogGetResponse< TResponseType >( Uri requestUri, string limit, string nextPage, string jsonResponse, 
+			Mark mark, int timeout, bool maskPersonalInfoInLog = false )
 		{
 			jsonResponse = !maskPersonalInfoInLog ? jsonResponse : MaskPersonalInfoInJson( jsonResponse );
-			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tNext Page: {3}\tResponse: {4}", requestUri, timeout, limit, nextPage, jsonResponse );
+			var contentForLogs = jsonResponse.ToLogContents< TResponseType >();
+			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tNext Page: {3}\tResponse: {4}", 
+				requestUri, timeout, limit, nextPage, contentForLogs );
 		}
 
 		public static void LogUpdateRequest( Uri requestUri, string jsonContent, Mark mark, int timeout )
@@ -74,37 +99,38 @@ namespace ShopifyAccess.Misc
 			Trace( ex, mark, "Failed response\tShopName: {0}\tMessage: {1}", shopName, ex.Message );
 		}
 
-		public static void LogWebException( WebException ex, Mark mark, string shopName )
+		public static void LogInvalidStatusCode( int statusCode, string message, string shopName, Mark mark )
 		{
-			Trace( ex, mark, "Failed response\tShopName: {0}\tMessage: {1}\tStatus: {2}", shopName, ex.Message, ex.Status );
+			Trace( mark, "Failed response\tShopName: {0}\tMessage: {1}\tStatus: {2}", shopName, message, statusCode );
 		}
 
-		public static void LogTimeoutException( Mark mark, string shopName, int timeout )
+		public static void LogOperationStart( string shopName, Mark mark, string message = null, [ CallerMemberName ] string callerMethodName = null )
 		{
-			Trace( mark, "Request timed out\tTimeout: {0}ms\tShopName: {1}", timeout, shopName );
+			Trace( mark, "Shop: {0}. Start {1}. {2}", shopName, callerMethodName, message ?? string.Empty );
 		}
 
-		public static void LogException( WebException ex, HttpWebResponse response, string jsonResponse, Mark mark )
+		public static void LogOperationEnd( string shopName, Mark mark, [ CallerMemberName ] string callerMethodName = null )
 		{
-			// mask sensitive fields on a log exception json content just in case
-			string maskedJsonResponse = MaskPersonalInfoInJson( jsonResponse );
-			Trace( ex, mark, "Failed response\tRequest: {0}\tMessage: {1}\tStatus: {2}\tJsonResponse: {3}",
-				response.ResponseUri, ex.Message, response.StatusCode, maskedJsonResponse );
+			Trace( mark, "Shop: {0}. End {1}", shopName, callerMethodName );
+		}
+		
+		public static void LogOperation( string shopName, Mark mark, string message, [ CallerMemberName ] string callerMethodName = null )
+		{
+			Trace( mark, "Shop: {0}. {1}: {2}", shopName, callerMethodName, message );
 		}
 
 		/// <summary>This will mask personal info in the json string</summary>
 		/// <param name="replaceWith">Text to replace personal information with</param>
-		public static string MaskPersonalInfoInJson(string jsonString, string replaceWith = "***")
+		public static string MaskPersonalInfoInJson( string jsonString, string replaceWith = "***" )
 		{
-			var jObj = JObject.Parse(jsonString);
-			foreach (var p in jObj.Descendants()
-				.OfType<JProperty>()
-				.Where(p => personalFieldNames.Contains(p.Name)))
+			var jsonObject = JObject.Parse( jsonString );
+			var jsonFieldsToMask = jsonObject.Descendants().OfType< JProperty >().Where( p => _personalFieldNames.Contains( p.Name ) );
+			foreach ( var jsonFieldToMask in jsonFieldsToMask )
 			{
-				p.Value = replaceWith;
+				jsonFieldToMask.Value = replaceWith;
 			}
 
-			return jObj.ToString();
+			return jsonObject.ToString();
 		}
 	}
 }

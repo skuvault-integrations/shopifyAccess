@@ -2,8 +2,8 @@
 
 namespace ShopifyAccess.Models.Order
 {
-	[DataContract]
-	public class ShopifyBillingAddress
+	[ DataContract ]
+	public sealed class ShopifyBillingAddress
 	{
 		// We should not sync most of Billing Address PII (personally identifiable information) fields (see GUARD-2660)
 		//[ DataMember( Name = "address1" ) ]
@@ -33,7 +33,7 @@ namespace ShopifyAccess.Models.Order
 		//[ DataMember( Name = "phone" ) ]
 		//public string Phone { get; set; }
 
-		[DataMember(Name = "zip")]
+		[ DataMember( Name = "zip" ) ]
 		public string Zip { get; set; }
 	}
 }

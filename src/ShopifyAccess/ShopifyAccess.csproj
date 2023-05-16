@@ -64,20 +64,48 @@
     <Compile Include="..\Global\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Exceptions\ShopifyHttpRequestExceptions.cs" />
+    <Compile Include="GraphQl\BulkOperationStatus.cs" />
+    <Compile Include="GraphQl\Helpers\GraphQlIdParser.cs" />
+    <Compile Include="GraphQl\Models\BaseGraphQlResponse.cs" />
+    <Compile Include="GraphQl\Models\PageInfo.cs" />
+    <Compile Include="GraphQl\Models\ProductVariantsInventory\InventoryLevelsNodes.cs" />
+    <Compile Include="GraphQl\Models\ProductVariantsInventory\ProductVariants.cs" />
+    <Compile Include="GraphQl\Models\Responses\GetBulkOperationByIdResponse.cs" />
+    <Compile Include="GraphQl\Models\Responses\BulkOperationRunQueryResponse.cs" />
+    <Compile Include="GraphQl\Models\Responses\GetCurrentBulkOperationResponse.cs" />
+    <Compile Include="GraphQl\Models\ProductVariantsInventory\Extensions\ProductVariantsInventoryReportParser.cs" />
+    <Compile Include="GraphQl\Models\ProductVariantsInventory\InventoryItem.cs" />
+    <Compile Include="GraphQl\Models\ProductVariantsInventory\InventoryLevel.cs" />
+    <Compile Include="GraphQl\Models\ProductVariantsInventory\Location.cs" />
+    <Compile Include="GraphQl\Models\ProductVariantsInventory\ProductVariant.cs" />
+    <Compile Include="GraphQl\Models\Responses\GetProductVariantsInventoryResponse.cs" />
+    <Compile Include="GraphQl\Queries\BulkOperationByIdQuery.cs" />
+    <Compile Include="GraphQl\Queries\CurrentBulkOperationQuery.cs" />
+    <Compile Include="GraphQl\Queries\GetProductVariantInventoryQuery.cs" />
+    <Compile Include="GraphQl\Queries\GetProductVariantsInventoryReportQuery.cs" />
+    <Compile Include="GraphQl\Queries\QueryBuilder.cs" />
+    <Compile Include="GraphQl\ReportType.cs" />
+    <Compile Include="GraphQl\Services\IReportGenerator.cs" />
+    <Compile Include="GraphQl\Services\ReportGenerator.cs" />
+    <Compile Include="GraphQl\ShopifyGraphQlThrottler.cs" />
     <Compile Include="IShopifyService.cs" />
     <Compile Include="Misc\ActionPolicies.cs" />
     <Compile Include="Misc\Extensions.cs" />
+    <Compile Include="Misc\LoggerExtensions.cs" />
     <Compile Include="Misc\ShopifyLogger.cs" />
     <Compile Include="Misc\ShopifyThrottler.cs" />
+    <Compile Include="Models\Configuration\Command\ShopifyApiVersion.cs" />
+    <Compile Include="Models\Configuration\Command\ShopifyCommandFactory.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyOrderCommandEndpoint.cs" />
     <Compile Include="Models\Configuration\Authorization\Scope.cs" />
     <Compile Include="Models\Configuration\Authorization\Scopes.cs" />
-    <Compile Include="Models\Configuration\Command\ShopifyCommandConfig.cs" />
+    <Compile Include="Models\Configuration\Command\ShopifyClientCredentials.cs" />
     <Compile Include="Models\Configuration\Authorization\ShopifyAuthorizationConfig.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyCommandEndpointConfig.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyCommandEndpointName.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyProductCommandEndpointName.cs" />
-    <Compile Include="Models\Configuration\ShopifyConfigBase.cs" />
+    <Compile Include="Models\Configuration\ShopifyShop.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyCommand.cs" />
     <Compile Include="Models\Location\ShopifyLocation.cs" />
     <Compile Include="Models\Location\ShopifyLocations.cs" />
@@ -120,7 +148,10 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Docs\AuthorizationFlowShopifyToSv.md" />
+    <Content Include="Docs\AuthorizationFlowSvToShopify.md" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

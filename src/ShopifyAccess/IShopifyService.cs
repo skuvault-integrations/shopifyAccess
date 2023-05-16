@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Threading;
 using System.Threading.Tasks;
 using ShopifyAccess.Models;
@@ -44,12 +43,20 @@ namespace ShopifyAccess
 		ShopifyLocations GetLocations( CancellationToken token, Mark mark = null );
 
 		/// <summary>
-		/// get locations async
+		/// Get all Shopify locations for the shop
 		/// </summary>
 		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns></returns>
 		Task< ShopifyLocations > GetLocationsAsync( CancellationToken token, Mark mark = null );
+
+		/// <summary>
+		/// Get active Shopify locations for the shop
+		/// </summary>
+		/// <param name="token">CancellationToken</param>
+		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
+		/// <returns></returns>
+		Task< ShopifyLocations > GetActiveLocationsAsync( CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		/// Get all existing products
@@ -111,18 +118,23 @@ namespace ShopifyAccess
 		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null );
 
 		/// <summary>
-		/// Update variants (inventory items). This method is obsolete. DON'T USE IT
+		/// Get all existing product variants with inventory levels
+		/// This method uses GraphQl API to get data
 		/// </summary>
-		/// <param name="token">Cancellation token</param>
+		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		void UpdateProductVariants( IEnumerable< ShopifyProductVariantForUpdate > variants, CancellationToken token, Mark mark = null );
+		/// <returns>Product variants with inventory levels</returns>
+		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportAsync( CancellationToken token, Mark mark = null );
 
 		/// <summary>
-		/// Update variants (inventory items) async. This method is obsolete. DON'T USE IT
+		/// Get the list of product variants for specified SKUs
+		/// This method uses GraphQl API to get data
 		/// </summary>
-		/// <param name="token">Cancellation token</param>
+		/// <param name="skus">List of SKU for search</param>
+		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		Task UpdateProductVariantsAsync( IEnumerable< ShopifyProductVariantForUpdate > variants, CancellationToken token, Mark mark = null );
+		/// <returns>List of variants (inventory items)</returns>
+		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		///     Update inventory levels (inventory items)
@@ -155,22 +167,6 @@ namespace ShopifyAccess
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns></returns>
 		Task< ShopifyUsers > GetUsersAsync( CancellationToken token, Mark mark = null );
-
-		/// <summary>
-		/// Get user
-		/// </summary>
-		/// <param name="token"></param>
-		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		/// <returns></returns>
-		ShopifyUser GetUser( long id, CancellationToken token, Mark mark = null );
-
-		/// <summary>
-		/// Get user async
-		/// </summary>
-		/// <param name="token">CancellationToken</param>
-		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		/// <returns></returns>
-		Task< ShopifyUser > GetUserAsync( long id, CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		/// Is Shopify Plus customer

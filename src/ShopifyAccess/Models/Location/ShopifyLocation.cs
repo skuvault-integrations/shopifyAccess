@@ -10,5 +10,8 @@ namespace ShopifyAccess.Models.Location
 
 		[ DataMember( Name = "name" ) ]
 		public string Name{ get; set; }
+
+		[ DataMember( Name = "active" ) ]
+		public bool IsActive{ get; set; }
 	}
 }

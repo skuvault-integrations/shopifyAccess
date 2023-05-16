@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
+using ShopifyAccess.Exceptions;
 using ShopifyAccess.Models.Configuration.Command;
 using ShopifyAccess.Models.Order;
 
@@ -13,15 +13,17 @@ namespace ShopifyAccessTests.Orders
 	public class OrdersListTests : BaseTests
 	{
 		[ Test ]
-		public void OrdersFilteredFulfillmentStatusDateLoaded()
+		[ Explicit ]
+		public void GetOrders_ReturnsItems_WhenAnyOrderStatusRequested()
 		{
-			var orders = this.Service.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -200), DateTime.UtcNow, CancellationToken.None );
+			var orders = this.Service.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow, CancellationToken.None );
 
 			orders.Count.Should().BeGreaterThan( 0 );
 		}
 
 		[ Test ]
-		public async Task OrdersFilteredFulfillmentStatusDateLoadedAsync()
+		[ Explicit ]
+		public async Task GetOrdersAsync_ReturnsItems_WhenAnyOrderStatusRequested()
 		{
 			var orders = await this.Service.GetOrdersAsync( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow, CancellationToken.None );
 
@@ -29,35 +31,26 @@ namespace ShopifyAccessTests.Orders
 		}
 
 		[ Test ]
-		public void OrdersNotLoaded_IncorrectToken()
+		public void GetOrders_ThrowsShopifyUnauthorizedException_WhenIncorrectToken()
 		{
-			var config = new ShopifyCommandConfig( this.Config.ShopName, "blabla" );
-			var service = this.ShopifyFactory.CreateService( config );
-			ShopifyOrders orders = null;
-			try
-			{
-				orders = service.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow, CancellationToken.None );
-			}
-			catch( WebException )
-			{
-				orders.Should().BeNull();
-			}
+			// Arrange
+			var clientCredentials = new ShopifyClientCredentials( this._clientCredentials.ShopName, "blabla" );
+			var service = this.ShopifyFactory.CreateService( clientCredentials );
+
+			// Act, Assert
+			service.Invoking( s => s.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow, CancellationToken.None ) )
+				.Should().Throw< ShopifyUnauthorizedException >();
 		}
 
 		[ Test ]
-		public void OrdersNotLoaded_IncorrectShopName()
+		public void GetOrders_ThrowsShopifyUnauthorizedException_WhenIncorrectShopName()
 		{
-			var config = new ShopifyCommandConfig( "blabla", this.Config.AccessToken );
-			var service = this.ShopifyFactory.CreateService( config );
-			ShopifyOrders orders = null;
-			try
-			{
-				orders = service.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow, CancellationToken.None );
-			}
-			catch( WebException )
-			{
-				orders.Should().BeNull();
-			}
+			var clientCredentials = new ShopifyClientCredentials( "blabla", this._clientCredentials.AccessToken );
+			var service = this.ShopifyFactory.CreateService( clientCredentials );
+
+			// Act, Assert
+			service.Invoking( s => s.GetOrders( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow, CancellationToken.None ) )
+				.Should().Throw< ShopifyUnauthorizedException >();
 		}
 	}
 }

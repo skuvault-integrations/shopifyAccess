@@ -56,13 +56,6 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
-		public void ProductVariantQuantityUpdated()
-		{
-			var variantToUpdate = new ShopifyProductVariantForUpdate { Id = 337095344, Quantity = 2 };
-			this.Service.UpdateProductVariants( new List< ShopifyProductVariantForUpdate > { variantToUpdate }, CancellationToken.None );
-		}
-
-		[ Test ]
 		public void GetAndUpdateProductQuantity()
 		{
 			const string sku = "testSku1";
@@ -156,6 +149,102 @@ namespace ShopifyAccessTests.Products
 				}
 			};
 			return inventoryLevels;
+		}
+
+		[ Test ]
+		[ Explicit ]
+		public async Task GetProductVariantsInventoryReportAsync_ReturnsCorrectReport()
+		{
+			// Arrange
+			var products = await this.Service.GetProductsInventoryAsync( CancellationToken.None );
+			var productVariants = products.ToListVariants();
+
+			// Act
+			var productVariantsReport = await this.Service.GetProductVariantsInventoryReportAsync( CancellationToken.None );
+
+			// Assert
+			 this.ValidateIfEqual( productVariantsReport, productVariants );
+		}
+
+		[ Test ]
+		[ Explicit ]
+		public async Task GetProductVariantsBySkusAsync_ReturnsCorrectData_WhenSingleSku_AndSkuContainsSpecialCharacters()
+		{
+			// Arrange
+			var skus = new[] { "AUTO_TEST 2649 1 ' \" \\ ! @ # $ % ^" };
+			var products = await this.Service.GetProductVariantsInventoryBySkusAsync( skus, CancellationToken.None );
+
+			// Act
+			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None );
+
+			// Assert
+			productVariants.Should().NotBeEmpty();
+			this.ValidateIfEqual( productVariants, products );
+		}
+
+		[ Test ]
+		[ Explicit ]
+		public async Task GetProductVariantsBySkuAsync_ReturnsCorrectData_WhenSingleSku_AndMoreThanOneVariantForTheSku()
+		{
+			// Arrange
+			var skus = new[] { "testSKU1" };
+			var products = await this.Service.GetProductVariantsInventoryBySkusAsync( skus, CancellationToken.None );
+
+			// Act
+			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None );
+
+			// Assert
+			productVariants.Count.Should().BeGreaterThan( 1 );
+			this.ValidateIfEqual( productVariants, products );
+		}
+
+		[ Test ]
+		[ Explicit ]
+		public async Task GetProductVariantsBySkuAsync_ReturnsEmptyList_WhenWrongSku()
+		{
+			// Arrange
+			var skus = new[] { "wrong SKU" };
+
+			// Act
+			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None );
+
+			// Assert
+			productVariants.Should().BeEmpty();
+		}
+
+		[ Test ]
+		[ Explicit ]
+		public async Task GetProductVariantsBySkuAsync_ReturnsCorrectData_WhenMultipleSkusRequested()
+		{
+			// Arrange
+			var countToCompare = 60;
+			var products = await this.Service.GetProductsInventoryAsync( CancellationToken.None );
+			products.Products = products.Products.Take( countToCompare ).ToList();
+			var productVariants = products.ToListVariants();
+			var skus = productVariants.Select( v => v.Sku );
+
+			// Act
+			var productVariantsFromReport = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None );
+
+			// Assert
+			this.ValidateIfEqual( productVariantsFromReport, productVariants );
+		}
+
+		private void ValidateIfEqual( List< ShopifyProductVariant > productVariantsReport, List< ShopifyProductVariant > productVariants )
+		{
+			productVariantsReport.Should().HaveCount( productVariants.Count );
+			productVariantsReport.Sort( ( x, y ) => Math.Sign( x.Id - y.Id ) );
+			productVariants.Sort( ( x, y ) => Math.Sign( x.Id - y.Id ) );
+			for( var i = 0; i < productVariantsReport.Count; i++ )
+			{
+				var v1 = productVariantsReport[ i ];
+				var v2 = productVariants[ i ];
+				v1.Id.Should().Be( v2.Id );
+				v1.InventoryItemId.Should().Be( v2.InventoryItemId );
+				v1.Sku.Should().BeEquivalentTo( v2.Sku );
+				v1.InventoryLevels.InventoryLevels.Should().BeEquivalentTo( v2.InventoryLevels.InventoryLevels,
+					o => o.Excluding( memberInfo => memberInfo.Name.Equals( "UpdatedAt" ) ) );
+			}
 		}
 	}
 }

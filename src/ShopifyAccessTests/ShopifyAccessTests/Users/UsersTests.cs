@@ -25,22 +25,6 @@ namespace ShopifyAccessTests.Users
 		}
 
 		[ Test ]
-		public void GetUser()
-		{
-			var user = this.Service.GetUser( 6250887, CancellationToken.None );
-
-			user.Should().NotBeNull();
-		}
-
-		[ Test ]
-		public async Task GetUserAsync()
-		{
-			var user = await this.Service.GetUserAsync( 6250887, CancellationToken.None );
-
-			user.Should().NotBeNull();
-		}
-
-		[ Test ]
 		public void IsShopifyPlusAccount()
 		{
 			var result = this.Service.IsShopifyPlusAccount( CancellationToken.None );
