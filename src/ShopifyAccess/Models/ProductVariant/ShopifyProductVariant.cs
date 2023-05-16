@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
 using ShopifyAccess.Models.Product;
 
 namespace ShopifyAccess.Models.ProductVariant
@@ -15,18 +14,15 @@ namespace ShopifyAccess.Models.ProductVariant
 		/// This field is obsolete. DON'T USE IT
 		/// </summary>
 		[ DataMember( Name = "inventory_quantity" ) ]
-		[ JsonProperty( NullValueHandling = NullValueHandling.Ignore ) ]
 		public int Quantity{ get; set; }
 
 		/// <summary>
 		/// This field is obsolete. DON'T USE IT
 		/// </summary>
 		[ DataMember( Name = "old_inventory_quantity" ) ]
-		[ JsonProperty( NullValueHandling = NullValueHandling.Ignore ) ]
 		public int OldQuantity{ get; set; }
 
 		[ DataMember( Name = "inventory_management" ) ]
-		[ JsonProperty( NullValueHandling = NullValueHandling.Ignore ) ]
 		public InventoryManagement InventoryManagement{ get; set; }
 
 		[ DataMember( Name = "sku" ) ]
@@ -52,18 +48,15 @@ namespace ShopifyAccess.Models.ProductVariant
 		}
 
 		[ DataMember( Name = "price" ) ]
-		[ JsonProperty( NullValueHandling = NullValueHandling.Ignore ) ]
 		public decimal Price { get; set; }
 		
 		[ DataMember( Name = "compare_at_price" ) ]
-		[ JsonProperty( NullValueHandling = NullValueHandling.Ignore ) ]
 		public decimal CompareAtPrice { get; set; }
 
 		[ DataMember( Name = "updated_at" ) ]
 		public DateTime UpdatedAt { get; set; }
 
 		[ DataMember( Name = "image_id" ) ]
-		[ JsonProperty( NullValueHandling = NullValueHandling.Ignore ) ]
 		public long ImageId { get; set; }
 
 		public ShopifyInventoryLevels InventoryLevels{ get; set; }

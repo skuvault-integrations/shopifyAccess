@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json;
 using ServiceStack;
 
 namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions
@@ -32,7 +31,7 @@ namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions
 		}
 
 		private static T ParseLine< T >( string content ) where T : class =>
-			!string.IsNullOrEmpty( content ) ? JsonConvert.DeserializeObject< T >( content ) : null;
+			!string.IsNullOrEmpty( content ) ? content.FromJson< T >() : null;
 
 		private static ProductVariant ParseAsProductVariant( string content ) =>
 			ParseLine< ProductVariant >( content );

@@ -21,7 +21,7 @@ namespace ShopifyAccessTests.Services
 	{
 		private readonly ShopifyCommand _TestCommand = new ShopifyCommand( "/test/command.json", ApiVersion );
 		private const int Timeout = 10000;
-		private const string responseOkJson = "\"ok\"";
+		private const string responseOkJson = "ok";
 
 		#region GetResponse
 		[ Test ]
@@ -82,7 +82,7 @@ namespace ShopifyAccessTests.Services
 			var response = webRequestServices.GetResponse< string >( this._TestCommand, "", CancellationToken.None, Mark.Create, Timeout );
 
 			// Assert
-			AssertExpectedResponse( response, responseOkJson );
+			response.Should().Be( responseOkJson );
 		}
 
 		#endregion
@@ -127,7 +127,7 @@ namespace ShopifyAccessTests.Services
 			var response = await webRequestServices.GetResponseAsync< string >( this._TestCommand, "", CancellationToken.None, Mark.Create, Timeout );
 
 			// Assert
-			AssertExpectedResponse( response, responseOkJson );
+			response.Should().Be( responseOkJson );
 		}
 		#endregion
 
@@ -171,7 +171,7 @@ namespace ShopifyAccessTests.Services
 			var response = webRequestServices.GetResponsePage< string >( this._TestCommand, "", CancellationToken.None, Mark.Create, Timeout );
 
 			// Assert
-			AssertExpectedResponse( response.Response, responseOkJson );
+			response.Response.Should().Be( responseOkJson );
 		}
 		#endregion
 
@@ -215,7 +215,7 @@ namespace ShopifyAccessTests.Services
 			var response = await webRequestServices.GetResponsePageAsync< string >( this._TestCommand, "", CancellationToken.None, Mark.Create, Timeout );
 
 			// Assert
-			AssertExpectedResponse( response.Response, responseOkJson );
+			response.Response.Should().Be( responseOkJson );
 		}
 		#endregion
 
@@ -259,7 +259,7 @@ namespace ShopifyAccessTests.Services
 			var response = webRequestServices.PostData< string >( this._TestCommand, "", CancellationToken.None, Mark.Create, Timeout );
 
 			// Assert
-			AssertExpectedResponse( response, responseOkJson );
+			response.Should().Be( responseOkJson );
 		}
 		#endregion
 
@@ -303,7 +303,7 @@ namespace ShopifyAccessTests.Services
 			var response = await webRequestServices.PostDataAsync< string >( this._TestCommand, "", CancellationToken.None, Mark.Create, Timeout );
 
 			// Assert
-			AssertExpectedResponse( response, responseOkJson );
+			response.Should().Be( responseOkJson );
 		}
 		#endregion
 
@@ -385,12 +385,6 @@ namespace ShopifyAccessTests.Services
 				} ) );
 
 			return new HttpClient( httpMessageHandlerMock );
-		}
-
-		private void AssertExpectedResponse( string response, string expectedResponseJson )
-		{
-			var expectedResponse = expectedResponseJson.Replace( "\"", string.Empty );
-			response.Should().Be( expectedResponse );
 		}
 	}
 }

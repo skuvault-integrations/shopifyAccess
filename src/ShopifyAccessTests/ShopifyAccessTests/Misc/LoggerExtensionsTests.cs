@@ -3,7 +3,6 @@ using NUnit.Framework;
 using ShopifyAccess.Models.Product;
 using ServiceStack;
 using ShopifyAccess.Misc;
-using Newtonsoft.Json;
 
 namespace ShopifyAccessTests.Misc
 {
@@ -34,7 +33,7 @@ namespace ShopifyAccessTests.Misc
 		{
 			var resultJson = TwoProductsJson.ToLogContents< ShopifyProducts >();
 
-			var resultProducts = JsonConvert.DeserializeObject< ShopifyProducts >( resultJson ).Products;
+			var resultProducts = resultJson.FromJson< ShopifyProducts >().Products;
 			//Should be considerably shorter due to truncation
 			Assert.That( resultJson.Length + 100, Is.LessThan( TwoProductsJson.Length ) );
 			Assert.That( resultProducts[ 0 ].BodyHtml.Length, Is.LessThanOrEqualTo( LoggerExtensions.MaxFieldValueLength ) );

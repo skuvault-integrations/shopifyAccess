@@ -1,9 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using FluentAssertions;
-using Newtonsoft.Json;
 using NUnit.Framework;
-using ShopifyAccess.GraphQl.Models.ProductVariantsInventory;
 using ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions;
 
 namespace ShopifyAccessTests.GraphQl.Models.ProductVariantsInventoryReport.Extensions
