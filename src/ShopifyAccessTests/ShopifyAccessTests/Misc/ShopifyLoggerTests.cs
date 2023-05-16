@@ -6,11 +6,11 @@ namespace ShopifyAccessTests.Misc
 {
 	public class ShopifyLoggerTests
 	{
-		[Test]
+		[ Test ]
 		public void MaskPersonalInfoInJson_ReturnsWithMaskedPersonalInfo_WhenJsonStringContainsPersonalInfo()
 		{
 			// Arrange
-			string jsonString = "{\"id\":\"450789469\",\"order_number\":\"1001\",\"billing_address\":{\"first_name\":\"Bob\"," +
+			var jsonString = "{\"id\":\"450789469\",\"order_number\":\"1001\",\"billing_address\":{\"first_name\":\"Bob\"," +
 				"\"address1\":\"ChestnutStreet92\",\"phone\":\"+1(502)-459-2181\",\"city\":\"Louisville\",\"zip\":\"40202\"," +
 				"\"province\":\"Kentucky\",\"country\":\"UnitedStates\",\"last_name\":\"Norman\",\"address2\":\"\",\"company\":null,}," +
 				"\"customer\":{\"email\":\"bob.norman@mail.example.com\"},\"shipping_address\":{\"first_name\":\"Bob\"," +
@@ -20,15 +20,15 @@ namespace ShopifyAccessTests.Misc
 			const string mask = "***";
 
 			// Act
-			string result = ShopifyLogger.MaskPersonalInfoInJson(jsonString, mask).Replace("\r\n", "").Replace(" ", "");
+			var result = ShopifyLogger.MaskPersonalInfoInJson( jsonString, mask ).Replace( "\r\n", "" ).Replace( " ", "" );
 
 			// Assert
-			result.Should().Be("{\"id\":\"450789469\",\"order_number\":\"1001\",\"billing_address\":{\"first_name\":\"***\"," +
+			result.Should().Be( "{\"id\":\"450789469\",\"order_number\":\"1001\",\"billing_address\":{\"first_name\":\"***\"," +
 				"\"address1\":\"***\",\"phone\":\"***\",\"city\":\"***\",\"zip\":\"40202\"," +
 				"\"province\":\"***\",\"country\":\"***\",\"last_name\":\"***\",\"address2\":\"***\",\"company\":\"***\"}," +
 				"\"customer\":{\"email\":\"***\"},\"shipping_address\":{\"first_name\":\"***\"," +
 				"\"address1\":\"***\",\"phone\":\"***\",\"city\":\"***\",\"zip\":\"40202\",\"province\":\"***\",\"country\":\"***\",\"last_name\":\"***\",\"address2\":\"***\",\"company\":\"***\"," +
-				"\"name\":\"***\",\"country_code\":\"***\",\"province_code\":\"***\",\"latitude\":\"***\",\"longitude\":\"***\"}}");	
+				"\"name\":\"***\",\"country_code\":\"***\",\"province_code\":\"***\",\"latitude\":\"***\",\"longitude\":\"***\"}}" );
 		}
 	}
 }
