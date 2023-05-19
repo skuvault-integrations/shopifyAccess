@@ -114,7 +114,6 @@
     <Compile Include="Models\Order\ShopifyBillingAddress.cs" />
     <Compile Include="Models\Order\ShopifyDiscounts.cs" />
     <Compile Include="Models\Order\ShopifyFulfillment.cs" />
-    <Compile Include="Models\Order\ShopifyCustomer.cs" />
     <Compile Include="Models\Order\ShopifyOrder.cs" />
     <Compile Include="Models\Order\ShopifyOrderShippingLine.cs" />
     <Compile Include="Models\Order\ShopifyOrderItem.cs" />

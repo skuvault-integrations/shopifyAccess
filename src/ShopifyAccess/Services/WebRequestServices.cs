@@ -66,9 +66,9 @@ namespace ShopifyAccess.Services
 		}
 
 		public ResponsePage< T > GetResponsePage< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark, 
-			int timeout, bool maskPersonalInfoInLog = false )
+			int timeout )
 		{
-			return this.GetResponsePageAsync< T >( command, endpoint, token, mark, timeout, maskPersonalInfoInLog ).GetAwaiter().GetResult();
+			return this.GetResponsePageAsync< T >( command, endpoint, token, mark, timeout ).GetAwaiter().GetResult();
 		}
 
 		public async Task< T > GetResponseAsync< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark, int timeout )
@@ -95,7 +95,7 @@ namespace ShopifyAccess.Services
 		}
 
 		public async Task< ResponsePage< T > > GetResponsePageAsync< T >( ShopifyCommand command, string endpoint, CancellationToken token, 
-			Mark mark, int timeout, bool maskPersonalInfoInLog = false )
+			Mark mark, int timeout )
 		{
 			Condition.Requires( mark, "mark" ).IsNotNull();
 
@@ -113,7 +113,7 @@ namespace ShopifyAccess.Services
 					await this.ThrowIfErrorAsync( response, mark ).ConfigureAwait( false );
 					var content = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
 					this.RefreshLastNetworkActivityTime();
-					return ParsePagedResponse< T >( content, response.Headers, uri, mark, timeout, maskPersonalInfoInLog );
+					return ParsePagedResponse< T >( content, response.Headers, uri, mark, timeout );
 				}
 			}
 		}
@@ -205,11 +205,11 @@ namespace ShopifyAccess.Services
 		}
 
 		private static ResponsePage< T > ParsePagedResponse< T >( string content, HttpHeaders headers, Uri uri, 
-			Mark mark, int timeout, bool maskPersonalInfoInLog = false )
+			Mark mark, int timeout )
 		{
 			var limit = GetLimitFromHeader( headers );
 			var nextPageLink = PagedResponseService.GetNextPageQueryStrFromHeader( headers );
-			ShopifyLogger.LogGetResponse< T >( uri, limit, nextPageLink, content, mark, timeout, maskPersonalInfoInLog );
+			ShopifyLogger.LogGetResponse< T >( uri, limit, nextPageLink, content, mark, timeout );
 
 			var result = !string.IsNullOrEmpty( content ) ? content.FromJson< T >() : default( T );
 

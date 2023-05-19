@@ -4,8 +4,10 @@ using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
 using Netco.Logging;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ShopifyAccess.Models;
+using ShopifyAccess.Models.Order;
 
 namespace ShopifyAccess.Misc
 {
@@ -73,12 +75,11 @@ namespace ShopifyAccess.Misc
 		/// <param name="jsonResponse"></param>
 		/// <param name="mark"></param>
 		/// <param name="timeout"></param>
-		/// <param name="maskPersonalInfoInLog"></param>
 		/// <typeparam name="TResponseType">The type of object returned in response from Shopify. Needed to transform the response for logging</typeparam>
 		public static void LogGetResponse< TResponseType >( Uri requestUri, string limit, string nextPage, string jsonResponse, 
-			Mark mark, int timeout, bool maskPersonalInfoInLog = false )
+			Mark mark, int timeout)
 		{
-			jsonResponse = !maskPersonalInfoInLog ? jsonResponse : MaskPersonalInfoInJson( jsonResponse );
+			jsonResponse = MaskPersonalInfoInShopifyOrders< TResponseType >( jsonResponse );
 			var contentForLogs = jsonResponse.ToLogContents< TResponseType >();
 			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tNext Page: {3}\tResponse: {4}", 
 				requestUri, timeout, limit, nextPage, contentForLogs );
@@ -119,9 +120,15 @@ namespace ShopifyAccess.Misc
 			Trace( mark, "Shop: {0}. {1}: {2}", shopName, callerMethodName, message );
 		}
 
+		internal static string MaskPersonalInfoInShopifyOrders< TResponseType >( string jsonResponse, string replaceWith = "***" )
+		{
+			return typeof( TResponseType ) == typeof( ShopifyOrders ) ? MaskPersonalInfoInJson( jsonResponse, replaceWith ) : jsonResponse;
+		}
+		
 		/// <summary>This will mask personal info in the json string</summary>
+		/// <param name="jsonString">Personal info json string</param>
 		/// <param name="replaceWith">Text to replace personal information with</param>
-		public static string MaskPersonalInfoInJson( string jsonString, string replaceWith = "***" )
+		internal static string MaskPersonalInfoInJson( string jsonString, string replaceWith = "***" )
 		{
 			var jsonObject = JObject.Parse( jsonString );
 			var jsonFieldsToMask = jsonObject.Descendants().OfType< JProperty >().Where( p => _personalFieldNames.Contains( p.Name ) );
@@ -130,7 +137,7 @@ namespace ShopifyAccess.Misc
 				jsonFieldToMask.Value = replaceWith;
 			}
 
-			return jsonObject.ToString();
+			return jsonObject.ToString( Formatting.None );
 		}
 	}
 }
