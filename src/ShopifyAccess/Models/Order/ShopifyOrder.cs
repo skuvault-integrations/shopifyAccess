@@ -29,10 +29,6 @@ namespace ShopifyAccess.Models.Order
 		[ DataMember( Name = "shipping_address" ) ]
 		public ShopifyShippingAddress ShippingAddress { get; set; }
 
-		// We should not sync PII (personally identifiable information) Customer Information (see GUARD-2660)
-		//[ DataMember( Name = "customer" ) ]
-		//public ShopifyCustomer Customer{ get; set; }
-
 		[ DataMember( Name = "closed_at" ) ]
 		public DateTime? ClosedAt { get; set; }
 
