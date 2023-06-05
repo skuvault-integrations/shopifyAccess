@@ -76,7 +76,7 @@ task NuGet Package, Version, {
 <package>
 	<metadata>
 		<id>$project_name</id>
-		<version>$Version-alpha.0</version>
+		<version>$Version-alpha.1</version>
 		<authors>SkuVault</authors>
 		<owners>SkuVault</owners>
 		<projectUrl>https://github.com/agileharbor/$project_name</projectUrl>
