@@ -100,6 +100,7 @@
     <Compile Include="GraphQl\Services\ReportGeneratorTests.cs" />
     <Compile Include="GraphQl\ShopifyGraphQlThrottlerTests.cs" />
     <Compile Include="Locations\LocationListTests.cs" />
+    <Compile Include="Misc\ShopifyLoggerTests.cs" />
     <Compile Include="Misc\ActionPoliciesTests.cs" />
     <Compile Include="Misc\LoggerExtensionsTests.cs" />
     <Compile Include="OperationTimeoutTests.cs" />

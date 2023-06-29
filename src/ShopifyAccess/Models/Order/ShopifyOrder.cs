@@ -6,81 +6,72 @@ using ShopifyAccess.Models.Order.Discounts;
 namespace ShopifyAccess.Models.Order
 {
 	[ DataContract ]
-	public class ShopifyOrder
+	public sealed class ShopifyOrder
 	{
 		[ DataMember( Name = "id" ) ]
-		public long Id{ get; set; }
+		public long Id { get; set; }
 
 		[ DataMember( Name = "total_price" ) ]
-		public decimal Total{ get; set; }
+		public decimal Total { get; set; }
 
 		[ DataMember( Name = "created_at" ) ]
-		public DateTime CreatedAt{ get; set; }
+		public DateTime CreatedAt { get; set; }
 
 		[ DataMember( Name = "line_items" ) ]
-		public IList< ShopifyOrderItem > OrderItems{ get; set; }
+		public IList< ShopifyOrderItem > OrderItems { get; set; }
 
 		[ DataMember( Name = "order_number" ) ]
-		public int OrderNumber{ get; set; }
+		public int OrderNumber { get; set; }
 
 		[ DataMember( Name = "billing_address" ) ]
-		public ShopifyBillingAddress BillingAddress{ get; set; }
+		public ShopifyBillingAddress BillingAddress { get; set; }
 
 		[ DataMember( Name = "shipping_address" ) ]
-		public ShopifyShippingAddress ShippingAddress{ get; set; }
-
-		[ DataMember( Name = "customer" ) ]
-		public ShopifyCustomer Customer{ get; set; }
+		public ShopifyShippingAddress ShippingAddress { get; set; }
 
 		[ DataMember( Name = "closed_at" ) ]
-		public DateTime? ClosedAt{ get; set; }
+		public DateTime? ClosedAt { get; set; }
 
 		[ DataMember( Name = "cancelled_at" ) ]
-		public DateTime? CancelledAt{ get; set; }
+		public DateTime? CancelledAt { get; set; }
 
 		[ DataMember( Name = "financial_status" ) ]
-		public ShopifyFinancialStatus FinancialStatus{ get; set; }
+		public ShopifyFinancialStatus FinancialStatus { get; set; }
 
 		[ DataMember( Name = "fulfillments" ) ]
-		public IEnumerable< ShopifyFulfillment > Fulfillments{ get; set; }
+		public IEnumerable< ShopifyFulfillment > Fulfillments { get; set; }
 
 		[ DataMember( Name = "fulfillment_status" ) ]
-		public FulfillmentStatusEnum FulfillmentStatus{ get; set; }
+		public FulfillmentStatusEnum FulfillmentStatus { get; set; }
 
 		[ DataMember( Name = "source_name" ) ]
-		public ShopifySourceNameEnum SourceName{ get; set; }
+		public ShopifySourceNameEnum SourceName { get; set; }
 
 		[ DataMember( Name = "location_id" ) ]
-		public string LocationId{ get; set; }
+		public string LocationId { get; set; }
 
 		[ DataMember( Name = "name" ) ]
-		public string Name{ get; set; }
+		public string Name { get; set; }
 
 		[ DataMember( Name = "shipping_lines" ) ]
-		public IList< ShopifyOrderShippingLine > ShippingLines{ get; set; }
+		public IList<ShopifyOrderShippingLine> ShippingLines { get; set; }
 
 		[ DataMember( Name = "discount_codes" ) ]
 		public IEnumerable< ShopifyDiscountCode > DiscountCodes { get; set; }
 
 		[ DataMember( Name = "tax_lines" ) ]
-		public IEnumerable< ShopifyTaxLine > TaxLines{ get; set; }
+		public IEnumerable< ShopifyTaxLine > TaxLines { get; set; }
 
 		[ DataMember( Name = "refunds" ) ]
 		public IEnumerable< ShopifyOrderRefund > Refunds { get; set; }
 
-		public bool IsShipped
-		{
-			get { return this.ClosedAt.HasValue; }
-		}
+		public bool IsShipped => this.ClosedAt.HasValue;
 
-		public bool IsCancelled
-		{
-			get { return this.CancelledAt.HasValue; }
-		}
+		public bool IsCancelled => this.CancelledAt.HasValue;
 	}
 
 	[ DataContract ]
-	public class ShopifyOrderRefund
+	public sealed class ShopifyOrderRefund
 	{
 		[ DataMember( Name = "id" ) ]
 		public long Id { get; set; }
@@ -91,7 +82,7 @@ namespace ShopifyAccess.Models.Order
 	}
 
 	[ DataContract ]
-	public class ShopifyOrderRefundLineItem
+	public sealed class ShopifyOrderRefundLineItem
 	{
 		[ DataMember( Name = "id" ) ]
 		public long Id { get; set; }
