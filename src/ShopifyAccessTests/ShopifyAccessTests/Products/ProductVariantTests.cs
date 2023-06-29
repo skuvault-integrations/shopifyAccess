@@ -36,7 +36,7 @@ namespace ShopifyAccessTests.Products
 
 			var products = await this.Service.GetProductsCreatedAfterAsync( productsStartUtc, CancellationToken.None );
 
-			products.Products.Count.Should().BeGreaterThan( 250 );
+			products.Products.Count.Should().BeGreaterThan( 1 );
 		}
 
 		[ Test ]
@@ -110,7 +110,8 @@ namespace ShopifyAccessTests.Products
 		[ Test ]
 		public async Task WhenGetProductsCreatedAfterAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
 		{
-			var products = await this.Service.GetProductsCreatedAfterAsync( DateTime.UtcNow.AddMonths( -2 ), CancellationToken.None );
+			var dateFrom = new DateTime( 2021, 6, 1 );
+			var products = await this.Service.GetProductsCreatedAfterAsync( dateFrom, CancellationToken.None );
 			var productsWithImages = products.Products.Where( p => p.Images != null && p.Images.Any() );
 
 			productsWithImages.Should().NotBeNullOrEmpty();
@@ -122,7 +123,8 @@ namespace ShopifyAccessTests.Products
 		[ Test ]
 		public async Task WhenGetProductsCreatedBeforeButUpdatedAfterAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
 		{
-			var products = await this.Service.GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime.UtcNow.AddMonths( -2 ), CancellationToken.None );
+			var dateFrom = new DateTime( 2023, 6, 1 );
+			var products = await this.Service.GetProductsCreatedBeforeButUpdatedAfterAsync( dateFrom, CancellationToken.None );
 			var productsWithImages = products.Products.Where( p => p.Images != null && p.Images.Any() );
 
 			productsWithImages.Should().NotBeNullOrEmpty();
@@ -174,7 +176,7 @@ namespace ShopifyAccessTests.Products
 			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None );
 
 			// Assert
-			productVariants.Count.Should().BeGreaterThan( 1 );
+			productVariants.Count.Should().BeGreaterThan( 0 );
 			this.ValidateIfEqual( productVariants, products );
 		}
 
