@@ -25,7 +25,13 @@ namespace ShopifyAccess.Models.Product
 		[ DataMember( Name = "location_id" ) ]
 		public long LocationId{ get; set; }
 
-		[ JsonProperty("available", NullValueHandling = NullValueHandling.Ignore ) ]
+		/// <summary>
+		/// The available quantity of an inventory item at the inventory level's associated location. 		
+		/// Note: If it returns 'null' (in a case if the inventory item is not tracked https://shopify.dev/docs/api/admin-rest/2023-01/resources/inventorylevel#resource-object),
+		/// then the value will remain 0 (by default) when serialized
+		/// </summary>
+		[ DataMember( Name = "available" ) ]
+		[ JsonProperty( NullValueHandling = NullValueHandling.Ignore ) ]
 		public int Available{ get; set; }
 
 		[ DataMember( Name = "updated_at" ) ]
