@@ -73,7 +73,7 @@ namespace ShopifyAccessTests.Products
 				{
 					InventoryItemId = firstInventoryLevel.InventoryItemId,
 					LocationId = firstInventoryLevel.LocationId,
-					Quantity = firstInventoryLevel.Available
+					Quantity = firstInventoryLevel.Available ?? 0
 				};
 
 				if( product.Key.Equals( sku, StringComparison.InvariantCultureIgnoreCase ) )
@@ -96,7 +96,7 @@ namespace ShopifyAccessTests.Products
 		{
 			const string sku = "testsku1";
 			var inventoryItem = await this.GetFirstInventoryItem( sku );
-			var initialQuantity = inventoryItem.Available;
+			var initialQuantity = inventoryItem.Available.Value;
 			const int quantity = 39;
 
 			await this.Service.UpdateInventoryLevelsAsync( CreateInventoryLevelForUpdate( inventoryItem, quantity ), CancellationToken.None );

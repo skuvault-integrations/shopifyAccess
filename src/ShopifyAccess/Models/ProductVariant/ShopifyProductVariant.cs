@@ -63,14 +63,12 @@ namespace ShopifyAccess.Models.ProductVariant
 		public DateTime UpdatedAt{ get; set; }
 
 		/// <summary>
-		/// The unique numeric identifier for a product's image. The image must be associated to the same product as the variant.
-		/// Note: If an image is not set, then the ImageId will remain 0 (by default) when serialized
+		/// The unique numeric identifier for a product's image. The image must be associated to the same product as the variant
 		/// </summary>
 		[ DataMember( Name = "image_id" ) ]
-		[ JsonProperty( NullValueHandling = NullValueHandling.Ignore ) ]
-		public long ImageId{ get; set; }
+		public long? ImageId{ get; set; }
 
-		public ShopifyInventoryLevels InventoryLevels{ get; set; }		
+		public ShopifyInventoryLevels InventoryLevels{ get; set; }
 	}
 
 	public enum InventoryManagementEnum
