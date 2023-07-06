@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Collections.Generic;
+using FluentAssertions;
 using NUnit.Framework;
 using ShopifyAccess.GraphQl.Models.ProductVariantsInventory;
 
@@ -80,10 +81,21 @@ namespace ShopifyAccessTests.GraphQl.Models.ProductVariantsInventoryReport
 			var locationGid = "gid://shopify/Location/" + locationId;
 			return new InventoryLevel()
 			{
-				Available = available,
+				Quantities = CreateAvailableQuantity( available ),
 				Location = new Location()
 				{
 					LocationId = locationGid
+				}
+			};
+		}
+
+		private static List< InventoryQuantity > CreateAvailableQuantity( int available )
+		{
+			return new List< InventoryQuantity >
+			{
+				new InventoryQuantity
+				{
+					Quantity = available
 				}
 			};
 		}

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CuttingEdge.Conditions;
+using Newtonsoft.Json;
 using ServiceStack;
 using ShopifyAccess.Exceptions;
 using ShopifyAccess.Misc;
@@ -201,7 +202,7 @@ namespace ShopifyAccess.Services
 			var limit = GetLimitFromHeader( headers );
 			ShopifyLogger.LogGetResponse< T >( uri, limit, content, mark, timeout );
 
-			return !string.IsNullOrEmpty( content ) ? content.FromJson< T >() : default( T );
+			return !string.IsNullOrEmpty( content ) ? JsonConvert.DeserializeObject< T >( content ) : default( T );
 		}
 
 		private static ResponsePage< T > ParsePagedResponse< T >( string content, HttpHeaders headers, Uri uri, 
@@ -211,7 +212,7 @@ namespace ShopifyAccess.Services
 			var nextPageLink = PagedResponseService.GetNextPageQueryStrFromHeader( headers );
 			ShopifyLogger.LogGetResponse< T >( uri, limit, nextPageLink, content, mark, timeout );
 
-			var result = !string.IsNullOrEmpty( content ) ? content.FromJson< T >() : default( T );
+			var result = !string.IsNullOrEmpty( content ) ? JsonConvert.DeserializeObject< T >( content ) : default( T );
 
 			return new ResponsePage< T > 
 			{
