@@ -19,7 +19,7 @@ namespace ShopifyAccess.Models.ProductVariant
 		{
 			get
 			{
-				if ( Enum.TryParse< InventoryManagementEnum >( RawInventoryManagement, out var inventoryManagement ) )
+				if ( Enum.TryParse< InventoryManagementEnum >( RawInventoryManagement, true, out var inventoryManagement ) )
 				{
 					return inventoryManagement;
 				}
