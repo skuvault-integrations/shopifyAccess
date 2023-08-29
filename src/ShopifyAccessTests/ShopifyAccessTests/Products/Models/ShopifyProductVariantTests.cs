@@ -8,24 +8,12 @@ namespace ShopifyAccessTests.Products.Models
 	[ TestFixture ]
 	public class ShopifyProductVariantTests
 	{
-		[ Test ]
-		public void Deserialize_CorrectInventoryManagement_WhenDoesNotIgnoreCaseForEnum()
+		[ TestCase( "Shopify" ) ]
+		[ TestCase( "shopify" ) ]
+		public void Deserialize_CorrectInventoryManagement( string rawInventoryManagement )
 		{
 			// Arrange
-			var json = "{\"id\":1,\"inventory_management\":\"Shopify\",\"inventory_item_id\":0,\"weight\":0,\"price\":0,\"updated_at\":\"\\/Date(-62135596800000-0000)\\/\"}";
-
-			// Act
-			var shopifyProductVariant = JsonSerializer.DeserializeFromString< ShopifyProductVariant >( json );
-
-			// Assert
-			shopifyProductVariant.InventoryManagement.Should().Be( InventoryManagementEnum.Shopify );
-		}
-
-		[ Test ]
-		public void Deserialize_CorrectInventoryManagement_WhenIgnoreCaseForEnum()
-		{
-			// Arrange
-			var json = "{\"id\":1,\"inventory_management\":\"shopify\",\"inventory_item_id\":0,\"weight\":0,\"price\":0,\"updated_at\":\"\\/Date(-62135596800000-0000)\\/\"}";
+			var json = "{\"id\":1,\"inventory_management\":\"" + rawInventoryManagement + "\",\"inventory_item_id\":0,\"weight\":0,\"price\":0,\"updated_at\":\"\\/Date(-62135596800000-0000)\\/\"}";
 
 			// Act
 			var shopifyProductVariant = JsonSerializer.DeserializeFromString< ShopifyProductVariant >( json );
