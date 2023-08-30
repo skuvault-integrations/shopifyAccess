@@ -107,6 +107,7 @@
     <Compile Include="Misc\ActionPoliciesTests.cs" />
     <Compile Include="Misc\LoggerExtensionsTests.cs" />
     <Compile Include="OperationTimeoutTests.cs" />
+    <Compile Include="Orders\Models\ShopifyOrderTests.cs" />
     <Compile Include="Orders\OrderMapperTests.cs" />
     <Compile Include="Orders\OrdersListTests.cs" />
     <Compile Include="Products\Models\ShopifyProductVariantTests.cs" />
