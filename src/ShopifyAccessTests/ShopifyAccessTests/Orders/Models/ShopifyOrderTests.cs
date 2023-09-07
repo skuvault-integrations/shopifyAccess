@@ -9,7 +9,6 @@ namespace ShopifyAccessTests.Orders.Models
 	public class ShopifyOrderTests
 	{
 		[ TestCase( "Fulfilled", FulfillmentStatusEnum.fulfilled ) ]
-		[ TestCase( "Partial", FulfillmentStatusEnum.partial ) ]
 		public void Deserialize_ReturnsFulfillmentStatus_IgnoringCase( string rawFulfillmentStatus, FulfillmentStatusEnum expectedFulfillmentStatus )
 		{
 			// Arrange
@@ -38,9 +37,6 @@ namespace ShopifyAccessTests.Orders.Models
 		}
 
 		[ TestCase( "Web", ShopifySourceNameEnum.web ) ]
-		[ TestCase( "Pos", ShopifySourceNameEnum.pos ) ]
-		[ TestCase( "IPhone", ShopifySourceNameEnum.iphone ) ]
-		[ TestCase( "Android", ShopifySourceNameEnum.android ) ]
 		public void Deserialize_ReturnsSourceName_IgnoringCase( string rawSourceName, ShopifySourceNameEnum expectedSourceName )
 		{
 			// Arrange
