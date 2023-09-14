@@ -44,25 +44,17 @@ namespace ShopifyAccess.Models.Order
 
 		[ DataMember( Name = "fulfillment_status" ) ]
 		private string RawFulfillmentStatus { get; set; }
-		
+
 		[ JsonIgnore ]
 		public FulfillmentStatusEnum FulfillmentStatus
 		{
 			get
 			{
-				if ( Enum.TryParse< FulfillmentStatusEnum >( RawFulfillmentStatus, out var fulfillmentStatus ) )
-				{
+				if( Enum.TryParse< FulfillmentStatusEnum >( this.RawFulfillmentStatus, true, out var fulfillmentStatus ) )
 					return fulfillmentStatus;
-				}
-				else
-				{
-					return FulfillmentStatusEnum.Undefined;
-				}
+				return FulfillmentStatusEnum.Undefined;
 			}
-			set
-			{
-				RawFulfillmentStatus = value.ToString();
-			}
+			set => this.RawFulfillmentStatus = value.ToString();
 		}
 
 		[ DataMember( Name = "source_name" ) ]
@@ -73,19 +65,11 @@ namespace ShopifyAccess.Models.Order
 		{
 			get
 			{
-				if ( Enum.TryParse< ShopifySourceNameEnum >( RawSourceName, out var sourceName ) )
-				{
+				if( Enum.TryParse< ShopifySourceNameEnum >( this.RawSourceName, true, out var sourceName ) )
 					return sourceName;
-				}
-				else
-				{
-					return ShopifySourceNameEnum.Undefined;
-				}
+				return ShopifySourceNameEnum.Undefined;
 			}
-			set
-			{
-				RawSourceName = value.ToString();
-			}
+			set => this.RawSourceName = value.ToString();
 		}
 
 		[ DataMember( Name = "location_id" ) ]
