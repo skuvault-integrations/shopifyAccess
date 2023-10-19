@@ -61,10 +61,9 @@ namespace ShopifyAccess.Misc
 		/// <typeparam name="TResponseType">The type of object returned in response from Shopify. Needed to transform the response for logging</typeparam>
 		public static void LogGetResponse< TResponseType >( Uri requestUri, string limit, string jsonResponse, Mark mark, int timeout )
 		{
-			//Temporarily disabled due to Production issues
-			// var contentForLogs = jsonResponse.ToLogContents< TResponseType >();
-			// Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tResponse: {3}", 
-			// 	requestUri, timeout, limit, contentForLogs );
+			var contentForLogs = jsonResponse.ToLogContents< TResponseType >();
+			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tResponse: {3}", 
+				requestUri, timeout, limit, contentForLogs );
 		}
 
 		/// <summary>
@@ -80,11 +79,10 @@ namespace ShopifyAccess.Misc
 		public static void LogGetResponse< TResponseType >( Uri requestUri, string limit, string nextPage, string jsonResponse, 
 			Mark mark, int timeout)
 		{
-			//Temporarily disabled due to Production issues
-			// jsonResponse = MaskPersonalInfoInShopifyOrders< TResponseType >( jsonResponse );
-			// var contentForLogs = jsonResponse.ToLogContents< TResponseType >();
-			// Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tNext Page: {3}\tResponse: {4}", 
-			// 	requestUri, timeout, limit, nextPage, contentForLogs );
+			jsonResponse = MaskPersonalInfoInShopifyOrders< TResponseType >( jsonResponse );
+			var contentForLogs = jsonResponse.ToLogContents< TResponseType >();
+			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms\tLimit: {2}\tNext Page: {3}\tResponse: {4}", 
+				requestUri, timeout, limit, nextPage, contentForLogs );
 		}
 
 		public static void LogUpdateRequest( Uri requestUri, string jsonContent, Mark mark, int timeout )
