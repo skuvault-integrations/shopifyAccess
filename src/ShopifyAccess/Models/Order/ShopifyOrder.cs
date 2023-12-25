@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 using ShopifyAccess.Models.Order.Discounts;
 
 namespace ShopifyAccess.Models.Order
@@ -42,10 +43,34 @@ namespace ShopifyAccess.Models.Order
 		public IEnumerable< ShopifyFulfillment > Fulfillments { get; set; }
 
 		[ DataMember( Name = "fulfillment_status" ) ]
-		public FulfillmentStatusEnum FulfillmentStatus { get; set; }
+		private string RawFulfillmentStatus { get; set; }
+
+		[ JsonIgnore ]
+		public FulfillmentStatusEnum FulfillmentStatus
+		{
+			get
+			{
+				if( Enum.TryParse< FulfillmentStatusEnum >( this.RawFulfillmentStatus, true, out var fulfillmentStatus ) )
+					return fulfillmentStatus;
+				return FulfillmentStatusEnum.Undefined;
+			}
+			set => this.RawFulfillmentStatus = value.ToString();
+		}
 
 		[ DataMember( Name = "source_name" ) ]
-		public ShopifySourceNameEnum SourceName { get; set; }
+		public string RawSourceName { get; set; }
+
+		[ JsonIgnore ]
+		public ShopifySourceNameEnum SourceName
+		{
+			get
+			{
+				if( Enum.TryParse< ShopifySourceNameEnum >( this.RawSourceName, true, out var sourceName ) )
+					return sourceName;
+				return ShopifySourceNameEnum.Undefined;
+			}
+			set => this.RawSourceName = value.ToString();
+		}
 
 		[ DataMember( Name = "location_id" ) ]
 		public string LocationId { get; set; }

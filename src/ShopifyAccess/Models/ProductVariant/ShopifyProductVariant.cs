@@ -1,29 +1,38 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 using ShopifyAccess.Models.Product;
 
 namespace ShopifyAccess.Models.ProductVariant
 {
 	[ DataContract ]
-	public class ShopifyProductVariant: IEquatable< ShopifyProductVariant >
+	public class ShopifyProductVariant
 	{
 		[ DataMember( Name = "id" ) ]
 		public long Id{ get; set; }
-
-		/// <summary>
-		/// This field is obsolete. DON'T USE IT
-		/// </summary>
-		[ DataMember( Name = "inventory_quantity" ) ]
-		public int Quantity{ get; set; }
-
-		/// <summary>
-		/// This field is obsolete. DON'T USE IT
-		/// </summary>
-		[DataMember( Name = "old_inventory_quantity" ) ]
-		public int OldQuantity{ get; set; }
-
+		
 		[ DataMember( Name = "inventory_management" ) ]
-		public InventoryManagement InventoryManagement{ get; set; }
+		private string RawInventoryManagement{ get; set; }
+		
+		[ JsonIgnore ]
+		public InventoryManagementEnum InventoryManagement
+		{
+			get
+			{
+				if ( Enum.TryParse< InventoryManagementEnum >( RawInventoryManagement, true, out var inventoryManagement ) )
+				{
+					return inventoryManagement;
+				}
+				else
+				{
+					return InventoryManagementEnum.Blank;
+				}
+			}
+			set
+			{
+				RawInventoryManagement = value.ToString();
+			}
+		}
 
 		[ DataMember( Name = "sku" ) ]
 		public string Sku{ get; set; }
@@ -32,78 +41,37 @@ namespace ShopifyAccess.Models.ProductVariant
 		public long InventoryItemId{ get; set; }
 
 		[ DataMember( Name = "barcode" ) ]
-		public string Barcode { get; set; }
-		
+		public string Barcode{ get; set; }
+
 		[ DataMember( Name = "title" ) ]
-		public string Title { get; set; }
+		public string Title{ get; set; }
 
 		[ DataMember( Name = "weight" ) ]
-		public decimal Weight;
+		public decimal Weight{ get; set; }
 
 		[ DataMember( Name = "weight_unit" ) ]
-		public string WeightUnit { get; set; }
+		public string WeightUnit{ get; set; }
 		public string WeightUnitStandardized
 		{
 			get { return this.WeightUnit != null ? this.WeightUnit.Replace( "kg", "kgs" ).Replace( "lb", "lbs" ) : "lbs"; }
 		}
 
 		[ DataMember( Name = "price" ) ]
-		public decimal Price { get; set; }
-		
-		[ DataMember( Name = "compare_at_price" ) ]
-		public decimal CompareAtPrice { get; set; }
+		public decimal Price{ get; set; }
 
 		[ DataMember( Name = "updated_at" ) ]
-		public DateTime UpdatedAt { get; set; }
+		public DateTime UpdatedAt{ get; set; }
 
+		/// <summary>
+		/// The unique numeric identifier for a product's image. The image must be associated to the same product as the variant
+		/// </summary>
 		[ DataMember( Name = "image_id" ) ]
-		public long ImageId { get; set; }
+		public long? ImageId{ get; set; }
 
 		public ShopifyInventoryLevels InventoryLevels{ get; set; }
-
-		public override int GetHashCode()
-		{
-			unchecked
-			{
-				var hashCode = this.Id.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ this.Quantity.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ this.InventoryManagement.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ this.Sku.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ this.Barcode.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ this.Title.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ this.Weight.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ this.WeightUnit.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ this.Price.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ this.CompareAtPrice.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ this.UpdatedAt.GetHashCode();
-				hashCode = ( hashCode * 397 ) ^ this.ImageId.GetHashCode();
-
-				return hashCode;
-			}
-		}
-
-		public bool Equals( ShopifyProductVariant other )
-		{
-			return this.Id.Equals( other.Id ) &&
-			       this.Quantity.Equals( other.Quantity ) &&
-			       this.InventoryManagement.Equals( other.InventoryManagement ) &&
-			       string.Equals( this.Sku, other.Sku ) &&
-			       this.InventoryLevels.Equals( other.InventoryLevels );
-		}
-
-		public override bool Equals( object obj )
-		{
-			if( ReferenceEquals( null, obj ) )
-				return false;
-			if( ReferenceEquals( this, obj ) )
-				return true;
-			if( obj.GetType() != this.GetType() )
-				return false;
-			return this.Equals( ( ShopifyProductVariant )obj );
-		}
 	}
 
-	public enum InventoryManagement
+	public enum InventoryManagementEnum
 	{
 		Blank,
 		Shopify

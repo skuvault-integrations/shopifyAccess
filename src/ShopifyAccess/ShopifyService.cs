@@ -666,7 +666,7 @@ namespace ShopifyAccess
 		{
 			foreach( var product in products.Products )
 			{
-				product.Variants.RemoveAll( v => v.InventoryManagement == InventoryManagement.Blank );
+				product.Variants.RemoveAll( v => v.InventoryManagement == InventoryManagementEnum.Blank );
 			}
 		}
 

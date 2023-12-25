@@ -70,6 +70,7 @@
     <Compile Include="GraphQl\Models\BaseGraphQlResponse.cs" />
     <Compile Include="GraphQl\Models\PageInfo.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventory\InventoryLevelsNodes.cs" />
+    <Compile Include="GraphQl\Models\ProductVariantsInventory\InventoryQuantity.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventory\ProductVariants.cs" />
     <Compile Include="GraphQl\Models\Responses\GetBulkOperationByIdResponse.cs" />
     <Compile Include="GraphQl\Models\Responses\BulkOperationRunQueryResponse.cs" />

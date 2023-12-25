@@ -37,7 +37,7 @@ namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventory
 			result.InventoryLevels.AddRange( inventories.Select( inv => new ShopifyInventoryLevel()
 			{
 				InventoryItemId = inventoryItemId,
-				Available = inv.Available,
+				Available = inv.Quantities.FirstOrDefault()?.Quantity ?? 0,
 				LocationId = GraphQlIdParser.Location.GetId( inv.Location?.LocationId )
 			} ) );
 			return result;

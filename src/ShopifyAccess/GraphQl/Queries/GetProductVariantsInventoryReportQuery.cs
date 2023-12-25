@@ -23,10 +23,12 @@
 										inventoryLevels{
 											edges{
 												node {
-													available
 													location {
 														id
 														name
+													}
+													quantities(names: [""available""]) {
+														quantity
 													}
 												}
 											}

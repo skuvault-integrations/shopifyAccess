@@ -16,7 +16,7 @@ namespace ShopifyAccess.Models.Product
 	{
 		public long LocationId{ get; set; }
 
-		public int Available{ get; set; }
+		public int? Available{ get; set; }
 
 		public string UpdatedAt{ get; set; }
 
