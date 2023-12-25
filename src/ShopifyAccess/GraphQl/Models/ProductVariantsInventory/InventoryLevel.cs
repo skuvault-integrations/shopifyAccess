@@ -1,12 +1,13 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventory
 {
 	[ DataContract ]
 	internal class InventoryLevel
 	{
-		[ DataMember( Name = "available" ) ]
-		public int Available{ get; set; }
+		[ DataMember( Name = "quantities") ]
+		public List< InventoryQuantity > Quantities { get; set; } = new List< InventoryQuantity >();
 
 		[ DataMember( Name = "location" ) ]
 		public Location Location{ get; set; }
