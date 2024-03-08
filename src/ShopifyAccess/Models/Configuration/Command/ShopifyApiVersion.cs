@@ -8,9 +8,9 @@ namespace ShopifyAccess.Models.Configuration.Command
 	public sealed class ShopifyApiVersion
 	{
 		private readonly string _versionCode;
-
-		public static readonly ShopifyApiVersion V2023_01 = new ShopifyApiVersion( "2023-01" );
+		
 		public static readonly ShopifyApiVersion V2023_04 = new ShopifyApiVersion( "2023-04" );
+		public static readonly ShopifyApiVersion V2023_10 = new ShopifyApiVersion( "2023-10" );
 
 		private ShopifyApiVersion( string versionCode )
 		{
