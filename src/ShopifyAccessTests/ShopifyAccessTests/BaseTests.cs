@@ -11,7 +11,7 @@ namespace ShopifyAccessTests
 {
 	public class BaseTests
 	{
-		protected static readonly ShopifyApiVersion ApiVersion = ShopifyApiVersion.V2023_04;
+		protected static readonly ShopifyApiVersion ApiVersion = ShopifyApiVersion.V2023_10;
 		protected readonly IShopifyFactory ShopifyFactory = new ShopifyFactory( ApiVersion );
 		protected ShopifyClientCredentials _clientCredentials;
 		protected IShopifyService Service;
