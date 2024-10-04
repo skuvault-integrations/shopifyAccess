@@ -152,7 +152,7 @@ namespace ShopifyAccess
 					break;
 
 				foreach( var order in updatedOrdersWithinPage.Response.Orders )
-					this.RemoveCancelledOrderItems( order );
+					ProcessRefundOrderLineItems( order );
 
 				orders.Orders.AddRange( updatedOrdersWithinPage.Response.Orders );
 
@@ -162,7 +162,7 @@ namespace ShopifyAccess
 			return orders;
 		}
 
-		private void RemoveCancelledOrderItems( ShopifyOrder order )
+		internal static void ProcessRefundOrderLineItems( ShopifyOrder order )
 		{
 			if ( order.Refunds == null || !order.Refunds.Any() )
 				return;
@@ -170,52 +170,36 @@ namespace ShopifyAccess
 			var actualOrderItems = new List< ShopifyOrderItem >();
 			foreach( var orderItem in order.OrderItems )
 			{
-				bool isCancelled = false;
-				int cancelledQuantity = 0;
+				var isCancelled = false;
+				var cancelledQuantity = 0;
 
 				foreach( var refund in order.Refunds )
 				{
 					var refundLineItem = refund.RefundLineItems.FirstOrDefault( rl => rl.LineItemId.ToString().Equals( orderItem.Id ) );
+					if( refundLineItem == null )
+						continue;
 
-					if ( refundLineItem != null && refundLineItem.RestockType.Equals( "cancel" ) )
+					// remove order item
+					if ( orderItem.Quantity == refundLineItem.Quantity && refundLineItem.RestockType.Equals( "cancel" ) )
 					{
-						// remove order item
-						if ( orderItem.Quantity == refundLineItem.Quantity )
-						{
-							isCancelled = true;
-							break;
-						}
-						
-						// adjust quantity
-						cancelledQuantity += refundLineItem.Quantity;
+						isCancelled = true;
+						break;
 					}
+						
+					// adjust quantity
+					cancelledQuantity += refundLineItem.Quantity;
 				}
 
-				if ( !isCancelled )
-				{
-					orderItem.Quantity -= cancelledQuantity;
-					actualOrderItems.Add( orderItem );
-				}
+				if( isCancelled )
+					continue;
+				
+				orderItem.Quantity -= cancelledQuantity;
+				actualOrderItems.Add( orderItem );
 			}
 
 			order.OrderItems = actualOrderItems;
 		}
 
-		private int GetOrdersCount( string updatedOrdersEndpoint, Mark mark, CancellationToken token )
-		{
-			var count = ActionPolicies.GetPolicy( mark, this._shopName, token ).Get(
-				() => this._throttler.Execute(
-					() => this._webRequestServices.GetResponse< OrdersCount >( _shopifyCommandFactory.CreateGetOrdersCountCommand(), updatedOrdersEndpoint, token, mark, this._timeouts[ ShopifyOperationEnum.GetOrdersCount ] ).Count ) );
-			return count;
-		}
-
-		private Task< int > GetOrdersCountAsync( string updatedOrdersEndpoint, Mark mark, CancellationToken token )
-		{
-			var count = ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
-				() => this._throttlerAsync.ExecuteAsync(
-					async () => ( await this._webRequestServices.GetResponseAsync< OrdersCount >( _shopifyCommandFactory.CreateGetOrdersCountCommand(), updatedOrdersEndpoint, token, mark, this._timeouts[ ShopifyOperationEnum.GetOrdersCount ] ) ).Count ) );
-			return count;
-		}
 		#endregion
 
 		#region Products
@@ -463,23 +447,7 @@ namespace ShopifyAccess
 		{
 			return variant.InventoryItem.Tracked && !string.IsNullOrEmpty( variant.Sku );
 		}
-
-		private int GetProductsCount( Mark mark, CancellationToken token )
-		{
-			var count = ActionPolicies.GetPolicy( mark, this._shopName, token ).Get(
-				() => this._throttler.Execute(
-					() => this._webRequestServices.GetResponse< ProductsCount >( _shopifyCommandFactory.CreateGetProductsCountCommand(), EndpointsBuilder.EmptyEndpoint, token, mark, this._timeouts[ ShopifyOperationEnum.GetProductsCount ] ).Count ) );
-			return count;
-		}
-
-		private Task< int > GetProductsCountAsync( Mark mark, CancellationToken token )
-		{
-			var count = ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
-				() => this._throttlerAsync.ExecuteAsync(
-					async () => ( await this._webRequestServices.GetResponseAsync< ProductsCount >( _shopifyCommandFactory.CreateGetProductsCountCommand(), EndpointsBuilder.EmptyEndpoint, token, mark, this._timeouts[ ShopifyOperationEnum.GetProductsCount ] ) ).Count ) );
-			return count;
-		}
-
+		
 		private ShopifyProducts CollectProductsFromAllPages( CancellationToken token, Mark mark, int timeout )
 		{
 			var products = new ShopifyProducts();
