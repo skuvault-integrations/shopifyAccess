@@ -110,6 +110,7 @@
     <Compile Include="Orders\Models\ShopifyOrderTests.cs" />
     <Compile Include="Orders\OrderMapperTests.cs" />
     <Compile Include="Orders\OrdersListTests.cs" />
+    <Compile Include="Orders\OrdersTests.cs" />
     <Compile Include="Products\Models\ShopifyProductVariantTests.cs" />
     <Compile Include="Products\ProductVariantTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
