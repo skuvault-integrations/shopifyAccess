@@ -32,7 +32,7 @@ _TeamCity*/
 *.ReSharper
 *.docstates
 _rltm*
-ShopifyCredentials.csv
+*Credentials*.csv
 license.txt
 
 #Ignore common build files
