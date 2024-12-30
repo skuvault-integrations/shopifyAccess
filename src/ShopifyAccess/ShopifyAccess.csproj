@@ -138,6 +138,7 @@
     <Compile Include="GraphQl\ReportType.cs" />
     <Compile Include="GraphQl\Services\IReportGenerator.cs" />
     <Compile Include="GraphQl\Services\ReportGenerator.cs" />
+    <Compile Include="GraphQl\ShopifyGraphQLGeneratedClient.2024.04.cs" />
     <Compile Include="GraphQl\ShopifyGraphQlThrottler.cs" />
     <Compile Include="IShopifyService.cs" />
     <Compile Include="Misc\ActionPolicies.cs" />
