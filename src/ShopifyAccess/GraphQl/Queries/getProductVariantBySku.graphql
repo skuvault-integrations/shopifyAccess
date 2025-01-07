@@ -1,0 +1,27 @@
+query getProductVariantBySku($query: String, $after: String, $locationsCount: Int){
+    productVariants(first: 1, after: $after, query: $query) {
+        nodes {
+            id
+            sku
+            inventoryItem {
+                id
+                tracked
+                inventoryLevels(first: $locationsCount) {
+                    nodes {
+                        location {
+                            id
+                            name
+                        }
+                        quantities(names: ["available"]) {
+                            quantity
+                        }
+                    }
+                }
+            }
+        }
+        pageInfo {
+            endCursor
+            hasNextPage
+        }
+    }
+}
