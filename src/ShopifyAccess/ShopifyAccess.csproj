@@ -151,6 +151,9 @@
   <ItemGroup>
     <Content Include="Docs\AuthorizationFlowShopifyToSv.md" />
     <Content Include="Docs\AuthorizationFlowSvToShopify.md" />
+    <Content Include="GraphQl\graphql.config.yml" />
+    <EmbeddedResource Include="GraphQl\Queries\getProductVariantBySku.graphql" />
+    <Content Include="GraphQl\schema.graphql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

@@ -1,0 +1,6 @@
+schema: schema.graphql
+extensions:
+  endpoints:
+    production:
+      url: https://shopify.dev/admin-graphql-direct-proxy/2024-04
+documents: '**/*.graphql'

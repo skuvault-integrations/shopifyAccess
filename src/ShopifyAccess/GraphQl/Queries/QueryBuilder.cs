@@ -1,4 +1,8 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using ServiceStack;
 
 namespace ShopifyAccess.GraphQl.Queries
@@ -6,6 +10,33 @@ namespace ShopifyAccess.GraphQl.Queries
 	internal static class QueryBuilder
 	{
 		private const int MaxLocationsCount = 250;
+		
+		/// <summary>
+		/// Build query from embedded resource
+		/// </summary>
+		/// <param name="queryName"></param>
+		/// <returns></returns>
+		public static string BuildQuery( string queryName )
+		{
+			var assembly = Assembly.GetExecutingAssembly();
+			var manifestResourceName = assembly.GetManifestResourceNames().FirstOrDefault(rn => rn.EndsWith($"{queryName}.graphql", StringComparison.InvariantCultureIgnoreCase ) );
+			return ReadQueryFile( assembly, manifestResourceName ).Result;
+		}
+
+		private static Task< string > ReadQueryFile( Assembly assembly, string manifestResourceName )
+		{
+			Task< string > contents = null;
+			using( var stream = assembly.GetManifestResourceStream(manifestResourceName) )
+			{
+				if( stream != null )
+					using( var reader = new StreamReader( stream ) )
+					{
+						contents = reader.ReadToEndAsync();
+					}
+			}
+
+			return contents ?? Task.FromResult( string.Empty );
+		}
 
 		public static string GetCurrentBulkOperationStatusRequest()
 		{
@@ -27,7 +58,7 @@ namespace ShopifyAccess.GraphQl.Queries
 				throw new ArgumentOutOfRangeException( nameof(locationsCount), locationsCount, "LocationsCount should not be more than " + MaxLocationsCount );
 			}
 
-			var query = PrepareRequest( GetProductVariantInventoryQuery.Query );
+			var query = PrepareRequest( BuildQuery( "getProductVariantBySku") );	//TODO Move this string to a constant
 			var escapedSku = sku.ToJson();
 			var variables = new
 			{
