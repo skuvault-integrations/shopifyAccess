@@ -234,22 +234,39 @@ namespace ShopifyAccess
 		{
 			return await this.GetProductsCreatedAfterAsync( DateTime.MinValue, token, mark );
 		}
-		
-		public async Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null )
+
+		public async Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark )
 		{
-			mark = mark.CreateNewIfBlank();
-
-			var productsDateFilter = new ProductsDateFilter
-			{
-				FilterType = productsStartUtc != DateTime.MinValue ? FilterType.CreatedAfter : FilterType.None,
-				ProductsStartUtc = productsStartUtc
-			};
-			var products = await this.CollectProductsFromAllPagesAsync( productsDateFilter, mark, token );
+			//TODO GUARD-3717: Add pagination logic
 			
-			RemoveQueryPartFromProductsImagesUrl( products );
-
-			return products;
+			var request = QueryBuilder.GetProductsCreatedOnOrAfterRequest( productsStartUtc );
+			
+			var response = await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
+				() => this._graphQlThrottler.ExecuteAsync(
+					() => this._webRequestServices.PostDataAsync< GetProductsResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, token, mark, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] )
+					, mark )
+			).ConfigureAwait( false );
+			
+			//TODO GUARD-3717: Map GetProductsResponse to ShopifyProducts
+			
+			return response;
 		}
+
+		// public async Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null )
+		// {
+		// 	mark = mark.CreateNewIfBlank();
+		//
+		// 	var productsDateFilter = new ProductsDateFilter
+		// 	{
+		// 		FilterType = productsStartUtc != DateTime.MinValue ? FilterType.CreatedAfter : FilterType.None,
+		// 		ProductsStartUtc = productsStartUtc
+		// 	};
+		// 	var products = await this.CollectProductsFromAllPagesAsync( productsDateFilter, mark, token );
+		// 	
+		// 	RemoveQueryPartFromProductsImagesUrl( products );
+		//
+		// 	return products;
+		// }
 		
 		public async Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null )
 		{
@@ -360,6 +377,7 @@ namespace ShopifyAccess
 
 			ShopifyLogger.LogOperationStart( this._shopName, mark, $"Sku: '{sku}'" );
 
+			//TODO GUARD-3717: Extract pagination logic into a common method in another class/helper
 			try
 			{
 				string nextCursor = null;
