@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace ShopifyAccess.GraphQl.Models.Products
+namespace ShopifyAccess.GraphQl.Models
 {
 	[ DataContract ]
-	internal class Products
+	public class Nodes< T >
 	{
 		[ DataMember( Name = "nodes" ) ]
-		public List< Product > Nodes{ get; set; }
-
+		internal List< T > Items{ get; set; }
+		
 		[ DataMember( Name = "pageInfo" ) ]
-		public PageInfo PageInfo{ get; set; }
+		internal PageInfo PageInfo{ get; set; }
 	}
 }

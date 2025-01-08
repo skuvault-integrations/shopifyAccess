@@ -8,6 +8,8 @@ namespace ShopifyAccessTests.Cancellation
 	[ TestFixture ]
 	public class CancellationTokenTests : BaseTests
 	{
+		private static readonly Mark _mark = Mark.Create;
+		
 		[ Test ]
 		public void CancelRequest()
 		{
@@ -16,7 +18,7 @@ namespace ShopifyAccessTests.Cancellation
 			Assert.ThrowsAsync< TaskCanceledException >( async () =>
 			{
 				cancellationTokenSource.Cancel();
-				await this.Service.GetProductsAsync( cancellationTokenSource.Token );
+				await this.Service.GetProductsAsync( cancellationTokenSource.Token, _mark );
 				Assert.Fail();
 			}, "Task wasn't cancelled" );
 		}
@@ -30,7 +32,7 @@ namespace ShopifyAccessTests.Cancellation
 
 			Assert.ThrowsAsync< TaskCanceledException >( async () => 
 			{
-				await service.GetProductsAsync( cancellationTokenSource.Token );
+				await service.GetProductsAsync( cancellationTokenSource.Token, _mark );
 			}, "Request didn't timeout. TaskCanceledException wasn't thrown");
 		}
 	}

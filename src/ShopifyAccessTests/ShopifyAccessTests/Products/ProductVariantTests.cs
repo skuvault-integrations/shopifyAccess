@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
+using ShopifyAccess.Models;
 using ShopifyAccess.Models.Product;
 using ShopifyAccess.Models.ProductVariant;
 
@@ -13,6 +14,8 @@ namespace ShopifyAccessTests.Products
 	[ TestFixture ]
 	public class ProductVariantTests : BaseTests
 	{
+		private static readonly Mark _mark = Mark.Create;
+		
 		[ Test ]
 		public void GetProducts()
 		{
@@ -24,17 +27,27 @@ namespace ShopifyAccessTests.Products
 		[ Test ]
 		public async Task GetProductsAsync()
 		{
-			var products = await this.Service.GetProductsAsync( CancellationToken.None );
+			var products = await this.Service.GetProductsAsync( CancellationToken.None, _mark );
 
 			products.Products.Count.Should().BeGreaterThan( 0 );
 		}
 
 		[ Test ]
+		public async Task RestLegacyGetProductsCreatedAfterAsync()
+		{
+			var productsStartUtc = DateTime.Parse( "2023-06-01T00:00:00Z" ); //new DateTime( 1800, 1, 1 );
+
+			var products = await this.Service.RestLegacyGetProductsCreatedAfterAsync( productsStartUtc, CancellationToken.None, _mark );
+
+			products.Products.Count.Should().BeGreaterThan( 1 );
+		}
+		
+		[ Test ]
 		public async Task GetProductsCreatedAfterAsync()
 		{
 			var productsStartUtc = new DateTime( 1800, 1, 1 );
 
-			var products = await this.Service.GetProductsCreatedAfterAsync( productsStartUtc, CancellationToken.None );
+			var products = await this.Service.GetProductsCreatedAfterAsync( productsStartUtc, CancellationToken.None, _mark );
 
 			products.Products.Count.Should().BeGreaterThan( 1 );
 		}
@@ -42,7 +55,7 @@ namespace ShopifyAccessTests.Products
 		[ Test ]
 		public async Task GetProductsCreatedAfterAsync_GetsVariationsWithUntrackedQuantity()
 		{
-			var products = await this.Service.GetProductsCreatedAfterAsync( DateTime.MinValue, CancellationToken.None );
+			var products = await this.Service.GetProductsCreatedAfterAsync( DateTime.MinValue, CancellationToken.None, _mark );
 
 			products.Products.Any( p => p.Variants.Any( v => v.InventoryManagement == InventoryManagementEnum.Blank ) );
 		}
@@ -111,7 +124,7 @@ namespace ShopifyAccessTests.Products
 		public async Task WhenGetProductsCreatedAfterAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
 		{
 			var dateFrom = new DateTime( 2021, 6, 1 );
-			var products = await this.Service.GetProductsCreatedAfterAsync( dateFrom, CancellationToken.None );
+			var products = await this.Service.GetProductsCreatedAfterAsync( dateFrom, CancellationToken.None, _mark );
 			var productsWithImages = products.Products.Where( p => p.Images != null && p.Images.Any() );
 
 			productsWithImages.Should().NotBeNullOrEmpty();
@@ -124,7 +137,7 @@ namespace ShopifyAccessTests.Products
 		public async Task WhenGetProductsCreatedBeforeButUpdatedAfterAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
 		{
 			var dateFrom = new DateTime( 2023, 6, 1 );
-			var products = await this.Service.GetProductsCreatedBeforeButUpdatedAfterAsync( dateFrom, CancellationToken.None );
+			var products = await this.Service.GetProductsCreatedBeforeButUpdatedAfterAsync( dateFrom, CancellationToken.None, _mark );
 			var productsWithImages = products.Products.Where( p => p.Images != null && p.Images.Any() );
 
 			productsWithImages.Should().NotBeNullOrEmpty();

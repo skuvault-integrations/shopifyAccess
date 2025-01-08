@@ -72,7 +72,7 @@ namespace ShopifyAccess
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <param name="token">CancellationToken</param>
 		/// <returns>Products with variants (inventory items)</returns>
-		Task< ShopifyProducts > GetProductsAsync( CancellationToken token, Mark mark = null );
+		Task< ShopifyProducts > GetProductsAsync( CancellationToken token, Mark mark );
 
 		/// <summary>
 		/// Get products created after the given date async
@@ -81,7 +81,10 @@ namespace ShopifyAccess
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <param name="token">CancellationToken</param>
 		/// <returns>Products with variants (inventory items)</returns>
-		Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null );
+		Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark );
+		
+		//TODO GUARD-3717 Remove once done testing
+		Task< ShopifyProducts > RestLegacyGetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		/// Get products created before the given date but updated after async
@@ -90,7 +93,7 @@ namespace ShopifyAccess
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <param name="token">CancellationToken</param>
 		/// <returns>Products with variants (inventory items)</returns>
-		Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null );
+		Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark );
 
 		/// <summary>
 		/// Get all existing products (through locations)

@@ -59,9 +59,8 @@ namespace ShopifyAccess.GraphQl.Queries
 			return request.ToJson();
 		}
 		
-		//TODO GUARD-3717: Add params: createdAtMin, after (default to null), first (default to 250)
 		/// <summary>
-		/// 
+		/// Create a query to get products created on or after the specified date.
 		/// </summary>
 		/// <param name="createdAtMinUtc"></param>
 		/// <param name="after">Pagination cursor to request the next page</param>
@@ -75,11 +74,9 @@ namespace ShopifyAccess.GraphQl.Queries
 				throw new ArgumentOutOfRangeException( nameof(productsPerPage), productsPerPage, $"productsPerPage should not be more than {MaxItemsPerResponse}" );
 			}
 			
-			//TODO GUARD-3717: Add createdAtMinUtc & after to the query
 			var variables = new
 			{
 				query = $"created_at:>='{createdAtMinUtc}'",
-				//query = $"created_at:>='{createdAtMinUtc.ToString( "yyyy-MM-ddTHH:mm:ssZ" )}'",
 				after
 			};
 			var request = new { query = CleanUpRequest( GetProductsQuery.CreatedOnOrAfterQuery ), variables };

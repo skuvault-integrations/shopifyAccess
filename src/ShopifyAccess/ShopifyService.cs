@@ -247,26 +247,30 @@ namespace ShopifyAccess
 					, mark )
 			).ConfigureAwait( false );
 			
-			//TODO GUARD-3717: Map GetProductsResponse to ShopifyProducts
+			var products = response.ToShopifyProducts();
 			
-			return response;
+			//TODO GUARD-3717: Perhaps, for GraphQL it's not even needed to call this method
+			RemoveQueryPartFromProductsImagesUrl( products );
+			
+			return products;
 		}
 
-		// public async Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null )
-		// {
-		// 	mark = mark.CreateNewIfBlank();
-		//
-		// 	var productsDateFilter = new ProductsDateFilter
-		// 	{
-		// 		FilterType = productsStartUtc != DateTime.MinValue ? FilterType.CreatedAfter : FilterType.None,
-		// 		ProductsStartUtc = productsStartUtc
-		// 	};
-		// 	var products = await this.CollectProductsFromAllPagesAsync( productsDateFilter, mark, token );
-		// 	
-		// 	RemoveQueryPartFromProductsImagesUrl( products );
-		//
-		// 	return products;
-		// }
+		//TODO GUARD-3717 Remove once done testing
+		public async Task< ShopifyProducts > RestLegacyGetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null )
+		{
+			mark = mark.CreateNewIfBlank();
+		
+			var productsDateFilter = new ProductsDateFilter
+			{
+				FilterType = productsStartUtc != DateTime.MinValue ? FilterType.CreatedAfter : FilterType.None,
+				ProductsStartUtc = productsStartUtc
+			};
+			var products = await this.CollectProductsFromAllPagesAsync( productsDateFilter, mark, token );
+			
+			RemoveQueryPartFromProductsImagesUrl( products );
+		
+			return products;
+		}
 		
 		public async Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null )
 		{

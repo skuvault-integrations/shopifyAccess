@@ -13,6 +13,8 @@ namespace ShopifyAccess.GraphQl.Models.Responses
 	[ DataContract ]
 	internal class GetProductVariantsInventoryData
 	{
+		//TODO GUARD-3717: Use Nodes< ProductVariant > instead of ProductVariants
+		//	Then delete class ProductVariants
 		[ DataMember( Name = "productVariants" ) ]
 		public ProductVariants ProductVariants{ get; set; }
 	}

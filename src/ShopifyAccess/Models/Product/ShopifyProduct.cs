@@ -8,9 +8,6 @@ namespace ShopifyAccess.Models.Product
 	[ DataContract ]
 	public class ShopifyProduct
 	{
-		[ DataMember( Name = "id" ) ]
-		public long Id { get; set; }
-
 		[ DataMember( Name = "title" ) ]
 		public string Title { get; set; }
 
@@ -29,9 +26,6 @@ namespace ShopifyAccess.Models.Product
 		[ DataMember( Name = "body_html" ) ]
 		public string BodyHtml { get; set; }
 		
-		[ DataMember( Name = "tags" ) ]
-		public string Tags { get; set; }
-
 		[ DataMember( Name = "updated_at" ) ]
 		public DateTime UpdatedAt { get; set; }
 	}
