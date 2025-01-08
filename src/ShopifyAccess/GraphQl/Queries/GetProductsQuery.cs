@@ -37,6 +37,7 @@ namespace ShopifyAccess.GraphQl.Queries
 								image
 								{
 									id
+									url
 								}
 								updatedAt
 							}

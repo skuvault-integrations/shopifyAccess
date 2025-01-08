@@ -12,7 +12,7 @@ namespace ShopifyAccess.GraphQl.Models.Products
 		
 		[ DataMember( Name = "variants" ) ]
 		//TODO GUARD-3717: Create a different Models/Products/ProductVariant class from the one in ProductVariantInventory, since need different fields:
-		// Sku, UpdatedAt, Barcode, Title, Weight, WeightUnit, Price, ImageId
+		// Sku, UpdatedAt, Barcode, Title, Weight, WeightUnit, Price, ImageId, ImageUrl
 		public Nodes< ProductVariant > Variants{ get; set; }
 
 		[ DataMember( Name = "vendor" ) ]
