@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using ShopifyAccess.GraphQl.Models.Common;
 using ShopifyAccess.Models.Product;
 
 namespace ShopifyAccess.Models.ProductVariant
@@ -50,11 +51,7 @@ namespace ShopifyAccess.Models.ProductVariant
 		public decimal Weight{ get; set; }
 
 		[ DataMember( Name = "weight_unit" ) ]
-		public string WeightUnit{ get; set; }
-		public string WeightUnitStandardized
-		{
-			get { return this.WeightUnit != null ? this.WeightUnit.Replace( "kg", "kgs" ).Replace( "lb", "lbs" ) : "lbs"; }
-		}
+		public WeightUnit WeightUnit{ get; set; }
 
 		[ DataMember( Name = "price" ) ]
 		public decimal Price{ get; set; }

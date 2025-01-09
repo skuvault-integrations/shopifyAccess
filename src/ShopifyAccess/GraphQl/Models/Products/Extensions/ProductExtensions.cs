@@ -32,7 +32,7 @@ namespace ShopifyAccess.GraphQl.Models.Products.Extensions
 				// }
 				
 				Variants = productVariants.Select( x => x.ToShopifyProductVariant() ).ToList(),
-				Type = product.Type,
+				Type = product.ProductType,
 				BodyHtml = product.DescriptionHtml,
 				UpdatedAt = product.UpdatedAt ?? default
 			};

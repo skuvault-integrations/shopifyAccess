@@ -1,5 +1,6 @@
 ﻿using System;
 using ServiceStack;
+using ShopifyAccess.GraphQl.Helpers;
 
 namespace ShopifyAccess.GraphQl.Queries
 {
@@ -76,7 +77,7 @@ namespace ShopifyAccess.GraphQl.Queries
 			
 			var variables = new
 			{
-				query = $"created_at:>='{createdAtMinUtc}'",
+				query = $"created_at:>='{createdAtMinUtc.ToIso8601()}'",
 				after,
 				first = productsPerPage
 			};

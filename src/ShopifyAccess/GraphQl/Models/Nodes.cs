@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace ShopifyAccess.GraphQl.Models
 {
 	[ DataContract ]
-	public class Nodes< T >
+	internal class Nodes< T >
 	{
 		[ DataMember( Name = "nodes" ) ]
 		internal List< T > Items{ get; set; }

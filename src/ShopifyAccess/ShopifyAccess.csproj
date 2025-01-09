@@ -66,9 +66,11 @@
     </Compile>
     <Compile Include="Exceptions\ShopifyHttpRequestExceptions.cs" />
     <Compile Include="GraphQl\BulkOperationStatus.cs" />
+    <Compile Include="GraphQl\Helpers\DateTimeExtensions.cs" />
     <Compile Include="GraphQl\Helpers\GraphQlIdParser.cs" />
     <Compile Include="GraphQl\Models\BaseGraphQlResponse.cs" />
     <Compile Include="GraphQl\Models\Common\Weight.cs" />
+    <Compile Include="GraphQl\Models\Common\WeightUnit.cs" />
     <Compile Include="GraphQl\Models\Nodes.cs" />
     <Compile Include="GraphQl\Models\PageInfo.cs" />
     <Compile Include="GraphQl\Models\Products\Extensions\ProductExtensions.cs" />

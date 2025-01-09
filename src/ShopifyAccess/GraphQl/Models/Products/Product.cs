@@ -26,7 +26,7 @@ namespace ShopifyAccess.GraphQl.Models.Products
 		// }
 
 		[ DataMember( Name = "productType" ) ]
-		public string Type{ get; set; }
+		public string ProductType{ get; set; }
 
 		[ DataMember( Name = "descriptionHtml" ) ]
 		public string DescriptionHtml{ get; set; }
