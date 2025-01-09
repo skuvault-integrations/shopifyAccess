@@ -381,7 +381,7 @@ namespace ShopifyAccess
 
 			ShopifyLogger.LogOperationStart( this._shopName, mark, $"Sku: '{sku}'" );
 
-			//TODO GUARD-3717: Extract pagination logic into a common method in another class/helper
+			//TODO GUARD-3717: Extract pagination logic into a common method in another class/helper, then use here and in GetProductsCreatedAfterAsync
 			try
 			{
 				string nextCursor = null;

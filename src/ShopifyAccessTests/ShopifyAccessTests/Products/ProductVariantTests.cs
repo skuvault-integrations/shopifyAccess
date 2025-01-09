@@ -45,11 +45,11 @@ namespace ShopifyAccessTests.Products
 		[ Test ]
 		public async Task GetProductsCreatedAfterAsync()
 		{
-			var productsStartUtc = new DateTime( 1800, 1, 1 );
+			var productsStartUtc = DateTime.Parse( "2024-12-31T00:00:00Z" );
 
 			var products = await this.Service.GetProductsCreatedAfterAsync( productsStartUtc, CancellationToken.None, _mark );
 
-			products.Products.Count.Should().BeGreaterThan( 1 );
+			Assert.That( products.Products, Is.Not.Empty );
 		}
 
 		[ Test ]

@@ -3,25 +3,19 @@ namespace ShopifyAccess.GraphQl.Queries
 	internal static class GetProductsQuery
 	{
 		/// <summary>
-		/// Query to get products created on or after the specified date 
+		/// Query to get products created on or after the specified date
+		/// https://shopify.dev/docs/api/admin-graphql/2024-04/queries/products 
 		/// </summary>
-		//TODO GUARD-3717: Replace the hard-coded date with the actual date
-		//TODO GUARD-3717: Paginate using the after field (see GetProductVariantsInventoryReportBySkuAsync() for example
+		/// <param name="$query">Filter</param>
+		/// <param name="$first">Number of products to return</param>
+		/// <param name="$after">Cursor for pagination</param>
 		internal const string CreatedOnOrAfterQuery =
-			//TODO GUARD-3717: Initial, as suggested by .dev
-			//query GetProducts($first: Int!, $createdAtMin: String!) {
-			//	products(first: $first, query: "created_at:>=$createdAtMin") {
-
-			//TODO GUARD-3717: Subsequent pages, as suggested by .dev
-			// query GetNextProducts($first: Int!, $after: String!) {
-			// products(first: $first, after: $after) {
-			@"query GetProducts {
-				products(first: 250, after: null, query: ""created_at:>='2023-06-01T00:00:00Z'"") {
+			@"query ($query: String, $first: Int, $after: String) {
+				products(query: $query, first: $first, after: $after) {
 					nodes {
 						title
 						variants(first: 250) {
 							nodes {
-								id
 								sku
 								title
 								barcode

@@ -77,7 +77,8 @@ namespace ShopifyAccess.GraphQl.Queries
 			var variables = new
 			{
 				query = $"created_at:>='{createdAtMinUtc}'",
-				after
+				after,
+				first = productsPerPage
 			};
 			var request = new { query = CleanUpRequest( GetProductsQuery.CreatedOnOrAfterQuery ), variables };
 			return request.ToJson();
