@@ -17,11 +17,24 @@ namespace ShopifyAccessTests.Products
 		private static readonly Mark _mark = Mark.Create;
 		
 		[ Test ]
+		[ Explicit ]
 		public async Task GetProductsCreatedAfterAsync()
 		{
 			var productsStartUtc = DateTime.Parse( "2025-01-01T00:00:00Z" );
 
 			var products = await this.Service.GetProductsCreatedAfterAsync( productsStartUtc, CancellationToken.None, _mark );
+
+			Assert.That( products.Products, Is.Not.Empty );
+		}
+		
+		[ Test ]
+		[ Explicit ]
+		//TODO GUARD-3717 Run once GetProductsCreatedBeforeButUpdatedAfterAsync is converted to GraphQL
+		public async Task GetProductsCreatedBeforeButUpdatedAfterAsync()
+		{
+			var productsStartUtc = DateTime.Parse( "2025-01-01T00:00:00Z" );
+
+			var products = await this.Service.GetProductsCreatedBeforeButUpdatedAfterAsync( productsStartUtc, CancellationToken.None, _mark );
 
 			Assert.That( products.Products, Is.Not.Empty );
 		}

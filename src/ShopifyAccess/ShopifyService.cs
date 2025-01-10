@@ -210,12 +210,12 @@ namespace ShopifyAccess
 			var request = QueryBuilder.GetProductsCreatedOnOrAfterRequest( productsStartUtc );
 			
 			var response = await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
-				() => this._graphQlThrottler.ExecuteAsync(
+				() => this._graphQlThrottler.ExecuteAsync< GetProductsResponse, GetProductsData >(
 					() => this._webRequestServices.PostDataAsync< GetProductsResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, token, mark, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] )
 					, mark )
 			).ConfigureAwait( false );
 			
-			var products = response.ToShopifyProducts();
+			var products = response?.Products?.Items.ToShopifyProducts();
 			
 			//TODO GUARD-3717: Perhaps, for GraphQL it's not even needed to call this method
 			RemoveQueryPartFromProductsImagesUrl( products );
@@ -307,7 +307,7 @@ namespace ShopifyAccess
 
 			ShopifyLogger.LogOperationStart( this._shopName, mark, $"Sku: '{sku}'" );
 
-			//TODO GUARD-3717: Extract pagination logic into a common method in another class/helper, then use here and in GetProductsCreatedAfterAsync
+			//TODO GUARD-3717: FIRST Extract pagination logic into a common method in another class/helper, then use here and in GetProductsCreatedAfterAsync
 			try
 			{
 				string nextCursor = null;
@@ -318,16 +318,16 @@ namespace ShopifyAccess
 					var request = QueryBuilder.GetProductVariantInventoryBySkuRequest( sku, nextCursor, locationsCount );
 
 					var response = await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
-						() => this._graphQlThrottler.ExecuteAsync(
+						() => this._graphQlThrottler.ExecuteAsync< GetProductVariantsInventoryResponse, GetProductVariantsInventoryData >(
 							() => this._webRequestServices.PostDataAsync< GetProductVariantsInventoryResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, token, mark, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] )
 							, mark )
 					).ConfigureAwait( false );
 
-					result.AddRange( response.Data.ProductVariants.Nodes );
+					result.AddRange( response.ProductVariants.Items );
 
-					if( response.Data.ProductVariants.PageInfo.HasNextPage )
+					if( response.ProductVariants.PageInfo.HasNextPage )
 					{
-						nextCursor = response.Data.ProductVariants.PageInfo.EndCursor;
+						nextCursor = response.ProductVariants.PageInfo.EndCursor;
 					}
 					else
 					{

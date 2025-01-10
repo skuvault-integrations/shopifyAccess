@@ -1,21 +1,22 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 using ShopifyAccess.GraphQl.Models.ProductVariantsInventory;
 
 namespace ShopifyAccess.GraphQl.Models.Responses
 {
 	[ DataContract ]
-	internal class GetProductVariantsInventoryResponse: BaseGraphQlResponse
+	internal class GetProductVariantsInventoryResponse: BaseGraphQlResponseWithItems< GetProductVariantsInventoryData, ProductVariant >
 	{
-		[ DataMember( Name = "data" ) ]
-		public GetProductVariantsInventoryData Data{ get; set; }
+		public override List< ProductVariant > GetItems()
+		{
+			return this.Data.ProductVariants.Items;
+		}
 	}
 
 	[ DataContract ]
 	internal class GetProductVariantsInventoryData
 	{
-		//TODO GUARD-3717: Use Nodes< ProductVariant > instead of ProductVariants
-		//	Then delete class ProductVariants
 		[ DataMember( Name = "productVariants" ) ]
-		public ProductVariants ProductVariants{ get; set; }
+		public Nodes< ProductVariant > ProductVariants{ get; set; }
 	}
 }

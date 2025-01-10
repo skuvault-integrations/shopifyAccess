@@ -3,10 +3,8 @@
 namespace ShopifyAccess.GraphQl.Models.Responses
 {
 	[ DataContract ]
-	internal class GetBulkOperationByIdResponse: BaseGraphQlResponse
+	internal class GetBulkOperationByIdResponse: BaseGraphQlResponse< BulkOperationByIdData >
 	{
-		[ DataMember( Name = "data" ) ]
-		public BulkOperationByIdData Data{ get; set; }
 	}
 
 	[ DataContract ]

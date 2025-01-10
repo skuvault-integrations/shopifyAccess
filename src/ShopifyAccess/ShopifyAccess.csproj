@@ -81,7 +81,6 @@
     <Compile Include="GraphQl\Models\Products\ProductVariant.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventory\InventoryLevelsNodes.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventory\InventoryQuantity.cs" />
-    <Compile Include="GraphQl\Models\ProductVariantsInventory\ProductVariants.cs" />
     <Compile Include="GraphQl\Models\Responses\GetBulkOperationByIdResponse.cs" />
     <Compile Include="GraphQl\Models\Responses\BulkOperationRunQueryResponse.cs" />
     <Compile Include="GraphQl\Models\Responses\GetCurrentBulkOperationResponse.cs" />
@@ -138,7 +137,6 @@
     <Compile Include="Models\Order\ShopifyTaxLine.cs" />
     <Compile Include="Models\ProductVariant\ShopifyProductVariant.cs" />
     <Compile Include="Models\ProductVariant\ShopifyInventoryLevelForUpdate.cs" />
-    <Compile Include="Models\ProductVariant\ShopifyProductVariantForUpdate.cs" />
     <Compile Include="Models\Product\ProductsCount.cs" />
     <Compile Include="Models\Product\ProductsDateFilter.cs" />
     <Compile Include="Models\Product\ShopifyInventoryLevelsModel.cs" />

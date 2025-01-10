@@ -24,10 +24,12 @@ namespace ShopifyAccess.GraphQl
 		/// </summary>
 		/// <param name="funcToThrottle">Function to throttle</param>
 		/// <param name="mark">Mark</param>
-		/// <typeparam name="TResult">BaseGraphQlResponse</typeparam>
+		/// <typeparam name="TResult">Full GraphQL response, should inherit from BaseGraphQlResponse</typeparam>
+		/// <typeparam name="TData">GraphQL response "data" element type</typeparam>
 		/// <returns>Function response</returns>
 		/// <exception cref="T:Netco.ThrottlerServices.ThrottlerException">When throttle max retry count reached</exception>
-		public async Task< TResult > ExecuteAsync< TResult >( Func< Task< TResult > > funcToThrottle, Mark mark ) where TResult: BaseGraphQlResponse
+		public async Task< TData > ExecuteAsync< TResult, TData >( Func< Task< TResult > > funcToThrottle, Mark mark ) 
+			where TResult: BaseGraphQlResponse< TData >
 		{
 			var retryCount = 1;
 			while( true )
@@ -36,7 +38,7 @@ namespace ShopifyAccess.GraphQl
 				if( response.Errors == null || response.Errors.Length == 0 )
 				{
 					await WaitIfNeededAsync( response ).ConfigureAwait( false );
-					return response;
+					return response.Data;
 				}
 
 				if( response.Errors[ 0 ].Extensions?.Code != ThrottledErrorCode )
@@ -63,7 +65,7 @@ namespace ShopifyAccess.GraphQl
 		/// </summary>
 		/// <param name="response">GraphQl Response</param>
 		/// <returns>Delay in ms</returns>
-		public static async Task<int> WaitIfNeededAsync( BaseGraphQlResponse response )
+		public static async Task<int> WaitIfNeededAsync< TData >( BaseGraphQlResponse< TData > response )
 		{
 			var remainingQuota = response.Extensions.Cost.ThrottleStatus.CurrentlyAvailable;
 			var requestedQuota = response.Extensions.Cost.RequestedQueryCost;

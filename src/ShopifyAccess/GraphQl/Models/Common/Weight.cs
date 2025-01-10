@@ -1,5 +1,5 @@
+using System;
 using System.Runtime.Serialization;
-using Netco.Extensions;
 
 namespace ShopifyAccess.GraphQl.Models.Common
 {
@@ -11,6 +11,6 @@ namespace ShopifyAccess.GraphQl.Models.Common
 		[ DataMember( Name = "unit" ) ]
 		public string Unit{ get; set; }
 		public WeightUnit UnitStandardized =>
-			this.Unit.ToEnum( WeightUnit.POUNDS );
+			Enum.TryParse( this.Unit, true, out WeightUnit unit ) ? unit : WeightUnit.POUNDS;
 	}
 }

@@ -4,6 +4,7 @@ using ShopifyAccess.Models.ProductVariant;
 
 namespace ShopifyAccess.Models.Product
 {
+	//TODO GUARD-3717: Once convert product-related REST calls to GraphQL, remove all [ Data* ] attributes since this will not be directly deserialized from GraphQL
 	[ DataContract ]
 	public class ShopifyProducts
 	{
