@@ -19,7 +19,7 @@ namespace ShopifyAccessTests.Products
 		[ Test ]
 		public async Task GetProductsCreatedAfterAsync()
 		{
-			var productsStartUtc = DateTime.Parse( "2024-12-31T00:00:00Z" );
+			var productsStartUtc = DateTime.Parse( "2025-01-01T00:00:00Z" );
 
 			var products = await this.Service.GetProductsCreatedAfterAsync( productsStartUtc, CancellationToken.None, _mark );
 

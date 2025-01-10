@@ -5,7 +5,6 @@ namespace ShopifyAccess.GraphQl.Models.Products
 {
 	internal class Product
 	{
-		//TODO GUARD-3717: Finish adding properties
 		[ DataMember( Name = "title" ) ]
 		public string Title{ get; set; }
 		

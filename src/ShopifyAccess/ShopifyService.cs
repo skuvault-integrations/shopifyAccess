@@ -416,7 +416,7 @@ namespace ShopifyAccess
 			do
 			{
 				var productsWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
-					//TODO GUARD-3717 Replace this call with GraphQL call that returns the fields needed for inventory  
+					//TODO GUARD-3717 LAST Replace this call with GraphQL call that returns the fields needed for inventory  
 					() => this._throttlerAsync.ExecuteAsync(
 						() => this._webRequestServices.GetResponsePageAsync< ShopifyProducts >( _shopifyCommandFactory.CreateGetProductsCommand(), endpoint, token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ) ) );
 				if( productsWithinPage.Response.Products.Count == 0 )
