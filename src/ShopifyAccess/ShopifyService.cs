@@ -203,38 +203,6 @@ namespace ShopifyAccess
 		#endregion
 
 		#region Products
-		public ShopifyProducts GetProducts( CancellationToken token, Mark mark = null )
-		{
-			mark = mark.CreateNewIfBlank();
-
-			var timeout = this._timeouts[ ShopifyOperationEnum.GetProducts ];
-			var products = this.CollectProductsFromAllPages( token, mark, timeout );
-			this.RemoveUntrackedProductVariants( products );
-			var inventoryLevels = this.CollectInventoryLevelsFromAllPages( token, mark, products.Products.SelectMany( x => x.Variants.Select( t => t.InventoryItemId ) ).ToArray(), timeout );
-
-			foreach( var product in products.Products )
-			foreach( var variant in product.Variants )
-			{
-				var inventoryLevelsModelOfInventoryItemId = new List< ShopifyInventoryLevelModel >();
-				if( !inventoryLevels.InventoryLevels.TryGetValue( variant.InventoryItemId, out inventoryLevelsModelOfInventoryItemId ) )
-					continue;
-
-				var inventoryLevelsOfInventoryItemId = inventoryLevelsModelOfInventoryItemId.Select( x => x.ToShopifyInventoryLevel( variant.InventoryItemId ) ).ToList();
-
-				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevelsOfInventoryItemId };
-				variant.InventoryLevels = inventoryLevelsForVariant;
-			}
-
-			RemoveQueryPartFromProductsImagesUrl( products );
-
-			return products;
-		}
-
-		public async Task< ShopifyProducts > GetProductsAsync( CancellationToken token, Mark mark = null )
-		{
-			return await this.GetProductsCreatedAfterAsync( DateTime.MinValue, token, mark );
-		}
-
 		public async Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark )
 		{
 			//TODO GUARD-3717: Add pagination logic
@@ -252,23 +220,6 @@ namespace ShopifyAccess
 			//TODO GUARD-3717: Perhaps, for GraphQL it's not even needed to call this method
 			RemoveQueryPartFromProductsImagesUrl( products );
 			
-			return products;
-		}
-
-		//TODO GUARD-3717 Remove once done testing
-		public async Task< ShopifyProducts > RestLegacyGetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null )
-		{
-			mark = mark.CreateNewIfBlank();
-		
-			var productsDateFilter = new ProductsDateFilter
-			{
-				FilterType = productsStartUtc != DateTime.MinValue ? FilterType.CreatedAfter : FilterType.None,
-				ProductsStartUtc = productsStartUtc
-			};
-			var products = await this.CollectProductsFromAllPagesAsync( productsDateFilter, mark, token );
-			
-			RemoveQueryPartFromProductsImagesUrl( products );
-		
 			return products;
 		}
 		
@@ -289,31 +240,6 @@ namespace ShopifyAccess
 			var products = await this.CollectProductsFromAllPagesAsync( productsDateFilter, mark, token );
 
 			RemoveQueryPartFromProductsImagesUrl( products );
-
-			return products;
-		}
-
-		public ShopifyProducts GetProductsInventory( CancellationToken token, Mark mark = null )
-		{
-			mark = mark.CreateNewIfBlank();
-
-			var products = this.CollectProductsFromAllPages( token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] );
-			var locations = this.GetLocations( token, mark );
-			this.RemoveUntrackedProductVariants( products );
-			var inventoryLevels = this.CollectInventoryLevelsFromAllPages( token, mark, locations, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] );
-
-			foreach( var product in products.Products )
-			foreach( var variant in product.Variants )
-			{
-				var inventoryLevelsModelOfInventoryItemId = new List< ShopifyInventoryLevelModel >();
-				if( !inventoryLevels.InventoryLevels.TryGetValue( variant.InventoryItemId, out inventoryLevelsModelOfInventoryItemId ) )
-					continue;
-
-				var inventoryLevelsOfInventoryItemId = inventoryLevelsModelOfInventoryItemId.Select( x => x.ToShopifyInventoryLevel( variant.InventoryItemId ) ).ToList();
-
-				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevelsOfInventoryItemId };
-				variant.InventoryLevels = inventoryLevelsForVariant;
-			}
 
 			return products;
 		}
@@ -469,28 +395,6 @@ namespace ShopifyAccess
 		{
 			return variant.InventoryItem.Tracked && !string.IsNullOrEmpty( variant.Sku );
 		}
-		
-		private ShopifyProducts CollectProductsFromAllPages( CancellationToken token, Mark mark, int timeout )
-		{
-			var products = new ShopifyProducts();
-			var endpoint = EndpointsBuilder.CreateGetEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
-
-			do
-			{
-				var productsWithinPage = ActionPolicies.GetPolicy( mark, this._shopName, token ).Get(
-					() => this._throttler.Execute(
-						() => this._webRequestServices.GetResponsePage< ShopifyProducts >( _shopifyCommandFactory.CreateGetProductsCommand(), endpoint, token, mark, timeout ) ) );
-
-				if( productsWithinPage.Response.Products.Count == 0 )
-					break;
-
-				products.Products.AddRange( productsWithinPage.Response.Products );
-
-				endpoint = productsWithinPage.NextPageQueryStr;
-			} while( endpoint != string.Empty );
-
-			return products;
-		}
 
 		private async Task< ShopifyProducts > CollectProductsFromAllPagesAsync( Mark mark, CancellationToken token )
 		{
@@ -512,6 +416,7 @@ namespace ShopifyAccess
 			do
 			{
 				var productsWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
+					//TODO GUARD-3717 Replace this call with GraphQL call that returns the fields needed for inventory  
 					() => this._throttlerAsync.ExecuteAsync(
 						() => this._webRequestServices.GetResponsePageAsync< ShopifyProducts >( _shopifyCommandFactory.CreateGetProductsCommand(), endpoint, token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ) ) );
 				if( productsWithinPage.Response.Products.Count == 0 )

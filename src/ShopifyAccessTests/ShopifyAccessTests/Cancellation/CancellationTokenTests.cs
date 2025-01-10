@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using ShopifyAccess.Models;
@@ -18,7 +19,7 @@ namespace ShopifyAccessTests.Cancellation
 			Assert.ThrowsAsync< TaskCanceledException >( async () =>
 			{
 				cancellationTokenSource.Cancel();
-				await this.Service.GetProductsAsync( cancellationTokenSource.Token, _mark );
+				await this.Service.GetProductsCreatedAfterAsync( DateTime.UtcNow, cancellationTokenSource.Token, _mark );
 				Assert.Fail();
 			}, "Task wasn't cancelled" );
 		}
@@ -32,7 +33,7 @@ namespace ShopifyAccessTests.Cancellation
 
 			Assert.ThrowsAsync< TaskCanceledException >( async () => 
 			{
-				await service.GetProductsAsync( cancellationTokenSource.Token, _mark );
+				await service.GetProductsCreatedAfterAsync( DateTime.UtcNow, cancellationTokenSource.Token, _mark );
 			}, "Request didn't timeout. TaskCanceledException wasn't thrown");
 		}
 	}

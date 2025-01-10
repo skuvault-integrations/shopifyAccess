@@ -17,32 +17,6 @@ namespace ShopifyAccessTests.Products
 		private static readonly Mark _mark = Mark.Create;
 		
 		[ Test ]
-		public void GetProducts()
-		{
-			var products = this.Service.GetProducts( CancellationToken.None );
-
-			products.Products.Count.Should().BeGreaterThan( 0 );
-		}
-
-		[ Test ]
-		public async Task GetProductsAsync()
-		{
-			var products = await this.Service.GetProductsAsync( CancellationToken.None, _mark );
-
-			products.Products.Count.Should().BeGreaterThan( 0 );
-		}
-
-		[ Test ]
-		public async Task RestLegacyGetProductsCreatedAfterAsync()
-		{
-			var productsStartUtc = DateTime.Parse( "2023-06-01T00:00:00Z" ); //new DateTime( 1800, 1, 1 );
-
-			var products = await this.Service.RestLegacyGetProductsCreatedAfterAsync( productsStartUtc, CancellationToken.None, _mark );
-
-			products.Products.Count.Should().BeGreaterThan( 1 );
-		}
-		
-		[ Test ]
 		public async Task GetProductsCreatedAfterAsync()
 		{
 			var productsStartUtc = DateTime.Parse( "2024-12-31T00:00:00Z" );
@@ -66,42 +40,6 @@ namespace ShopifyAccessTests.Products
 			var products = await this.Service.GetProductsInventoryAsync( CancellationToken.None );
 
 			products.Products.Should().NotBeNullOrEmpty();
-		}
-
-		[ Test ]
-		public void GetAndUpdateProductQuantity()
-		{
-			const string sku = "testSku1";
-			var products = this.Service.GetProducts( CancellationToken.None ).ToDictionary();
-			const int quantity = 17;
-
-			var productsForUpdate = new List< ShopifyInventoryLevelForUpdate >();
-			foreach( var product in products )
-			{
-				var firstInventoryLevel = product.Value.InventoryLevels.InventoryLevels.FirstOrDefault();
-				if( firstInventoryLevel == null )
-					continue;
-
-				var productForUpdate = new ShopifyInventoryLevelForUpdate
-				{
-					InventoryItemId = firstInventoryLevel.InventoryItemId,
-					LocationId = firstInventoryLevel.LocationId,
-					Quantity = firstInventoryLevel.Available ?? 0
-				};
-
-				if( product.Key.Equals( sku, StringComparison.InvariantCultureIgnoreCase ) )
-				{
-					productForUpdate.Quantity = quantity;
-					productsForUpdate.Add( productForUpdate );
-					break;
-				}
-			}
-
-			Service.UpdateInventoryLevels( productsForUpdate, CancellationToken.None );
-			var updatedProducts = this.Service.GetProducts( CancellationToken.None ).ToDictionary();
-			
-			var updatedProduct = updatedProducts.FirstOrDefault( p => p.Key.Equals( sku, StringComparison.InvariantCultureIgnoreCase ) );
-			updatedProduct.Value.InventoryLevels.InventoryLevels[ 0 ].Available.Should().Be( quantity );
 		}
 
 		[ Test ]
