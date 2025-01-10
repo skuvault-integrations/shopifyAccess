@@ -248,7 +248,7 @@ namespace ShopifyAccess
 		{
 			mark = mark.CreateNewIfBlank();
 
-			var products = await this.CollectProductsFromAllPagesAsync( mark, token );
+			var products = await this.GetAllProductsForInventoryAsync( mark, token );
 			var locations = await this.GetLocationsAsync( token, mark );
 			this.RemoveUntrackedProductVariants( products );
 			var inventoryLevels = await this.CollectInventoryLevelsFromAllPagesAsync( mark, locations, token );
@@ -273,7 +273,7 @@ namespace ShopifyAccess
 		{
 			mark = mark.CreateNewIfBlank();
 
-			var products = await this.CollectProductsFromAllPagesAsync( mark, token );
+			var products = await this.GetAllProductsForInventoryAsync( mark, token );
 			this.RemoveUntrackedProductVariants( products );
 
 			var productVariants = products.ToListVariants();
@@ -396,7 +396,7 @@ namespace ShopifyAccess
 			return variant.InventoryItem.Tracked && !string.IsNullOrEmpty( variant.Sku );
 		}
 
-		private async Task< ShopifyProducts > CollectProductsFromAllPagesAsync( Mark mark, CancellationToken token )
+		private async Task< ShopifyProducts > GetAllProductsForInventoryAsync( Mark mark, CancellationToken token )
 		{
 			var noFilter = new ProductsDateFilter { FilterType = FilterType.None };
 
@@ -669,14 +669,6 @@ namespace ShopifyAccess
 			{
 				return false;
 			}
-		}
-		#endregion
-
-		#region Misc
-		private int CalculatePagesCount( int productsCount )
-		{
-			var result = ( int )Math.Ceiling( ( double )productsCount / RequestMaxLimit );
-			return result;
 		}
 		#endregion
 	}
