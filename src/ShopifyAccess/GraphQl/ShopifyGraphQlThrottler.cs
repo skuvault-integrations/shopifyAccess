@@ -21,6 +21,7 @@ namespace ShopifyAccess.GraphQl
 		}
 
 		/// <summary>
+		/// Throttle GraphQL request for a single item
 		/// </summary>
 		/// <param name="funcToThrottle">Function to throttle</param>
 		/// <param name="mark">Mark</param>
@@ -37,6 +38,47 @@ namespace ShopifyAccess.GraphQl
 				{
 					await WaitIfNeededAsync( response ).ConfigureAwait( false );
 					return response.Data;
+				}
+
+				if( response.Errors[ 0 ].Extensions?.Code != ThrottledErrorCode )
+				{
+					var exception = new SystemException( $"{response.Errors[ 0 ].Message}, Error code: {response.Errors[ 0 ].Extensions?.Code}" );
+					ShopifyLogger.LogException( exception, mark, this._shopName );
+					throw exception;
+				}
+
+				if( retryCount >= this._maxRetryCount )
+				{
+					var exception = new ThrottlerException( $"Throttle max retry count {this._maxRetryCount} reached" );
+					ShopifyLogger.LogException( exception, mark, this._shopName );
+					throw exception;
+				}
+
+				await WaitIfNeededAsync( response ).ConfigureAwait( false );
+				++retryCount;
+			}
+		}
+
+		/// <summary>
+		/// Throttle GraphQL request for paginated response
+		/// </summary>
+		/// <param name="funcToThrottle">Function to throttle</param>
+		/// <param name="mark">Mark</param>
+		/// <typeparam name="TData">GraphQL response "data" element type</typeparam>
+		/// <typeparam name="TResponseItem"></typeparam>
+		/// <returns>Function response</returns>
+		/// <exception cref="T:Netco.ThrottlerServices.ThrottlerException">When throttle max retry count reached</exception>
+		//TODO GUARD-3717 Add tests
+		public async Task< GraphQlResponseWithPages< TData, TResponseItem > > ExecuteWithPaginationAsync< TData, TResponseItem >( Func< Task< GraphQlResponseWithPages< TData, TResponseItem > > > funcToThrottle, Mark mark ) 
+		{
+			var retryCount = 1;
+			while( true )
+			{
+				var response = await funcToThrottle().ConfigureAwait( false );
+				if( response.Errors == null || response.Errors.Length == 0 )
+				{
+					await WaitIfNeededAsync( response ).ConfigureAwait( false );
+					return response;
 				}
 
 				if( response.Errors[ 0 ].Extensions?.Code != ThrottledErrorCode )

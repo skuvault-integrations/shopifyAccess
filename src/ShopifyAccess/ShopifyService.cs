@@ -324,6 +324,16 @@ namespace ShopifyAccess
 
 		//TODO GUARD-3717 NEXT Extract into a GraphQlPaginationService & add tests
 		// Constructor should take everything this._...
+		//TODO GUARD-3717 NEXT Ensure tests with page size 1 and multiple items returned, return multiple pages correctly
+		/// <summary>
+		/// Get all pages of multi-page responses
+		/// </summary>
+		/// <param name="sendRequestAsync"></param>
+		/// <param name="mark"></param>
+		/// <param name="token"></param>
+		/// <typeparam name="TData"></typeparam>
+		/// <typeparam name="TResponseItem"></typeparam>
+		/// <returns></returns>
 		private async Task< List< TResponseItem > > GetAllPagesAsync< TData, TResponseItem >( Func< string, Task< GraphQlResponseWithPages< TData, TResponseItem > > > sendRequestAsync, Mark mark, CancellationToken token )
 		{
 			string nextCursor = null;
@@ -331,25 +341,19 @@ namespace ShopifyAccess
 			var result = new List< TResponseItem >();
 			do
 			{
-				Nodes< TResponseItem > response = null;
-
-				await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
-					() => this._graphQlThrottler.ExecuteAsync< TData >(
-						async () =>
-						{
-							var responseData = await sendRequestAsync( nextCursor );
-							response = responseData.GetItemsAndPagingInfo();
-							return responseData;
-							//TODO GUARD-3717 Will calling GetItemsAndPagingInfo cause issues with async?
-						},
+				var response = await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
+					() => this._graphQlThrottler.ExecuteWithPaginationAsync(
+						async () => await sendRequestAsync( nextCursor ),
 						mark )
 				).ConfigureAwait( false );
 
-				result.AddRange( response.Items );
+				var itemsAndPagingInfo = response.GetItemsAndPagingInfo();
+				
+				result.AddRange( itemsAndPagingInfo.Items );
 
-				if( response.PageInfo.HasNextPage )
+				if( itemsAndPagingInfo.PageInfo.HasNextPage )
 				{
-					nextCursor = response.PageInfo.EndCursor;
+					nextCursor = itemsAndPagingInfo.PageInfo.EndCursor;
 				}
 				else
 				{
