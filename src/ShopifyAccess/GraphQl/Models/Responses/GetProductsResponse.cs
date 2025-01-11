@@ -8,12 +8,11 @@ using ShopifyAccess.Models.Product;
 namespace ShopifyAccess.GraphQl.Models.Responses
 {
 	[ DataContract ]
-	internal class GetProductsResponse: BaseGraphQlResponseWithItems< GetProductsData, Product >
+	internal class GetProductsResponse: GraphQlResponseWithPages< GetProductsData, Product >
 	{
-		//TODO GUARD-3717 Doesn't seem needed
-		public override List< Product > GetItems()
+		public override Nodes< Products.Product > GetDataWithPagingInfo()
 		{
-			return this.Data.Products.Items;
+			return this.Data.Products;
 		}
 	}
 

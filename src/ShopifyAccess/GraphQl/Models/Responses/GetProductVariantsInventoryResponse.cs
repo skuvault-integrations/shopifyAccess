@@ -1,15 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using ShopifyAccess.GraphQl.Models.ProductVariantsInventory;
 
 namespace ShopifyAccess.GraphQl.Models.Responses
 {
 	[ DataContract ]
-	internal class GetProductVariantsInventoryResponse: BaseGraphQlResponseWithItems< GetProductVariantsInventoryData, ProductVariant >
+	internal class GetProductVariantsInventoryResponse: GraphQlResponseWithPages< GetProductVariantsInventoryData, ProductVariant >
 	{
-		public override List< ProductVariant > GetItems()
+		public override Nodes< ProductVariant > GetDataWithPagingInfo()
 		{
-			return this.Data.ProductVariants.Items;
+			return this.Data.ProductVariants;
 		}
 	}
 

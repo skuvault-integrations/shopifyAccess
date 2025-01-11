@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace ShopifyAccess.GraphQl.Models
 {
@@ -17,9 +16,9 @@ namespace ShopifyAccess.GraphQl.Models
 	}
 	
 	[ DataContract ]
-	internal abstract class BaseGraphQlResponseWithItems< TData, TItem > : BaseGraphQlResponse< TData >
+	internal abstract class GraphQlResponseWithPages< TData, TItem > : BaseGraphQlResponse< TData >
 	{
-		public abstract List< TItem > GetItems();
+		public abstract Nodes< TItem > GetDataWithPagingInfo();
 	}
 
 	[ DataContract ]

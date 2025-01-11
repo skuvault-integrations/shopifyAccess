@@ -7,6 +7,7 @@ using CuttingEdge.Conditions;
 using Netco.Extensions;
 using ServiceStack;
 using ShopifyAccess.GraphQl;
+using ShopifyAccess.GraphQl.Models;
 using ShopifyAccess.GraphQl.Models.ProductVariantsInventory;
 using ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions;
 using ShopifyAccess.GraphQl.Models.Responses;
@@ -316,19 +317,26 @@ namespace ShopifyAccess
 				do
 				{
 					var request = QueryBuilder.GetProductVariantInventoryBySkuRequest( sku, nextCursor, locationsCount );
-
-					var response = await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
+					
+					Nodes< ProductVariant > response = null;
+					
+					await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
 						() => this._graphQlThrottler.ExecuteAsync< GetProductVariantsInventoryData >(
-							async () => await this._webRequestServices.PostDataAsync< GetProductVariantsInventoryResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, token, mark,
-								this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] )
+							async () =>
+							{
+								var responseData = await this._webRequestServices.PostDataAsync< GetProductVariantsInventoryResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, token, mark,
+									this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] );
+								response = responseData.GetDataWithPagingInfo();
+								return responseData;
+							}
 							, mark )
 					).ConfigureAwait( false );
 
-					result.AddRange( response.ProductVariants.Items );
+					result.AddRange( response.Items );
 
-					if( response.ProductVariants.PageInfo.HasNextPage )
+					if( response.PageInfo.HasNextPage )
 					{
-						nextCursor = response.ProductVariants.PageInfo.EndCursor;
+						nextCursor = response.PageInfo.EndCursor;
 					}
 					else
 					{
