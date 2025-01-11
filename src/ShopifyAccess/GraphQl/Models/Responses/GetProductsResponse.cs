@@ -10,7 +10,7 @@ namespace ShopifyAccess.GraphQl.Models.Responses
 	[ DataContract ]
 	internal class GetProductsResponse: GraphQlResponseWithPages< GetProductsData, Product >
 	{
-		public override Nodes< Products.Product > GetDataWithPagingInfo()
+		public override Nodes< Products.Product > GetItemsAndPagingInfo()
 		{
 			return this.Data.Products;
 		}

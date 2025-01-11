@@ -206,7 +206,7 @@ namespace ShopifyAccess
 		#region Products
 		public async Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark )
 		{
-			//TODO GUARD-3717: Add pagination logic
+			//TODO GUARD-3717 NEXT Use extracted pagination logic
 			
 			var request = QueryBuilder.GetProductsCreatedOnOrAfterRequest( productsStartUtc );
 			
@@ -308,48 +308,56 @@ namespace ShopifyAccess
 
 			ShopifyLogger.LogOperationStart( this._shopName, mark, $"Sku: '{sku}'" );
 
-			//TODO GUARD-3717: FIRST Extract pagination logic into a common method in another class/helper, then use here and in GetProductsCreatedAfterAsync
 			try
 			{
-				string nextCursor = null;
-
-				var result = new List< ProductVariant >();
-				do
-				{
-					var request = QueryBuilder.GetProductVariantInventoryBySkuRequest( sku, nextCursor, locationsCount );
-					
-					Nodes< ProductVariant > response = null;
-					
-					await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
-						() => this._graphQlThrottler.ExecuteAsync< GetProductVariantsInventoryData >(
-							async () =>
-							{
-								var responseData = await this._webRequestServices.PostDataAsync< GetProductVariantsInventoryResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, token, mark,
-									this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] );
-								response = responseData.GetDataWithPagingInfo();
-								return responseData;
-							}
-							, mark )
-					).ConfigureAwait( false );
-
-					result.AddRange( response.Items );
-
-					if( response.PageInfo.HasNextPage )
-					{
-						nextCursor = response.PageInfo.EndCursor;
-					}
-					else
-					{
-						break;
-					}
-				} while( true );
-
-				return result;
+				return await this.GetAllPagesAsync< GetProductVariantsInventoryData, ProductVariant >( 
+					async (nextCursor) => await this._webRequestServices.PostDataAsync< GetProductVariantsInventoryResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
+						QueryBuilder.GetProductVariantInventoryBySkuRequest( sku, nextCursor, locationsCount ),
+						token, mark, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] ),
+					mark, token );
 			}
 			finally
 			{
 				ShopifyLogger.LogOperationEnd( this._shopName, mark );
 			}
+		}
+
+		//TODO GUARD-3717 NEXT Extract into a GraphQlPaginationService & add tests
+		// Constructor should take everything this._...
+		private async Task< List< TResponseItem > > GetAllPagesAsync< TData, TResponseItem >( Func< string, Task< GraphQlResponseWithPages< TData, TResponseItem > > > sendRequestAsync, Mark mark, CancellationToken token )
+		{
+			string nextCursor = null;
+
+			var result = new List< TResponseItem >();
+			do
+			{
+				Nodes< TResponseItem > response = null;
+
+				await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
+					() => this._graphQlThrottler.ExecuteAsync< TData >(
+						async () =>
+						{
+							var responseData = await sendRequestAsync( nextCursor );
+							response = responseData.GetItemsAndPagingInfo();
+							return responseData;
+							//TODO GUARD-3717 Will calling GetItemsAndPagingInfo cause issues with async?
+						},
+						mark )
+				).ConfigureAwait( false );
+
+				result.AddRange( response.Items );
+
+				if( response.PageInfo.HasNextPage )
+				{
+					nextCursor = response.PageInfo.EndCursor;
+				}
+				else
+				{
+					break;
+				}
+			} while( true );
+
+			return result;
 		}
 
 		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null )

@@ -6,7 +6,7 @@ namespace ShopifyAccess.GraphQl.Models.Responses
 	[ DataContract ]
 	internal class GetProductVariantsInventoryResponse: GraphQlResponseWithPages< GetProductVariantsInventoryData, ProductVariant >
 	{
-		public override Nodes< ProductVariant > GetDataWithPagingInfo()
+		public override Nodes< ProductVariant > GetItemsAndPagingInfo()
 		{
 			return this.Data.ProductVariants;
 		}

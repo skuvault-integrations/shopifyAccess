@@ -18,7 +18,7 @@ namespace ShopifyAccess.GraphQl.Models
 	[ DataContract ]
 	internal abstract class GraphQlResponseWithPages< TData, TItem > : BaseGraphQlResponse< TData >
 	{
-		public abstract Nodes< TItem > GetDataWithPagingInfo();
+		public abstract Nodes< TItem > GetItemsAndPagingInfo();
 	}
 
 	[ DataContract ]
