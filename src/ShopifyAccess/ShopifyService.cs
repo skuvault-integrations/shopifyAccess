@@ -8,7 +8,7 @@ using Netco.Extensions;
 using ServiceStack;
 using ShopifyAccess.GraphQl;
 using ShopifyAccess.GraphQl.Models;
-using ShopifyAccess.GraphQl.Models.ProductVariantsInventory;
+using ShopifyAccess.GraphQl.Models.Products;
 using ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions;
 using ShopifyAccess.GraphQl.Models.Responses;
 using ShopifyAccess.GraphQl.Queries;
@@ -22,6 +22,7 @@ using ShopifyAccess.Models.Product;
 using ShopifyAccess.Models.ProductVariant;
 using ShopifyAccess.Models.User;
 using ShopifyAccess.Services;
+using ProductVariant = ShopifyAccess.GraphQl.Models.ProductVariantsInventory.ProductVariant;
 
 namespace ShopifyAccess
 {
@@ -204,24 +205,30 @@ namespace ShopifyAccess
 		#endregion
 
 		#region Products
-		public async Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark )
+		public async Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark, 
+			int productsPerPage = GraphQl.Queries.QueryBuilder.MaxItemsPerResponse )
 		{
-			//TODO GUARD-3717 NEXT Use extracted pagination logic
+			ShopifyLogger.LogOperationStart( this._shopName, mark, $"productsStartUtc: '{productsStartUtc}'" );
+
+			try
+			{
+				var response = await this.GetAllPagesAsync< GetProductsData, Product >( 
+					async (nextCursor) => await this._webRequestServices.PostDataAsync< GetProductsResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
+						QueryBuilder.GetProductsCreatedOnOrAfterRequest( productsStartUtc, nextCursor, productsPerPage ),
+						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
+					mark, token );
+				
+				var products = response?.ToShopifyProducts();
 			
-			var request = QueryBuilder.GetProductsCreatedOnOrAfterRequest( productsStartUtc );
+				//TODO GUARD-3717: Perhaps, for GraphQL it's not even needed to call this method
+				RemoveQueryPartFromProductsImagesUrl( products );
 			
-			var response = await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
-				() => this._graphQlThrottler.ExecuteAsync< GetProductsData >(
-					async () => await this._webRequestServices.PostDataAsync< GetProductsResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, token, mark, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] )
-					, mark )
-			).ConfigureAwait( false );
-			
-			var products = response?.Products?.Items.ToShopifyProducts();
-			
-			//TODO GUARD-3717: Perhaps, for GraphQL it's not even needed to call this method
-			RemoveQueryPartFromProductsImagesUrl( products );
-			
-			return products;
+				return products;
+			}
+			finally
+			{
+				ShopifyLogger.LogOperationEnd( this._shopName, mark );
+			}
 		}
 		
 		public async Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null )
@@ -304,8 +311,6 @@ namespace ShopifyAccess
 
 		private async Task< List< ProductVariant > > GetProductVariantsInventoryReportBySkuAsync( string sku, int locationsCount, Mark mark, CancellationToken token )
 		{
-			mark = mark.CreateNewIfBlank();
-
 			ShopifyLogger.LogOperationStart( this._shopName, mark, $"Sku: '{sku}'" );
 
 			try
@@ -324,14 +329,13 @@ namespace ShopifyAccess
 
 		//TODO GUARD-3717 NEXT Extract into a GraphQlPaginationService & add tests
 		// Constructor should take everything this._...
-		//TODO GUARD-3717 NEXT Ensure tests with page size 1 and multiple items returned, return multiple pages correctly
 		/// <summary>
 		/// Get all pages of multi-page responses
 		/// </summary>
 		/// <param name="sendRequestAsync"></param>
 		/// <param name="mark"></param>
 		/// <param name="token"></param>
-		/// <typeparam name="TData"></typeparam>
+		/// <typeparam name="TData">GraphQL response "data" element type</typeparam>
 		/// <typeparam name="TResponseItem"></typeparam>
 		/// <returns></returns>
 		private async Task< List< TResponseItem > > GetAllPagesAsync< TData, TResponseItem >( Func< string, Task< GraphQlResponseWithPages< TData, TResponseItem > > > sendRequestAsync, Mark mark, CancellationToken token )
