@@ -17,6 +17,6 @@ namespace ShopifyAccess.GraphQl.Models.Responses
 	internal class GetProductVariantsInventoryData
 	{
 		[ DataMember( Name = "productVariants" ) ]
-		public Nodes< ProductVariant > ProductVariants{ get; set; }
+		public Nodes< ProductVariant > ProductVariants{ get; set; } = new Nodes< ProductVariant >();
 	}
 }

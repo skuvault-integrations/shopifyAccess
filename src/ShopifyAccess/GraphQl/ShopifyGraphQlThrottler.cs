@@ -24,12 +24,10 @@ namespace ShopifyAccess.GraphQl
 		/// </summary>
 		/// <param name="funcToThrottle">Function to throttle</param>
 		/// <param name="mark">Mark</param>
-		/// <typeparam name="TResult">Full GraphQL response, should inherit from BaseGraphQlResponse</typeparam>
 		/// <typeparam name="TData">GraphQL response "data" element type</typeparam>
 		/// <returns>Function response</returns>
 		/// <exception cref="T:Netco.ThrottlerServices.ThrottlerException">When throttle max retry count reached</exception>
-		public async Task< TData > ExecuteAsync< TResult, TData >( Func< Task< TResult > > funcToThrottle, Mark mark ) 
-			where TResult: BaseGraphQlResponse< TData >
+		public async Task< TData > ExecuteAsync< TData >( Func< Task< BaseGraphQlResponse< TData > > > funcToThrottle, Mark mark ) 
 		{
 			var retryCount = 1;
 			while( true )

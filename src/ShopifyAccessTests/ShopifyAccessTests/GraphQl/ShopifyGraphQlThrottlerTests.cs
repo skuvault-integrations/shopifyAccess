@@ -28,7 +28,7 @@ namespace ShopifyAccessTests.GraphQl
 			} );
 
 			// Act
-			await this._throttler.ExecuteAsync< BaseGraphQlResponse< ProductVariant >, ProductVariant >( funcToThrottle, Mark.Create );
+			await this._throttler.ExecuteAsync( funcToThrottle, Mark.Create );
 
 			// Assert
 			funcToThrottleCallCount.Should().Be( 1 );
@@ -46,7 +46,7 @@ namespace ShopifyAccessTests.GraphQl
 			} );
 
 			// Act, Assert
-			await this._throttler.Invoking( p => p.ExecuteAsync< BaseGraphQlResponse< ProductVariant >, ProductVariant >( funcToThrottle, Mark.Create ) ).Should().ThrowAsync< ThrottlerException >();
+			await this._throttler.Invoking( p => p.ExecuteAsync( funcToThrottle, Mark.Create ) ).Should().ThrowAsync< ThrottlerException >();
 			funcToThrottleCallCount.Should().Be( MaxRetryCount );
 		}
 
@@ -62,7 +62,7 @@ namespace ShopifyAccessTests.GraphQl
 			} );
 
 			// Act, Assert
-			await this._throttler.Invoking( p => p.ExecuteAsync< BaseGraphQlResponse< ProductVariant >, ProductVariant >( funcToThrottle, Mark.Create ) ).Should().ThrowAsync< SystemException >();
+			await this._throttler.Invoking( p => p.ExecuteAsync( funcToThrottle, Mark.Create ) ).Should().ThrowAsync< SystemException >();
 			funcToThrottleCallCount.Should().Be( 1 );
 		}
 
@@ -78,7 +78,7 @@ namespace ShopifyAccessTests.GraphQl
 			} );
 
 			// Act
-			await this._throttler.ExecuteAsync< BaseGraphQlResponse< ProductVariant >, ProductVariant >( funcToThrottle, Mark.Create );
+			await this._throttler.ExecuteAsync( funcToThrottle, Mark.Create );
 
 			// Assert
 			funcToThrottleCallCount.Should().Be( 1 );

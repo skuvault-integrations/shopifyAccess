@@ -210,8 +210,8 @@ namespace ShopifyAccess
 			var request = QueryBuilder.GetProductsCreatedOnOrAfterRequest( productsStartUtc );
 			
 			var response = await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
-				() => this._graphQlThrottler.ExecuteAsync< GetProductsResponse, GetProductsData >(
-					() => this._webRequestServices.PostDataAsync< GetProductsResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, token, mark, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] )
+				() => this._graphQlThrottler.ExecuteAsync< GetProductsData >(
+					async () => await this._webRequestServices.PostDataAsync< GetProductsResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, token, mark, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] )
 					, mark )
 			).ConfigureAwait( false );
 			
@@ -318,8 +318,9 @@ namespace ShopifyAccess
 					var request = QueryBuilder.GetProductVariantInventoryBySkuRequest( sku, nextCursor, locationsCount );
 
 					var response = await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
-						() => this._graphQlThrottler.ExecuteAsync< GetProductVariantsInventoryResponse, GetProductVariantsInventoryData >(
-							() => this._webRequestServices.PostDataAsync< GetProductVariantsInventoryResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, token, mark, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] )
+						() => this._graphQlThrottler.ExecuteAsync< GetProductVariantsInventoryData >(
+							async () => await this._webRequestServices.PostDataAsync< GetProductVariantsInventoryResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, token, mark,
+								this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] )
 							, mark )
 					).ConfigureAwait( false );
 
