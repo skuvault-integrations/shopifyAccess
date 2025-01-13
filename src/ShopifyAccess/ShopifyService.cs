@@ -39,7 +39,6 @@ namespace ShopifyAccess
 		private readonly ShopifyGraphQlThrottler _graphQlThrottler;
 
 		// Separate throttler for updating to save limit for other syncs
-		private readonly ShopifyThrottler _productUpdateThrottler = new ShopifyThrottler( 30 );
 		private readonly ShopifyThrottlerAsync _productUpdateThrottlerAsync = new ShopifyThrottlerAsync( 30 );
 		private readonly ShopifyTimeouts _timeouts;
 		private readonly ShopifyCommandFactory _shopifyCommandFactory;
@@ -260,15 +259,15 @@ namespace ShopifyAccess
 			}
 		}
 
-		public async Task< ShopifyProducts > GetProductsInventoryAsync( CancellationToken token, Mark mark )
+		//TODO GUARD-3717: Rerun integration tests and add unit tests (if possible)
+		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryAsync( CancellationToken token, Mark mark )
 		{
-			var products = await this.GetAllProductsForInventoryAsync( mark, token );
+			var productVariants = await this.GetAllProductVariantsInventoryAsync( mark, token );
 			var locations = await this.GetLocationsAsync( token, mark );
-			this.RemoveUntrackedProductVariants( products );
+			RemoveUntrackedProductVariants( productVariants );
 			var inventoryLevels = await this.CollectInventoryLevelsFromAllPagesAsync( mark, locations, token );
 
-			foreach( var product in products.Products )
-			foreach( var variant in product.Variants )
+			foreach( var variant in productVariants )
 			{
 				var inventoryLevelsModelOfInventoryItemId = new List< ShopifyInventoryLevelModel >();
 				if( !inventoryLevels.InventoryLevels.TryGetValue( variant.InventoryItemId, out inventoryLevelsModelOfInventoryItemId ) )
@@ -280,15 +279,14 @@ namespace ShopifyAccess
 				variant.InventoryLevels = inventoryLevelsForVariant;
 			}
 
-			return products;
+			return productVariants;
 		}
 
 		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark )
 		{
-			var products = await this.GetAllProductsForInventoryAsync( mark, token );
-			this.RemoveUntrackedProductVariants( products );
+			var productVariants = await this.GetAllProductVariantsInventoryAsync( mark, token );
+			RemoveUntrackedProductVariants( productVariants );
 
-			var productVariants = products.ToListVariants();
 			var variantIds = productVariants.Select( v => new { Sku = v.Sku.ToLowerInvariant(), v.InventoryItemId } );
 			var inventoryItemIds = skus.Select( s => s.ToLowerInvariant() ).Distinct()
 				.Join( variantIds, s => s, v => v.Sku, ( s, v ) => v.InventoryItemId )
@@ -389,7 +387,7 @@ namespace ShopifyAccess
 					result.AddRange( productVariantsBySku );
 				}
 
-				return new List< ShopifyProductVariant >( result.Where( FilterProductVariants ).Select( variant => variant.ToShopifyProductVariant() ) );
+				return new List< ShopifyProductVariant >( result.Where( FilterProductVariants ).Select( variant => variant.ToShopifyProductVariantForInventory() ) );
 			}
 			finally
 			{
@@ -408,7 +406,7 @@ namespace ShopifyAccess
 					ProductVariantsInventoryReportParser.Parse,
 					this._timeouts[ ShopifyOperationEnum.GetProductsInventory ],
 					mark, token ).ConfigureAwait( false );
-				return new List< ShopifyProductVariant >( data.Where( FilterProductVariants ).Select( variant => variant.ToShopifyProductVariant() ) );
+				return new List< ShopifyProductVariant >( data.Where( FilterProductVariants ).Select( variant => variant.ToShopifyProductVariantForInventory() ) );
 			}
 			finally
 			{
@@ -421,39 +419,26 @@ namespace ShopifyAccess
 			return variant.InventoryItem.Tracked && !string.IsNullOrEmpty( variant.Sku );
 		}
 
-		private async Task< ShopifyProducts > GetAllProductsForInventoryAsync( Mark mark, CancellationToken token )
+		private async Task< List< ShopifyProductVariant > > GetAllProductVariantsInventoryAsync( Mark mark, CancellationToken token )
 		{
-			var noFilter = new ProductsDateFilter { FilterType = FilterType.None };
-
-			return await this.CollectProductsFromAllPagesAsync( noFilter, mark, token );
-		}
-
-		//TODO GUARD-3717 LAST Once GetProductsCreatedBeforeButUpdatedAfterAsync is migrated GraphQL, this will only be called from GetAllProductsForInventoryAsync
-		//	So replace this call with GraphQL call that returns the fields needed for inventory  
-		private async Task< ShopifyProducts > CollectProductsFromAllPagesAsync( ProductsDateFilter productsDateFilter, Mark mark, CancellationToken token )
-		{
-			var products = new ShopifyProducts();
-			var endpoint = EndpointsBuilder.CreateGetEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
-
-			if( productsDateFilter.FilterType != FilterType.None )
+			ShopifyLogger.LogOperationStart( this._shopName, mark );
+			
+			try
 			{
-				endpoint += EndpointsBuilder.AppendGetProductsFilteredByDateEndpoint( productsDateFilter, endpoint );
+				var response = await this.GetAllPagesAsync< GetProductVariantsInventoryData, ProductVariant >( 
+					async (nextCursor) => await this._webRequestServices.PostDataAsync< GetProductVariantsInventoryResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
+						QueryBuilder.GetAllProductVariants( nextCursor ),
+						token, mark, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] ),
+					mark, token );
+				
+				return response?
+					.Where( x => x != null && !string.IsNullOrEmpty( x.Sku ) )
+					.Select( y => y.ToShopifyProductVariantForInventory() ).ToList() ?? new List< ShopifyProductVariant >();
 			}
-
-			do
+			finally
 			{
-				var productsWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
-					() => this._throttlerAsync.ExecuteAsync(
-						() => this._webRequestServices.GetResponsePageAsync< ShopifyProducts >( _shopifyCommandFactory.CreateGetProductsCommand(), endpoint, token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ) ) );
-				if( productsWithinPage.Response.Products.Count == 0 )
-					break;
-
-				products.Products.AddRange( productsWithinPage.Response.Products );
-
-				endpoint = productsWithinPage.NextPageQueryStr;
-			} while( endpoint != string.Empty );
-
-			return products;
+				ShopifyLogger.LogOperationEnd( this._shopName, mark );
+			}
 		}
 
 		private void ConvertToShopifyInventoryLevelsModel( ShopifyInventoryLevelsModel inventoryLevels, ShopifyInventoryLevels productsWithinPage )
@@ -583,12 +568,9 @@ namespace ShopifyAccess
 			return inventoryLevels;
 		}
 
-		private void RemoveUntrackedProductVariants( ShopifyProducts products )
+		private static void RemoveUntrackedProductVariants( List< ShopifyProductVariant > productVariants )
 		{
-			foreach( var product in products.Products )
-			{
-				product.Variants.RemoveAll( v => v.InventoryManagement == InventoryManagementEnum.Blank );
-			}
+			productVariants.RemoveAll( v => v.InventoryManagement == InventoryManagementEnum.Blank );
 		}
 
 		private void RemoveQueryPartFromProductsImagesUrl( ShopifyProducts products )

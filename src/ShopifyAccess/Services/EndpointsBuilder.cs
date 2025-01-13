@@ -31,36 +31,6 @@ namespace ShopifyAccess.Services
 			return endpoint;
 		}
 
-		//TODO GUARD-3717: Remove once no longer any calls to it
-		public static string AppendGetProductsFilteredByDateEndpoint( ProductsDateFilter productsDateFilter, string initialEndpoint )
-		{
-			if( productsDateFilter.FilterType == FilterType.None )
-				return string.Empty;
-
-			var endpoint = !initialEndpoint.IsNullOrEmpty() ? "&" : "";
-
-			switch( productsDateFilter.FilterType )
-			{
-				case FilterType.CreatedAfter:
-					endpoint += string.Format( "{0}={1}",
-						ShopifyProductCommandEndpointName.ProductDateCreatedAfter.Name, DateTime.SpecifyKind( productsDateFilter.ProductsStartUtc, DateTimeKind.Utc ).ToString( "o" ));
-					break;
-				case FilterType.CreatedBeforeUpdatedAfter:
-					endpoint += string.Format( "{0}={1}&{2}={3}",
-						ShopifyProductCommandEndpointName.ProductDateCreatedBefore.Name, DateTime.SpecifyKind( productsDateFilter.ProductsStartUtc, DateTimeKind.Utc ).ToString( "o" ),
-						ShopifyProductCommandEndpointName.ProductDateUpdatedAfter.Name, DateTime.SpecifyKind( productsDateFilter.ProductsStartUtc, DateTimeKind.Utc ).ToString( "o" ));
-					break;
-			}
-
-			return endpoint;
-		}
-
-		public static string CreateProductVariantUpdateEndpoint( long variantId )
-		{
-			var endpoint = string.Format( "{0}.json", variantId );
-			return endpoint;
-		}
-
 		public static string CreateGetEndpoint( ShopifyCommandEndpointConfig config )
 		{
 			var endpoint = string.Format( "?{0}={1}",

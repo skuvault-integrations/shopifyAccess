@@ -31,7 +31,7 @@ namespace ShopifyAccess.GraphQl.Queries
 				throw new ArgumentOutOfRangeException( nameof(locationsCount), locationsCount, "LocationsCount should not be more than " + MaxItemsPerResponse );
 			}
 
-			var query = CleanUpRequest( GetProductVariantInventoryQuery.Query );
+			var query = CleanUpRequest( GetProductVariantInventoryQuery.GetFirstVariantQuery );
 			var escapedSku = sku.ToJson();
 			var variables = new
 			{
@@ -72,7 +72,7 @@ namespace ShopifyAccess.GraphQl.Queries
 		{
 			if( productsPerPage > MaxItemsPerResponse )
 			{
-				throw new ArgumentOutOfRangeException( nameof(productsPerPage), productsPerPage, $"productsPerPage should not be more than {MaxItemsPerResponse}" );
+				throw new ArgumentOutOfRangeException( nameof(productsPerPage), productsPerPage, $"productsPerPage should not be greater than {MaxItemsPerResponse}" );
 			}
 			
 			var variables = new
@@ -97,7 +97,7 @@ namespace ShopifyAccess.GraphQl.Queries
 		{
 			if( productsPerPage > MaxItemsPerResponse )
 			{
-				throw new ArgumentOutOfRangeException( nameof(productsPerPage), productsPerPage, $"productsPerPage should not be more than {MaxItemsPerResponse}" );
+				throw new ArgumentOutOfRangeException( nameof(productsPerPage), productsPerPage, $"productsPerPage should not be greater than {MaxItemsPerResponse}" );
 			}
 			
 			var variables = new
@@ -107,6 +107,23 @@ namespace ShopifyAccess.GraphQl.Queries
 				first = productsPerPage
 			};
 			var request = new { query = CleanUpRequest( GetProductsQuery.Query ), variables };
+			return request.ToJson();
+		}
+		
+		//TODO GUARD-3717: Add tests for this method
+		public static string GetAllProductVariants( string after = null, int productVariantsPerPage = MaxItemsPerResponse )
+		{
+			if( productVariantsPerPage > MaxItemsPerResponse )
+			{
+				throw new ArgumentOutOfRangeException( nameof(productVariantsPerPage), productVariantsPerPage, $"{nameof(productVariantsPerPage)} should not be greater than {MaxItemsPerResponse}" );
+			}
+			
+			var variables = new
+			{
+				after,
+				first = productVariantsPerPage
+			};
+			var request = new { query = CleanUpRequest( GetProductVariantInventoryQuery.GetAllVariantsQuery ), variables };
 			return request.ToJson();
 		}
 		

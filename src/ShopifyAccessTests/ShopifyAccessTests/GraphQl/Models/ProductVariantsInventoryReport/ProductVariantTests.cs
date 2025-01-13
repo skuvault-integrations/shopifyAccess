@@ -13,13 +13,13 @@ namespace ShopifyAccessTests.GraphQl.Models.ProductVariantsInventoryReport
 		private const string Sku = "testSku";
 
 		[ Test ]
-		public void ToShopifyProductVariant_ReturnsShopifyProductVariant()
+		public void ToShopifyProductVariantForInventory_ReturnsShopifyProductVariant()
 		{
 			// Arrange
 			var productVariant = GetProductVariant();
 
 			// Act
-			var result = productVariant.ToShopifyProductVariant();
+			var result = productVariant.ToShopifyProductVariantForInventory();
 
 			// Assert
 			result.Id.Should().Be( ProductVariantId );
@@ -28,7 +28,7 @@ namespace ShopifyAccessTests.GraphQl.Models.ProductVariantsInventoryReport
 		}
 
 		[ Test ]
-		public void ToShopifyProductVariant_ReturnsShopifyProductVariantWithInventoryLevel()
+		public void ToShopifyProductVariantForInventory_ReturnsShopifyProductVariantWithInventoryLevel()
 		{
 			// Arrange
 			var available = 111;
@@ -38,7 +38,7 @@ namespace ShopifyAccessTests.GraphQl.Models.ProductVariantsInventoryReport
 			productVariant.InventoryItem.InventoryLevelsNodes.Nodes.Add( inventoryLevel );
 
 			// Act
-			var result = productVariant.ToShopifyProductVariant();
+			var result = productVariant.ToShopifyProductVariantForInventory();
 
 			// Assert
 			result.InventoryLevels.InventoryLevels.Should().HaveCount( 1 );
@@ -48,7 +48,7 @@ namespace ShopifyAccessTests.GraphQl.Models.ProductVariantsInventoryReport
 		}
 
 		[ Test ]
-		public void ToShopifyProductVariant_ReturnsShopifyProductVariantWithInventoryLevels()
+		public void ToShopifyProductVariantForInventory_ReturnsShopifyProductVariantWithInventoryLevels()
 		{
 			// Arrange
 			var inventoryLevel1 = GetInventoryLevel( 1, 2 );
@@ -58,7 +58,7 @@ namespace ShopifyAccessTests.GraphQl.Models.ProductVariantsInventoryReport
 			productVariant.InventoryItem.InventoryLevelsNodes.Nodes.AddRange( new[] { inventoryLevel1, inventoryLevel2, inventoryLevel3 } );
 
 			// Act
-			var result = productVariant.ToShopifyProductVariant();
+			var result = productVariant.ToShopifyProductVariantForInventory();
 
 			// Assert
 			result.InventoryLevels.InventoryLevels.Should().HaveCount( 3 );

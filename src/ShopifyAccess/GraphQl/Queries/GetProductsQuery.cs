@@ -9,6 +9,7 @@ namespace ShopifyAccess.GraphQl.Queries
 		/// <param name="$query">Filter</param>
 		/// <param name="$first">Number of products to return</param>
 		/// <param name="$after">Cursor for pagination</param>
+		//Assumption: No product has more than 250 variants. If not correct, will have to get variants in pages if a product has more than 250
 		internal const string Query =
 			@"query ($query: String, $first: Int, $after: String) {
 				products(query: $query, first: $first, after: $after) {

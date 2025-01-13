@@ -17,6 +17,7 @@ namespace ShopifyAccess.Models.ProductVariant
 		private string RawInventoryManagement{ get; set; }
 		
 		[ JsonIgnore ]
+		//TODO GUARD-3717: This isn't needed since switch to GraphQL, since InventoryLevels & InventoryItemId are used instead
 		public InventoryManagementEnum InventoryManagement
 		{
 			get
@@ -51,9 +52,7 @@ namespace ShopifyAccess.Models.ProductVariant
 		[ DataMember( Name = "weight" ) ]
 		public decimal Weight{ get; set; }
 
-		// [ DataMember( Name = "weight_unit" ) ]
-		//TODO GUARD-3717: Having to temporarily ignore, for REST API tests to pass
-		[ IgnoreDataMember ]
+		[ DataMember( Name = "weight_unit" ) ]
 		public WeightUnit WeightUnit{ get; set; }
 
 		[ DataMember( Name = "price" ) ]

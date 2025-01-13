@@ -138,7 +138,6 @@
     <Compile Include="Models\ProductVariant\ShopifyProductVariant.cs" />
     <Compile Include="Models\ProductVariant\ShopifyInventoryLevelForUpdate.cs" />
     <Compile Include="Models\Product\ProductsCount.cs" />
-    <Compile Include="Models\Product\ProductsDateFilter.cs" />
     <Compile Include="Models\Product\ShopifyInventoryLevelsModel.cs" />
     <Compile Include="Models\Product\ShopifyProduct.cs" />
     <Compile Include="Models\Product\ShopifyInventoryLevels.cs" />

@@ -50,9 +50,9 @@ namespace ShopifyAccessTests.Products
 		[ Test ]
 		public async Task GetProductsThroughLocationsAsync()
 		{
-			var products = await this.Service.GetProductsInventoryAsync( CancellationToken.None );
+			var productVariants = await this.Service.GetProductVariantsInventoryAsync( CancellationToken.None, _mark );
 
-			products.Products.Should().NotBeNullOrEmpty();
+			Assert.That( productVariants, Is.Not.Empty );
 		}
 
 		[ Test ]
@@ -102,8 +102,7 @@ namespace ShopifyAccessTests.Products
 		public async Task GetProductVariantsInventoryReportAsync_ReturnsCorrectReport()
 		{
 			// Arrange
-			var products = await this.Service.GetProductsInventoryAsync( CancellationToken.None );
-			var productVariants = products.ToListVariants();
+			var productVariants = await this.Service.GetProductVariantsInventoryAsync( CancellationToken.None, _mark );
 
 			// Act
 			var productVariantsReport = await this.Service.GetProductVariantsInventoryReportAsync( CancellationToken.None, _mark );
@@ -164,9 +163,8 @@ namespace ShopifyAccessTests.Products
 		{
 			// Arrange
 			var countToCompare = 60;
-			var products = await this.Service.GetProductsInventoryAsync( CancellationToken.None );
-			products.Products = products.Products.Take( countToCompare ).ToList();
-			var productVariants = products.ToListVariants();
+			var productVariants = await this.Service.GetProductVariantsInventoryAsync( CancellationToken.None, _mark );
+			productVariants = productVariants.Take( countToCompare ).ToList();
 			var skus = productVariants.Select( v => v.Sku );
 
 			// Act

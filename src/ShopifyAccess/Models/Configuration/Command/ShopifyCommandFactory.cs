@@ -5,8 +5,6 @@ namespace ShopifyAccess.Models.Configuration.Command
 		private readonly ShopifyApiVersion _apiVersion;
 
 		public ShopifyCommand CreateUpdateInventoryLevelsCommand() => new ShopifyCommand( "/inventory_levels/set.json", this._apiVersion );
-		//TODO GUARD-3717 Remove once no usages
-		public ShopifyCommand CreateGetProductsCommand() => new ShopifyCommand( "/products.json", this._apiVersion );
 		public ShopifyCommand CreateGetInventoryLevelsCommand() => new ShopifyCommand( "/inventory_levels.json", this._apiVersion );
 		public ShopifyCommand CreateGetOrdersCommand() => new ShopifyCommand( "/orders.json", this._apiVersion );
 		public ShopifyCommand CreateGetLocationsCommand() => new ShopifyCommand( "/locations.json", this._apiVersion );
