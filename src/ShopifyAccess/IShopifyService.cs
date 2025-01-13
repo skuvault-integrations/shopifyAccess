@@ -91,7 +91,7 @@ namespace ShopifyAccess
 		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns>List of variants (inventory items)</returns>
-		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null );
+		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark );
 
 		/// <summary>
 		/// Get all existing product variants with inventory levels
@@ -100,7 +100,7 @@ namespace ShopifyAccess
 		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns>Product variants with inventory levels</returns>
-		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportAsync( CancellationToken token, Mark mark = null );
+		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportAsync( CancellationToken token, Mark mark );
 
 		/// <summary>
 		/// Get the list of product variants for specified SKUs
@@ -110,15 +110,7 @@ namespace ShopifyAccess
 		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns>List of variants (inventory items)</returns>
-		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null );
-
-		/// <summary>
-		///     Update inventory levels (inventory items)
-		/// </summary>
-		/// <param name="token">Cancellation tokens</param>
-		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		/// <param name="inventoryLevels"></param>
-		void UpdateInventoryLevels( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, CancellationToken token, Mark mark = null );
+		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark );
 
 		/// <summary>
 		///     Update inventory levels (inventory items) async
@@ -126,7 +118,7 @@ namespace ShopifyAccess
 		/// <param name="token">Cancellation tokens</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <param name="inventoryLevels"></param>
-		Task UpdateInventoryLevelsAsync( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, CancellationToken token, Mark mark = null );
+		Task UpdateInventoryLevelsAsync( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, CancellationToken token, Mark mark );
 
 		/// <summary>
 		/// Get all users

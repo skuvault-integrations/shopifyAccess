@@ -32,5 +32,8 @@ namespace ShopifyAccess.GraphQl.Models.Products
 
 		[ DataMember( Name = "updatedAt" ) ]
 		public DateTime? UpdatedAt{ get; set; }
+		
+		[ DataMember( Name = "createdAt" ) ]
+		public DateTime? CreatedAt{ get; set; }
 	}
 }

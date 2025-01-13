@@ -61,12 +61,12 @@ namespace ShopifyAccess.GraphQl.Queries
 		}
 		
 		/// <summary>
-		/// Create a query to get products created on or after the specified date.
+		/// Create a query to get products created after the specified date/time, inclusive.
 		/// </summary>
 		/// <param name="createdAtMinUtc"></param>
 		/// <param name="after">Pagination cursor to request the next page</param>
 		/// <param name="productsPerPage"></param>
-		/// <returns></returns>
+		/// <returns>GraphQL Query</returns>
 		//TODO GUARD-3717: Add tests for this method
 		public static string GetProductsCreatedOnOrAfterRequest( DateTime createdAtMinUtc, string after = null, int productsPerPage = MaxItemsPerResponse )
 		{
@@ -81,7 +81,32 @@ namespace ShopifyAccess.GraphQl.Queries
 				after,
 				first = productsPerPage
 			};
-			var request = new { query = CleanUpRequest( GetProductsQuery.CreatedOnOrAfterQuery ), variables };
+			var request = new { query = CleanUpRequest( GetProductsQuery.Query ), variables };
+			return request.ToJson();
+		}
+		
+		/// <summary>
+		/// Create a query to get products created before but updated after the specified date/time, inclusive.
+		/// </summary>
+		/// <param name="createdAtMaxAndUpdatedAtMinUtc"></param>
+		/// <param name="after">Pagination cursor to request the next page</param>
+		/// <param name="productsPerPage"></param>
+		/// <returns>GraphQL Query</returns>
+		//TODO GUARD-3717: Add tests for this method
+		public static string GetProductsCreatedBeforeButUpdatedAfter( DateTime createdAtMaxAndUpdatedAtMinUtc, string after = null, int productsPerPage = MaxItemsPerResponse )
+		{
+			if( productsPerPage > MaxItemsPerResponse )
+			{
+				throw new ArgumentOutOfRangeException( nameof(productsPerPage), productsPerPage, $"productsPerPage should not be more than {MaxItemsPerResponse}" );
+			}
+			
+			var variables = new
+			{
+				query = $"created_at:<='{createdAtMaxAndUpdatedAtMinUtc.ToIso8601()}' AND updated_at:>='{createdAtMaxAndUpdatedAtMinUtc.ToIso8601()}'",
+				after,
+				first = productsPerPage
+			};
+			var request = new { query = CleanUpRequest( GetProductsQuery.Query ), variables };
 			return request.ToJson();
 		}
 		

@@ -205,8 +205,7 @@ namespace ShopifyAccess
 		#endregion
 
 		#region Products
-		public async Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark, 
-			int productsPerPage = GraphQl.Queries.QueryBuilder.MaxItemsPerResponse )
+		public async Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark, $"productsStartUtc: '{productsStartUtc}'" );
 
@@ -214,7 +213,7 @@ namespace ShopifyAccess
 			{
 				var response = await this.GetAllPagesAsync< GetProductsData, Product >( 
 					async (nextCursor) => await this._webRequestServices.PostDataAsync< GetProductsResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
-						QueryBuilder.GetProductsCreatedOnOrAfterRequest( productsStartUtc, nextCursor, productsPerPage ),
+						QueryBuilder.GetProductsCreatedOnOrAfterRequest( productsStartUtc, nextCursor ),
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
 					mark, token );
 				
@@ -231,31 +230,38 @@ namespace ShopifyAccess
 			}
 		}
 		
-		public async Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null )
+		public async Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark )
 		{
-			mark = mark.CreateNewIfBlank();
-
+			ShopifyLogger.LogOperationStart( this._shopName, mark, $"productsStartUtc: '{productsStartUtc}'" );
+			
 			if( productsStartUtc == DateTime.MinValue )
 			{
 				return new ShopifyProducts();
 			}
 
-			var productsDateFilter = new ProductsDateFilter
+			try
 			{
-				FilterType = FilterType.CreatedBeforeUpdatedAfter,
-				ProductsStartUtc = productsStartUtc
-			};
-			var products = await this.CollectProductsFromAllPagesAsync( productsDateFilter, mark, token );
+				var response = await this.GetAllPagesAsync< GetProductsData, Product >( 
+					async (nextCursor) => await this._webRequestServices.PostDataAsync< GetProductsResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
+						QueryBuilder.GetProductsCreatedBeforeButUpdatedAfter( productsStartUtc, nextCursor ),
+						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
+					mark, token );
+				
+				var products = response?.ToShopifyProducts();
 
-			RemoveQueryPartFromProductsImagesUrl( products );
+				//TODO GUARD-3717: Perhaps, for GraphQL it's not even needed to call this method
+				RemoveQueryPartFromProductsImagesUrl( products );
 
-			return products;
+				return products;
+			}
+			finally
+			{
+				ShopifyLogger.LogOperationEnd( this._shopName, mark );
+			}
 		}
 
-		public async Task< ShopifyProducts > GetProductsInventoryAsync( CancellationToken token, Mark mark = null )
+		public async Task< ShopifyProducts > GetProductsInventoryAsync( CancellationToken token, Mark mark )
 		{
-			mark = mark.CreateNewIfBlank();
-
 			var products = await this.GetAllProductsForInventoryAsync( mark, token );
 			var locations = await this.GetLocationsAsync( token, mark );
 			this.RemoveUntrackedProductVariants( products );
@@ -277,10 +283,8 @@ namespace ShopifyAccess
 			return products;
 		}
 
-		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null )
+		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark )
 		{
-			mark = mark.CreateNewIfBlank();
-
 			var products = await this.GetAllProductsForInventoryAsync( mark, token );
 			this.RemoveUntrackedProductVariants( products );
 
@@ -368,10 +372,8 @@ namespace ShopifyAccess
 			return result;
 		}
 
-		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null )
+		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark )
 		{
-			mark = mark.CreateNewIfBlank();
-
 			ShopifyLogger.LogOperationStart( this._shopName, mark );
 
 			try
@@ -395,10 +397,8 @@ namespace ShopifyAccess
 			}
 		}
 
-		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportAsync( CancellationToken token, Mark mark = null )
+		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportAsync( CancellationToken token, Mark mark )
 		{
-			mark = mark.CreateNewIfBlank();
-
 			ShopifyLogger.LogOperationStart( this._shopName, mark );
 
 			try
@@ -428,6 +428,8 @@ namespace ShopifyAccess
 			return await this.CollectProductsFromAllPagesAsync( noFilter, mark, token );
 		}
 
+		//TODO GUARD-3717 LAST Once GetProductsCreatedBeforeButUpdatedAfterAsync is migrated GraphQL, this will only be called from GetAllProductsForInventoryAsync
+		//	So replace this call with GraphQL call that returns the fields needed for inventory  
 		private async Task< ShopifyProducts > CollectProductsFromAllPagesAsync( ProductsDateFilter productsDateFilter, Mark mark, CancellationToken token )
 		{
 			var products = new ShopifyProducts();
@@ -441,7 +443,6 @@ namespace ShopifyAccess
 			do
 			{
 				var productsWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
-					//TODO GUARD-3717 LAST Replace this call with GraphQL call that returns the fields needed for inventory  
 					() => this._throttlerAsync.ExecuteAsync(
 						() => this._webRequestServices.GetResponsePageAsync< ShopifyProducts >( _shopifyCommandFactory.CreateGetProductsCommand(), endpoint, token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ) ) );
 				if( productsWithinPage.Response.Products.Count == 0 )
@@ -606,31 +607,10 @@ namespace ShopifyAccess
 		#endregion
 
 		#region Update variants
-		public void UpdateInventoryLevels( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, CancellationToken token, Mark mark = null )
+		public async Task UpdateInventoryLevelsAsync( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, CancellationToken token, Mark mark )
 		{
-			mark = mark.CreateNewIfBlank();
-			foreach( var inventoryLevel in inventoryLevels )
-				this.UpdateInventoryLevelQuantity( inventoryLevel, token, mark );
-		}
-		
-		public async Task UpdateInventoryLevelsAsync( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, CancellationToken token, Mark mark = null )
-		{
-			mark = mark.CreateNewIfBlank();
 			foreach( var inventoryLevel in inventoryLevels )
 				await this.UpdateInventoryLevelQuantityAsync( inventoryLevel, token, mark );
-		}
-
-		private void UpdateInventoryLevelQuantity( ShopifyInventoryLevelForUpdate variant, CancellationToken token, Mark mark )
-		{
-			//just simpliest way to serialize with the root name.
-			var jsonContent = variant.ToJson();
-
-			ActionPolicies.SubmitPolicy( mark, this._shopName, token ).Do( () =>
-				this._productUpdateThrottler.Execute( () =>
-				{
-					this._webRequestServices.PostData< ShopifyInventoryLevelForUpdateResponse >( _shopifyCommandFactory.CreateUpdateInventoryLevelsCommand(), jsonContent, token, mark, this._timeouts[ ShopifyOperationEnum.UpdateInventory ] );
-					return true;
-				} ) );
 		}
 
 		private async Task UpdateInventoryLevelQuantityAsync( ShopifyInventoryLevelForUpdate variant, CancellationToken token, Mark mark )

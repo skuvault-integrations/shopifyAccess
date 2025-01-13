@@ -31,6 +31,7 @@ namespace ShopifyAccess.Services
 			return endpoint;
 		}
 
+		//TODO GUARD-3717: Remove once no longer any calls to it
 		public static string AppendGetProductsFilteredByDateEndpoint( ProductsDateFilter productsDateFilter, string initialEndpoint )
 		{
 			if( productsDateFilter.FilterType == FilterType.None )

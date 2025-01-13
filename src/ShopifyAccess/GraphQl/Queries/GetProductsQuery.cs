@@ -3,13 +3,13 @@ namespace ShopifyAccess.GraphQl.Queries
 	internal static class GetProductsQuery
 	{
 		/// <summary>
-		/// Query to get products created on or after the specified date
+		/// Query to get products, for the products sync
 		/// https://shopify.dev/docs/api/admin-graphql/2024-04/queries/products 
 		/// </summary>
 		/// <param name="$query">Filter</param>
 		/// <param name="$first">Number of products to return</param>
 		/// <param name="$after">Cursor for pagination</param>
-		internal const string CreatedOnOrAfterQuery =
+		internal const string Query =
 			@"query ($query: String, $first: Int, $after: String) {
 				products(query: $query, first: $first, after: $after) {
 					nodes {
@@ -48,6 +48,7 @@ namespace ShopifyAccess.GraphQl.Queries
 						productType
 						descriptionHtml
 						updatedAt
+						createdAt
 					}
 					pageInfo {
 						endCursor
@@ -55,8 +56,5 @@ namespace ShopifyAccess.GraphQl.Queries
 					}
 				}
 			}";
-
-		//TODO GUARD-3717: Add params to the above to get ?limit=250&created_at_max=2023-06-01T00:00:00.0000000Z&updated_at_min=2023-06-01T00:00:00.0000000Z
-		//	TEST to ensure that if I use both created_at:< & updated_at:> then it'll do an AND operation, not an OR. 
 	}
 }
