@@ -62,7 +62,5 @@ namespace ShopifyAccess.GraphQl.Queries
 					}
 				}
 			}";
-		
-		//TODO Update deserialization for mediaContentType and other image related changes (removed ids)
 	}
 }
