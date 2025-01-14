@@ -5,15 +5,18 @@ using System.Runtime.Serialization;
 namespace ShopifyAccess.Models
 {
 	[ DataContract ]
+	//TODO GUARD-3717 [Cleanup] Remove all [ Data* ] attributes since this will not be directly deserialized from GraphQL
 	public class ShopifyProductImage: IEquatable< ShopifyProductImage >
 	{
 		[ DataMember( Name = "id") ]
+		[ Obsolete( "TODO GUARD-3717 [Cleanup] Remove" ) ]
 		public long Id { get; set; }
 
 		[ DataMember( Name = "src") ]
 		public string Src { get; set; }
 
 		[ DataMember( Name = "variant_ids" ) ]
+		[ Obsolete( "TODO GUARD-3717 [Cleanup] Remove" ) ]
 		public List< long > VariantIds { get; set; }
 
 		public bool Equals( ShopifyProductImage other )

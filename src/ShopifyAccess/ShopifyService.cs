@@ -248,13 +248,8 @@ namespace ShopifyAccess
 						QueryBuilder.GetProductsCreatedOnOrAfterRequest( productsStartUtc, nextCursor ),
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
 					mark, token );
-				
-				var products = response?.ToShopifyProducts();
-			
-				//TODO GUARD-3717: Perhaps, for GraphQL it's not even needed to call this method
-				RemoveQueryPartFromProductsImagesUrl( products );
-			
-				return products;
+
+				return response?.ToShopifyProducts();
 			}
 			finally
 			{
@@ -278,13 +273,8 @@ namespace ShopifyAccess
 						QueryBuilder.GetProductsCreatedBeforeButUpdatedAfter( productsStartUtc, nextCursor ),
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
 					mark, token );
-				
-				var products = response?.ToShopifyProducts();
 
-				//TODO GUARD-3717: Perhaps, for GraphQL it's not even needed to call this method
-				RemoveQueryPartFromProductsImagesUrl( products );
-
-				return products;
+				return response?.ToShopifyProducts();
 			}
 			finally
 			{
@@ -317,7 +307,7 @@ namespace ShopifyAccess
 			return products;
 		}
 
-		//TODO GUARD-3717: Rerun integration tests and add unit tests (if possible)
+		//TODO GUARD-3717 Add unit tests (if possible)
 		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryAsync( CancellationToken token, Mark mark )
 		{
 			var productVariants = await this.GetAllProductVariantsInventoryAsync( mark, token );
@@ -387,7 +377,7 @@ namespace ShopifyAccess
 			}
 		}
 
-		//TODO GUARD-3717 NEXT Extract into a GraphQlPaginationService & add tests
+		//TODO GUARD-3717 [Refactor] Extract into a GraphQlPaginationService & add tests
 		// Constructor should take everything this._...
 		/// <summary>
 		/// Get all pages of multi-page responses

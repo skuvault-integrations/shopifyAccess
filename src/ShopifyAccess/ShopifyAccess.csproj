@@ -69,6 +69,9 @@
     <Compile Include="GraphQl\Helpers\DateTimeExtensions.cs" />
     <Compile Include="GraphQl\Helpers\GraphQlIdParser.cs" />
     <Compile Include="GraphQl\Models\BaseGraphQlResponse.cs" />
+    <Compile Include="GraphQl\Models\Common\Extensions\MediaExtensions.cs" />
+    <Compile Include="GraphQl\Models\Common\Image.cs" />
+    <Compile Include="GraphQl\Models\Common\Media.cs" />
     <Compile Include="GraphQl\Models\Common\Weight.cs" />
     <Compile Include="GraphQl\Models\Common\WeightUnit.cs" />
     <Compile Include="GraphQl\Models\Nodes.cs" />
