@@ -13,14 +13,14 @@ namespace ShopifyAccess.GraphQl.Queries
 
 		public static string GetCurrentBulkOperationStatusRequest()
 		{
-			var request = new { query = CleanUpRequest( CurrentBulkOperationQuery.Query ) };
+			var request = new { query = PrepareRequest( CurrentBulkOperationQuery.Query ) };
 			return request.ToJson();
 		}
 
 		public static string GetBulkOperationStatusByIdRequest( string gid )
 		{
 			var query = BulkOperationByIdQuery.Query.Replace( "{gid}", gid );
-			var request = new { query = CleanUpRequest( query ) };
+			var request = new { query = PrepareRequest( query ) };
 			return request.ToJson();
 		}
 
@@ -31,7 +31,7 @@ namespace ShopifyAccess.GraphQl.Queries
 				throw new ArgumentOutOfRangeException( nameof(locationsCount), locationsCount, "LocationsCount should not be more than " + MaxItemsPerResponse );
 			}
 
-			var query = CleanUpRequest( GetProductVariantInventoryQuery.GetFirstVariantQuery );
+			var query = PrepareRequest( GetProductVariantInventoryQuery.GetFirstVariantQuery );
 			var escapedSku = sku.ToJson();
 			var variables = new
 			{
@@ -40,7 +40,7 @@ namespace ShopifyAccess.GraphQl.Queries
 				after
 			};
 
-			var request = new { query = CleanUpRequest( query ), variables };
+			var request = new { query = PrepareRequest( query ), variables };
 			return request.ToJson();
 		}
 
@@ -56,7 +56,7 @@ namespace ShopifyAccess.GraphQl.Queries
 					throw new ArgumentOutOfRangeException( nameof(type), type, null );
 			}
 
-			var request = new { query = CleanUpRequest( query ) };
+			var request = new { query = PrepareRequest( query ) };
 			return request.ToJson();
 		}
 		
@@ -81,7 +81,7 @@ namespace ShopifyAccess.GraphQl.Queries
 				after,
 				first = productsPerPage
 			};
-			var request = new { query = CleanUpRequest( GetProductsQuery.Query ), variables };
+			var request = new { query = PrepareRequest( GetProductsQuery.Query ), variables };
 			return request.ToJson();
 		}
 		
@@ -106,7 +106,7 @@ namespace ShopifyAccess.GraphQl.Queries
 				after,
 				first = productsPerPage
 			};
-			var request = new { query = CleanUpRequest( GetProductsQuery.Query ), variables };
+			var request = new { query = PrepareRequest( GetProductsQuery.Query ), variables };
 			return request.ToJson();
 		}
 		
@@ -123,7 +123,7 @@ namespace ShopifyAccess.GraphQl.Queries
 				after,
 				first = productVariantsPerPage
 			};
-			var request = new { query = CleanUpRequest( GetProductVariantInventoryQuery.GetAllVariantsQuery ), variables };
+			var request = new { query = PrepareRequest( GetProductVariantInventoryQuery.GetAllVariantsQuery ), variables };
 			return request.ToJson();
 		}
 		
@@ -132,7 +132,7 @@ namespace ShopifyAccess.GraphQl.Queries
 		/// </summary>
 		/// <param name="request"></param>
 		/// <returns></returns>
-		private static string CleanUpRequest( string request )
+		private static string PrepareRequest( string request )
 		{
 			return request.Replace( '\t', ' ' );
 		}

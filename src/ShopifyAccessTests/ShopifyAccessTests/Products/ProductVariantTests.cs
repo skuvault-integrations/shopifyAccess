@@ -63,10 +63,10 @@ namespace ShopifyAccessTests.Products
 			var initialQuantity = inventoryItem.Available.Value;
 			const int quantity = 39;
 
-			await this.Service.UpdateInventoryLevelsAsync( CreateInventoryLevelForUpdate( inventoryItem, quantity ), CancellationToken.None, _mark );
-			var product = ( await this.Service.GetProductVariantsInventoryBySkusAsync( new List< string > { sku }, CancellationToken.None, _mark ) ).First();
+			await this.Service.UpdateInventoryLevelsAsync( CreateInventoryLevelForUpdate( inventoryItem, quantity ), CancellationToken.None );
+			var product = ( await this.Service.GetProductVariantsInventoryBySkusAsync( new List< string > { sku }, CancellationToken.None ) ).First();
 			var newQuantity = product.InventoryLevels.InventoryLevels.First().Available;
-			await this.Service.UpdateInventoryLevelsAsync( CreateInventoryLevelForUpdate( inventoryItem, initialQuantity ), CancellationToken.None, _mark );
+			await this.Service.UpdateInventoryLevelsAsync( CreateInventoryLevelForUpdate( inventoryItem, initialQuantity ), CancellationToken.None );
 
 			newQuantity.Should().Be( quantity );
 		}
@@ -75,7 +75,7 @@ namespace ShopifyAccessTests.Products
 		public async Task WhenGetProductsCreatedAfterAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
 		{
 			var dateFrom = new DateTime( 2021, 6, 1 );
-			var products = await this.Service.GetProductsCreatedAfterAsync( dateFrom, CancellationToken.None, _mark );
+			var products = await this.Service.GetProductsCreatedAfterAsync( dateFrom, CancellationToken.None );
 			var productsWithImages = products.Products.Where( p => p.Images != null && p.Images.Any() );
 
 			productsWithImages.Should().NotBeNullOrEmpty();
@@ -88,7 +88,7 @@ namespace ShopifyAccessTests.Products
 		public async Task WhenGetProductsCreatedBeforeButUpdatedAfterAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
 		{
 			var dateFrom = new DateTime( 2023, 6, 1 );
-			var products = await this.Service.GetProductsCreatedBeforeButUpdatedAfterAsync( dateFrom, CancellationToken.None, _mark );
+			var products = await this.Service.GetProductsCreatedBeforeButUpdatedAfterAsync( dateFrom, CancellationToken.None );
 			var productsWithImages = products.Products.Where( p => p.Images != null && p.Images.Any() );
 
 			productsWithImages.Should().NotBeNullOrEmpty();
@@ -105,7 +105,7 @@ namespace ShopifyAccessTests.Products
 			var productVariants = await this.Service.GetProductVariantsInventoryAsync( CancellationToken.None, _mark );
 
 			// Act
-			var productVariantsReport = await this.Service.GetProductVariantsInventoryReportAsync( CancellationToken.None, _mark );
+			var productVariantsReport = await this.Service.GetProductVariantsInventoryReportAsync( CancellationToken.None );
 
 			// Assert
 			this.ValidateIfEqual( productVariantsReport, productVariants );
@@ -117,10 +117,10 @@ namespace ShopifyAccessTests.Products
 		{
 			// Arrange
 			var skus = new[] { "AUTO_TEST 2649 1 ' \" \\ ! @ # $ % ^" };
-			var products = await this.Service.GetProductVariantsInventoryBySkusAsync( skus, CancellationToken.None, _mark );
+			var products = await this.Service.GetProductVariantsInventoryBySkusAsync( skus, CancellationToken.None );
 
 			// Act
-			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None, _mark );
+			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None );
 
 			// Assert
 			productVariants.Should().NotBeEmpty();
@@ -133,10 +133,10 @@ namespace ShopifyAccessTests.Products
 		{
 			// Arrange
 			var skus = new[] { "testSKU1" };
-			var products = await this.Service.GetProductVariantsInventoryBySkusAsync( skus, CancellationToken.None, _mark );
+			var products = await this.Service.GetProductVariantsInventoryBySkusAsync( skus, CancellationToken.None );
 
 			// Act
-			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None, _mark );
+			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None );
 
 			// Assert
 			productVariants.Count.Should().BeGreaterThan( 0 );
@@ -151,7 +151,7 @@ namespace ShopifyAccessTests.Products
 			var skus = new[] { "wrong SKU" };
 
 			// Act
-			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None, _mark );
+			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None );
 
 			// Assert
 			productVariants.Should().BeEmpty();
@@ -176,7 +176,7 @@ namespace ShopifyAccessTests.Products
 
 		private async Task< ShopifyInventoryLevel > GetFirstInventoryItem( string sku )
 		{
-			var product = ( await this.Service.GetProductVariantsInventoryBySkusAsync( new List< string > { sku }, CancellationToken.None, _mark ) ).First();
+			var product = ( await this.Service.GetProductVariantsInventoryBySkusAsync( new List< string > { sku }, CancellationToken.None ) ).First();
 			return product.InventoryLevels.InventoryLevels.First();
 		}
 

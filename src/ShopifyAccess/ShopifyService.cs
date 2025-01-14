@@ -291,30 +291,7 @@ namespace ShopifyAccess
 				ShopifyLogger.LogOperationEnd( this._shopName, mark );
 			}
 		}
-
-		//TODO GUARD-3717: Rerun integration tests and add unit tests (if possible)
-		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryAsync( CancellationToken token, Mark mark )
-		{
-			var productVariants = await this.GetAllProductVariantsInventoryAsync( mark, token );
-			var locations = await this.GetLocationsAsync( token, mark );
-			RemoveUntrackedProductVariants( productVariants );
-			var inventoryLevels = await this.CollectInventoryLevelsFromAllPagesAsync( mark, locations, token );
-
-			foreach( var variant in productVariants )
-			{
-				var inventoryLevelsModelOfInventoryItemId = new List< ShopifyInventoryLevelModel >();
-				if( !inventoryLevels.InventoryLevels.TryGetValue( variant.InventoryItemId, out inventoryLevelsModelOfInventoryItemId ) )
-					continue;
-
-				var inventoryLevelsOfInventoryItemId = inventoryLevelsModelOfInventoryItemId.Select( x => x.ToShopifyInventoryLevel( variant.InventoryItemId ) ).ToList();
-
-				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevelsOfInventoryItemId };
-				variant.InventoryLevels = inventoryLevelsForVariant;
-			}
-
-			return productVariants;
-		}
-
+		
 		public ShopifyProducts GetProductsInventory( CancellationToken token, Mark mark = null )
 		{
 			mark = mark.CreateNewIfBlank();
@@ -338,6 +315,29 @@ namespace ShopifyAccess
 			}
 
 			return products;
+		}
+
+		//TODO GUARD-3717: Rerun integration tests and add unit tests (if possible)
+		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryAsync( CancellationToken token, Mark mark )
+		{
+			var productVariants = await this.GetAllProductVariantsInventoryAsync( mark, token );
+			var locations = await this.GetLocationsAsync( token, mark );
+			RemoveUntrackedProductVariants( productVariants );
+			var inventoryLevels = await this.CollectInventoryLevelsFromAllPagesAsync( mark, locations, token );
+
+			foreach( var variant in productVariants )
+			{
+				var inventoryLevelsModelOfInventoryItemId = new List< ShopifyInventoryLevelModel >();
+				if( !inventoryLevels.InventoryLevels.TryGetValue( variant.InventoryItemId, out inventoryLevelsModelOfInventoryItemId ) )
+					continue;
+
+				var inventoryLevelsOfInventoryItemId = inventoryLevelsModelOfInventoryItemId.Select( x => x.ToShopifyInventoryLevel( variant.InventoryItemId ) ).ToList();
+
+				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevelsOfInventoryItemId };
+				variant.InventoryLevels = inventoryLevelsForVariant;
+			}
+
+			return productVariants;
 		}
 		
 		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark )
@@ -797,6 +797,14 @@ namespace ShopifyAccess
 			{
 				return false;
 			}
+		}
+		#endregion
+
+		#region Misc
+		private int CalculatePagesCount( int productsCount )
+		{
+			var result = ( int )Math.Ceiling( ( double )productsCount / RequestMaxLimit );
+			return result;
 		}
 		#endregion
 	}
