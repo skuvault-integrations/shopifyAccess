@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.Serialization;
+using ShopifyAccess.GraphQl.Models.Common;
 
 namespace ShopifyAccess.GraphQl.Models.Products
 {
@@ -20,12 +21,8 @@ namespace ShopifyAccess.GraphQl.Models.Products
 		[ DataMember( Name = "price" ) ]
 		public decimal? Price{ get; set; }
 		
-		//TODO 3717: image
-		// image
-		// {
-		// 	id
-		// 		url
-		// }
+		[ DataMember( Name = "image" ) ]
+		public Image Image{ get; set; }
 		
 		[ DataMember( Name = "updatedAt" ) ]
 		public DateTime? UpdatedAt{ get; set; }

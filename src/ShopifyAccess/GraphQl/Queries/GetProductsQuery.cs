@@ -31,7 +31,6 @@ namespace ShopifyAccess.GraphQl.Queries
 								price
 								image
 								{
-									id
 									url
 								}
 								updatedAt
@@ -42,8 +41,14 @@ namespace ShopifyAccess.GraphQl.Queries
 						{
 							nodes
 							{
-								id
 								mediaContentType
+								preview
+								{
+									image
+									{
+										url
+									}
+								}
 							}
 						}
 						productType
@@ -57,5 +62,7 @@ namespace ShopifyAccess.GraphQl.Queries
 					}
 				}
 			}";
+		
+		//TODO Update deserialization for mediaContentType and other image related changes (removed ids)
 	}
 }

@@ -77,11 +77,11 @@ namespace ShopifyAccess
 		Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark );
 
 		/// <summary>
-		/// Get all existing products async (through locations)
+		/// Get all product variants for inventory (through locations)
 		/// </summary>
 		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		/// <returns>Products with variants (inventory items)</returns>
+		/// <returns>Product variants (inventory items)</returns>
 		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryAsync( CancellationToken token, Mark mark );
 
 		/// <summary>

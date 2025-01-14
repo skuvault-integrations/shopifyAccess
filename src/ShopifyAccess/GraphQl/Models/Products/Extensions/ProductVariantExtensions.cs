@@ -1,4 +1,5 @@
 using ShopifyAccess.GraphQl.Models.Common;
+using ShopifyAccess.Misc;
 using ShopifyAccess.Models.ProductVariant;
 
 namespace ShopifyAccess.GraphQl.Models.Products.Extensions
@@ -17,7 +18,7 @@ namespace ShopifyAccess.GraphQl.Models.Products.Extensions
 				Weight = ( decimal )(productVariant.InventoryItem?.Measurement?.Weight?.Value ?? default),
 				WeightUnit = productVariant.InventoryItem?.Measurement?.Weight?.UnitStandardized ?? WeightUnit.POUNDS,
 				Price = productVariant.Price ?? default,
-				//TODO GUARD-3717: Add image id, url, as needed
+				ImageUrl = productVariant.Image?.Url?.GetUrlWithoutQueryPart(),
 				UpdatedAt = productVariant.UpdatedAt ?? default
 			};
 		}

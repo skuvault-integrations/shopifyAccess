@@ -14,15 +14,8 @@ namespace ShopifyAccess.GraphQl.Models.Products
 		[ DataMember( Name = "vendor" ) ]
 		public string Vendor{ get; set; }
 		
-		//TODO GUARD-3717: Images if needed
-		// media(first: 250)
-		// {
-		// 	nodes
-		// 	{
-		// 		id
-		// 			mediaContentType
-		// 	}
-		// }
+		[ DataMember( Name = "media" ) ]
+		public Nodes< Common.Media > Media{ get; set; }
 
 		[ DataMember( Name = "productType" ) ]
 		public string ProductType{ get; set; }

@@ -16,12 +16,12 @@ namespace ShopifyAccessTests.Products
 	{
 		private static readonly Mark _mark = Mark.Create;
 		
-		//TODO GUARD-3717: Move to GraphQL folder all tests of GetProductsCreatedAfterAsync, GetProductsCreatedBeforeButUpdatedAfterAsync, GetProductVariantsInventoryReportBySkusAsync
+		//TODO GUARD-3717 [Refactor] Move to GraphQL folder all tests of GetProductsCreatedAfterAsync, GetProductsCreatedBeforeButUpdatedAfterAsync, GetProductVariantsInventoryReportBySkusAsync
 		[ Test ]
 		[ Explicit ]
 		public async Task GetProductsCreatedAfterAsync()
 		{
-			var productsStartUtc = DateTime.Parse( "2025-01-12T17:14:34Z" ); 
+			var productsStartUtc = DateTime.Parse( "2025-01-06T17:14:34Z" ); 
 
 			var products = await this.Service.GetProductsCreatedAfterAsync( productsStartUtc, CancellationToken.None, _mark );
 
