@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using ShopifyAccess.GraphQl.Models.Common;
 using ShopifyAccess.Models.Product;
 
 namespace ShopifyAccess.Models.ProductVariant
 {
+	//TODO GUARD-3717: Once convert product-related REST calls to GraphQL, remove all [ Data* ] attributes since this will not be directly deserialized from GraphQL
 	[ DataContract ]
 	public class ShopifyProductVariant
 	{
@@ -15,6 +17,7 @@ namespace ShopifyAccess.Models.ProductVariant
 		private string RawInventoryManagement{ get; set; }
 		
 		[ JsonIgnore ]
+		//TODO GUARD-3717: This isn't needed since switch to GraphQL, since InventoryLevels & InventoryItemId are used instead
 		public InventoryManagementEnum InventoryManagement
 		{
 			get
@@ -50,11 +53,7 @@ namespace ShopifyAccess.Models.ProductVariant
 		public decimal Weight{ get; set; }
 
 		[ DataMember( Name = "weight_unit" ) ]
-		public string WeightUnit{ get; set; }
-		public string WeightUnitStandardized
-		{
-			get { return this.WeightUnit != null ? this.WeightUnit.Replace( "kg", "kgs" ).Replace( "lb", "lbs" ) : "lbs"; }
-		}
+		public WeightUnit WeightUnit{ get; set; }
 
 		[ DataMember( Name = "price" ) ]
 		public decimal Price{ get; set; }

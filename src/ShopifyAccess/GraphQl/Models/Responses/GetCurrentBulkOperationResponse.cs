@@ -6,10 +6,8 @@ namespace ShopifyAccess.GraphQl.Models.Responses
 	/// While the operation is running, we can poll to see its progress using the currentBulkOperation command
 	/// </summary>
 	[ DataContract ]
-	internal class GetCurrentBulkOperationResponse: BaseGraphQlResponse
+	internal class GetCurrentBulkOperationResponse: BaseGraphQlResponse< CurrentBulkOperationData >
 	{
-		[ DataMember( Name = "data" ) ]
-		public CurrentBulkOperationData Data{ get; set; }
 	}
 
 	[ DataContract ]

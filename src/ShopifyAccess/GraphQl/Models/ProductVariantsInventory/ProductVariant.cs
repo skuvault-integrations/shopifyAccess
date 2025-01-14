@@ -19,10 +19,10 @@ namespace ShopifyAccess.GraphQl.Models.ProductVariantsInventory
 		[ DataMember( Name = "inventoryItem" ) ]
 		public InventoryItem InventoryItem{ get; set; } = new InventoryItem();
 
-		public ShopifyProductVariant ToShopifyProductVariant()
+		public ShopifyProductVariant ToShopifyProductVariantForInventory()
 		{
 			var inventoryItemId = GraphQlIdParser.InventoryItem.GetId( this.InventoryItem?.InventoryItemId );
-			return new ShopifyProductVariant()
+			return new ShopifyProductVariant
 			{
 				Id = GraphQlIdParser.ProductVariant.GetId( this.ProductVariantId ),
 				Sku = this.Sku,

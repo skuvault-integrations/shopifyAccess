@@ -106,7 +106,7 @@ namespace ShopifyAccess
 		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns>Products with variants (inventory items)</returns>
-		Task< ShopifyProducts > GetProductsInventoryAsync( CancellationToken token, Mark mark = null );
+		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryAsync( CancellationToken token, Mark mark );
 
 		/// <summary>
 		/// Get the list of product variants for specified SKUs
