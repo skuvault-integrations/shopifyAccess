@@ -39,6 +39,7 @@ namespace ShopifyAccess
 		private readonly ShopifyGraphQlThrottler _graphQlThrottler;
 
 		// Separate throttler for updating to save limit for other syncs
+		private readonly ShopifyThrottler _productUpdateThrottler = new ShopifyThrottler( 30 );
 		private readonly ShopifyThrottlerAsync _productUpdateThrottlerAsync = new ShopifyThrottlerAsync( 30 );
 		private readonly ShopifyTimeouts _timeouts;
 		private readonly ShopifyCommandFactory _shopifyCommandFactory;
@@ -204,6 +205,38 @@ namespace ShopifyAccess
 		#endregion
 
 		#region Products
+		public ShopifyProducts GetProducts( CancellationToken token, Mark mark = null )
+		{
+			mark = mark.CreateNewIfBlank();
+
+			var timeout = this._timeouts[ ShopifyOperationEnum.GetProducts ];
+			var products = this.CollectProductsFromAllPages( token, mark, timeout );
+			this.RemoveUntrackedProductVariants( products );
+			var inventoryLevels = this.CollectInventoryLevelsFromAllPages( token, mark, products.Products.SelectMany( x => x.Variants.Select( t => t.InventoryItemId ) ).ToArray(), timeout );
+
+			foreach( var product in products.Products )
+			foreach( var variant in product.Variants )
+			{
+				var inventoryLevelsModelOfInventoryItemId = new List< ShopifyInventoryLevelModel >();
+				if( !inventoryLevels.InventoryLevels.TryGetValue( variant.InventoryItemId, out inventoryLevelsModelOfInventoryItemId ) )
+					continue;
+
+				var inventoryLevelsOfInventoryItemId = inventoryLevelsModelOfInventoryItemId.Select( x => x.ToShopifyInventoryLevel( variant.InventoryItemId ) ).ToList();
+
+				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevelsOfInventoryItemId };
+				variant.InventoryLevels = inventoryLevelsForVariant;
+			}
+
+			RemoveQueryPartFromProductsImagesUrl( products );
+
+			return products;
+		}
+
+		public async Task< ShopifyProducts > GetProductsAsync( CancellationToken token, Mark mark = null )
+		{
+			return await this.GetProductsCreatedAfterAsync( DateTime.MinValue, token, mark );
+		}
+		
 		public async Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark, $"productsStartUtc: '{productsStartUtc}'" );
@@ -282,6 +315,31 @@ namespace ShopifyAccess
 			return productVariants;
 		}
 
+		public ShopifyProducts GetProductsInventory( CancellationToken token, Mark mark = null )
+		{
+			mark = mark.CreateNewIfBlank();
+
+			var products = this.CollectProductsFromAllPages( token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] );
+			var locations = this.GetLocations( token, mark );
+			this.RemoveUntrackedProductVariants( products );
+			var inventoryLevels = this.CollectInventoryLevelsFromAllPages( token, mark, locations, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] );
+
+			foreach( var product in products.Products )
+			foreach( var variant in product.Variants )
+			{
+				var inventoryLevelsModelOfInventoryItemId = new List< ShopifyInventoryLevelModel >();
+				if( !inventoryLevels.InventoryLevels.TryGetValue( variant.InventoryItemId, out inventoryLevelsModelOfInventoryItemId ) )
+					continue;
+
+				var inventoryLevelsOfInventoryItemId = inventoryLevelsModelOfInventoryItemId.Select( x => x.ToShopifyInventoryLevel( variant.InventoryItemId ) ).ToList();
+
+				var inventoryLevelsForVariant = new ShopifyInventoryLevels { InventoryLevels = inventoryLevelsOfInventoryItemId };
+				variant.InventoryLevels = inventoryLevelsForVariant;
+			}
+
+			return products;
+		}
+		
 		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark )
 		{
 			var productVariants = await this.GetAllProductVariantsInventoryAsync( mark, token );
@@ -440,7 +498,62 @@ namespace ShopifyAccess
 				ShopifyLogger.LogOperationEnd( this._shopName, mark );
 			}
 		}
+		
+		private ShopifyProducts CollectProductsFromAllPages( CancellationToken token, Mark mark, int timeout )
+		{
+			var products = new ShopifyProducts();
+			var endpoint = EndpointsBuilder.CreateGetEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
 
+			do
+			{
+				var productsWithinPage = ActionPolicies.GetPolicy( mark, this._shopName, token ).Get(
+					() => this._throttler.Execute(
+						() => this._webRequestServices.GetResponsePage< ShopifyProducts >( _shopifyCommandFactory.CreateGetProductsCommand(), endpoint, token, mark, timeout ) ) );
+
+				if( productsWithinPage.Response.Products.Count == 0 )
+					break;
+
+				products.Products.AddRange( productsWithinPage.Response.Products );
+
+				endpoint = productsWithinPage.NextPageQueryStr;
+			} while( endpoint != string.Empty );
+
+			return products;
+		}
+
+		private async Task< ShopifyProducts > CollectProductsFromAllPagesAsync( Mark mark, CancellationToken token )
+		{
+			var noFilter = new ProductsDateFilter { FilterType = FilterType.None };
+
+			return await this.CollectProductsFromAllPagesAsync( noFilter, mark, token );
+		}
+
+		private async Task< ShopifyProducts > CollectProductsFromAllPagesAsync( ProductsDateFilter productsDateFilter, Mark mark, CancellationToken token )
+		{
+			var products = new ShopifyProducts();
+			var endpoint = EndpointsBuilder.CreateGetEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) );
+
+			if( productsDateFilter.FilterType != FilterType.None )
+			{
+				endpoint += EndpointsBuilder.AppendGetProductsFilteredByDateEndpoint( productsDateFilter, endpoint );
+			}
+
+			do
+			{
+				var productsWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
+					() => this._throttlerAsync.ExecuteAsync(
+						() => this._webRequestServices.GetResponsePageAsync< ShopifyProducts >( _shopifyCommandFactory.CreateGetProductsCommand(), endpoint, token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ) ) );
+				if( productsWithinPage.Response.Products.Count == 0 )
+					break;
+
+				products.Products.AddRange( productsWithinPage.Response.Products );
+
+				endpoint = productsWithinPage.NextPageQueryStr;
+			} while( endpoint != string.Empty );
+
+			return products;
+		}
+		
 		private void ConvertToShopifyInventoryLevelsModel( ShopifyInventoryLevelsModel inventoryLevels, ShopifyInventoryLevels productsWithinPage )
 		{
 			var productsWithinPageGroupByInventoryItemId = productsWithinPage.InventoryLevels
@@ -568,6 +681,14 @@ namespace ShopifyAccess
 			return inventoryLevels;
 		}
 
+		private void RemoveUntrackedProductVariants( ShopifyProducts products )
+		{
+			foreach( var product in products.Products )
+			{
+				product.Variants.RemoveAll( v => v.InventoryManagement == InventoryManagementEnum.Blank );
+			}
+		}
+		
 		private static void RemoveUntrackedProductVariants( List< ShopifyProductVariant > productVariants )
 		{
 			productVariants.RemoveAll( v => v.InventoryManagement == InventoryManagementEnum.Blank );
@@ -589,10 +710,30 @@ namespace ShopifyAccess
 		#endregion
 
 		#region Update variants
+		public void UpdateInventoryLevels( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, CancellationToken token, Mark mark = null )
+		{
+			mark = mark.CreateNewIfBlank();
+			foreach( var inventoryLevel in inventoryLevels )
+				this.UpdateInventoryLevelQuantity( inventoryLevel, token, mark );
+		}
+		
 		public async Task UpdateInventoryLevelsAsync( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, CancellationToken token, Mark mark )
 		{
 			foreach( var inventoryLevel in inventoryLevels )
 				await this.UpdateInventoryLevelQuantityAsync( inventoryLevel, token, mark );
+		}
+
+		private void UpdateInventoryLevelQuantity( ShopifyInventoryLevelForUpdate variant, CancellationToken token, Mark mark )
+		{
+			//just simpliest way to serialize with the root name.
+			var jsonContent = variant.ToJson();
+
+			ActionPolicies.SubmitPolicy( mark, this._shopName, token ).Do( () =>
+				this._productUpdateThrottler.Execute( () =>
+				{
+					this._webRequestServices.PostData< ShopifyInventoryLevelForUpdateResponse >( _shopifyCommandFactory.CreateUpdateInventoryLevelsCommand(), jsonContent, token, mark, this._timeouts[ ShopifyOperationEnum.UpdateInventory ] );
+					return true;
+				} ) );
 		}
 
 		private async Task UpdateInventoryLevelQuantityAsync( ShopifyInventoryLevelForUpdate variant, CancellationToken token, Mark mark )
