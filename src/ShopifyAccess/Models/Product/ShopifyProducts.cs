@@ -1,14 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
 using ShopifyAccess.Models.ProductVariant;
 
 namespace ShopifyAccess.Models.Product
 {
-	//TODO GUARD-3717 [Cleanup] Remove all [ Data* ] attributes since this will not be directly deserialized from GraphQL
-	[ DataContract ]
 	public class ShopifyProducts
 	{
-		[ DataMember( Name = "products" ) ]
 		public List< ShopifyProduct > Products { get; set; }
 
 		public ShopifyProducts()

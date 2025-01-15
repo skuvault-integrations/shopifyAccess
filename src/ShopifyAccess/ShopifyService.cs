@@ -7,7 +7,6 @@ using CuttingEdge.Conditions;
 using Netco.Extensions;
 using ServiceStack;
 using ShopifyAccess.GraphQl;
-using ShopifyAccess.GraphQl.Models;
 using ShopifyAccess.GraphQl.Models.Products;
 using ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions;
 using ShopifyAccess.GraphQl.Models.Responses;
@@ -42,6 +41,7 @@ namespace ShopifyAccess
 		private readonly ShopifyThrottlerAsync _productUpdateThrottlerAsync = new ShopifyThrottlerAsync( 30 );
 		private readonly ShopifyTimeouts _timeouts;
 		private readonly ShopifyCommandFactory _shopifyCommandFactory;
+		private readonly GraphQlPaginationService _graphQlPaginationService;
 
 		/// <summary>
 		///	Last service's network activity time. Can be used to monitor service's state.
@@ -60,11 +60,12 @@ namespace ShopifyAccess
 			Condition.Requires( operationsTimeouts, "operationsTimeouts" ).IsNotNull();
 			Condition.Requires( shopifyCommandFactory, "shopifyCommandFactory" ).IsNotNull();
 
+			this._shopName = clientCredentials.ShopName;
 			this._webRequestServices = new WebRequestServices( clientCredentials );
 			this._shopifyCommandFactory = shopifyCommandFactory;
 			this._reportGenerator = new ReportGenerator( clientCredentials.ShopName, this._webRequestServices, this._shopifyCommandFactory );
 			this._graphQlThrottler = new ShopifyGraphQlThrottler( clientCredentials.ShopName );
-			this._shopName = clientCredentials.ShopName;
+			this._graphQlPaginationService = new GraphQlPaginationService( this._graphQlThrottler, this._shopName ); 
 			this._timeouts = operationsTimeouts;
 		}
 
@@ -204,13 +205,14 @@ namespace ShopifyAccess
 		#endregion
 
 		#region Products
+		//TODO GUARD-3717 [Cleanup] Potentially extract to ShopifyProductsService
 		public async Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark, $"productsStartUtc: '{productsStartUtc}'" );
 
 			try
 			{
-				var response = await this.GetAllPagesAsync< GetProductsData, Product >( 
+				var response = await this._graphQlPaginationService.GetAllPagesAsync< GetProductsData, Product >( 
 					async (nextCursor) => await this._webRequestServices.PostDataAsync< GetProductsResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
 						QueryBuilder.GetProductsCreatedOnOrAfterRequest( productsStartUtc, nextCursor ),
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
@@ -224,6 +226,7 @@ namespace ShopifyAccess
 			}
 		}
 		
+		//TODO GUARD-3717 [Cleanup] Potentially extract to ShopifyProductsService
 		public async Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark, $"productsStartUtc: '{productsStartUtc}'" );
@@ -235,7 +238,7 @@ namespace ShopifyAccess
 
 			try
 			{
-				var response = await this.GetAllPagesAsync< GetProductsData, Product >( 
+				var response = await this._graphQlPaginationService.GetAllPagesAsync< GetProductsData, Product >( 
 					async (nextCursor) => await this._webRequestServices.PostDataAsync< GetProductsResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
 						QueryBuilder.GetProductsCreatedBeforeButUpdatedAfter( productsStartUtc, nextCursor ),
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
@@ -299,13 +302,14 @@ namespace ShopifyAccess
 			return productVariants;
 		}
 
+		//TODO GUARD-3717 [Cleanup] Potentially extract to ShopifyInventoryService
 		private async Task< List< ProductVariant > > GetProductVariantsInventoryReportBySkuAsync( string sku, int locationsCount, Mark mark, CancellationToken token )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark, $"Sku: '{sku}'" );
 
 			try
 			{
-				return await this.GetAllPagesAsync< GetProductVariantsInventoryData, ProductVariant >( 
+				return await this._graphQlPaginationService.GetAllPagesAsync< GetProductVariantsInventoryData, ProductVariant >( 
 					async (nextCursor) => await this._webRequestServices.PostDataAsync< GetProductVariantsInventoryResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
 						QueryBuilder.GetProductVariantInventoryBySkuRequest( sku, nextCursor, locationsCount ),
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] ),
@@ -315,47 +319,6 @@ namespace ShopifyAccess
 			{
 				ShopifyLogger.LogOperationEnd( this._shopName, mark );
 			}
-		}
-
-		//TODO GUARD-3717 [Refactor] Extract into a GraphQlPaginationService & add tests
-		// Constructor should take everything this._...
-		/// <summary>
-		/// Get all pages of multi-page responses
-		/// </summary>
-		/// <param name="sendRequestAsync"></param>
-		/// <param name="mark"></param>
-		/// <param name="token"></param>
-		/// <typeparam name="TData">GraphQL response "data" element type</typeparam>
-		/// <typeparam name="TResponseItem"></typeparam>
-		/// <returns></returns>
-		private async Task< List< TResponseItem > > GetAllPagesAsync< TData, TResponseItem >( Func< string, Task< GraphQlResponseWithPages< TData, TResponseItem > > > sendRequestAsync, Mark mark, CancellationToken token )
-		{
-			string nextCursor = null;
-
-			var result = new List< TResponseItem >();
-			do
-			{
-				var response = await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
-					() => this._graphQlThrottler.ExecuteWithPaginationAsync(
-						async () => await sendRequestAsync( nextCursor ),
-						mark )
-				).ConfigureAwait( false );
-
-				var itemsAndPagingInfo = response.GetItemsAndPagingInfo();
-				
-				result.AddRange( itemsAndPagingInfo.Items );
-
-				if( itemsAndPagingInfo.PageInfo.HasNextPage )
-				{
-					nextCursor = itemsAndPagingInfo.PageInfo.EndCursor;
-				}
-				else
-				{
-					break;
-				}
-			} while( true );
-
-			return result;
 		}
 
 		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark )
@@ -412,13 +375,14 @@ namespace ShopifyAccess
 			return ( variant?.InventoryItem?.Tracked ?? false ) && !string.IsNullOrEmpty( variant.Sku );
 		}
 
+		//TODO GUARD-3717 [Cleanup] Potentially extract to ShopifyInventoryService
 		private async Task< List< ShopifyProductVariant > > GetAllProductVariantsInventoryAsync( Mark mark, CancellationToken token )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark );
 			
 			try
 			{
-				var response = await this.GetAllPagesAsync< GetProductVariantsInventoryData, ProductVariant >( 
+				var response = await this._graphQlPaginationService.GetAllPagesAsync< GetProductVariantsInventoryData, ProductVariant >( 
 					async (nextCursor) => await this._webRequestServices.PostDataAsync< GetProductVariantsInventoryResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
 						QueryBuilder.GetAllProductVariants( nextCursor ),
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] ),
@@ -504,11 +468,6 @@ namespace ShopifyAccess
 			}
 
 			return inventoryLevels;
-		}
-
-		private static void RemoveUntrackedProductVariants( List< ShopifyProductVariant > productVariants )
-		{
-			productVariants.RemoveAll( v => v.InventoryManagement == InventoryManagementEnum.Blank );
 		}
 		#endregion
 

@@ -16,7 +16,6 @@ namespace ShopifyAccessTests.Products
 	{
 		private static readonly Mark _mark = Mark.Create;
 		
-		//TODO GUARD-3717 [Refactor] Move to GraphQL folder all tests of GetProductsCreatedAfterAsync, GetProductsCreatedBeforeButUpdatedAfterAsync, GetProductVariantsInventoryReportBySkusAsync
 		[ Test ]
 		[ Explicit ]
 		public async Task GetProductsCreatedAfterAsync()
@@ -37,14 +36,6 @@ namespace ShopifyAccessTests.Products
 			var products = await this.Service.GetProductsCreatedBeforeButUpdatedAfterAsync( productsStartUtc, CancellationToken.None, _mark );
 
 			Assert.That( products.Products, Is.Not.Empty );
-		}
-
-		[ Test ]
-		public async Task GetProductsCreatedAfterAsync_GetsVariationsWithUntrackedQuantity()
-		{
-			var products = await this.Service.GetProductsCreatedAfterAsync( DateTime.MinValue, CancellationToken.None, _mark );
-
-			products.Products.Any( p => p.Variants.Any( v => v.InventoryManagement == InventoryManagementEnum.Blank ) );
 		}
 
 		[ Test ]
