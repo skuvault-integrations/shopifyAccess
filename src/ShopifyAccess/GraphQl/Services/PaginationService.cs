@@ -8,18 +8,17 @@ using ShopifyAccess.Models;
 
 namespace ShopifyAccess.GraphQl.Services
 {
-	internal class GraphQlPaginationService
+	internal class PaginationService
 	{
 		private readonly ShopifyGraphQlThrottler _graphQlThrottler;
 		private readonly string _shopName;
 
-		public GraphQlPaginationService( ShopifyGraphQlThrottler graphQlThrottler, string shopName )
+		public PaginationService( ShopifyGraphQlThrottler graphQlThrottler, string shopName )
 		{
 			this._graphQlThrottler = graphQlThrottler;
 			this._shopName = shopName;
 		}
 
-		//TODO GUARD-3717 Add tests
 		/// <summary>
 		/// Get all pages of multi-page responses
 		/// </summary>

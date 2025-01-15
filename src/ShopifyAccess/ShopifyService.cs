@@ -41,7 +41,7 @@ namespace ShopifyAccess
 		private readonly ShopifyThrottlerAsync _productUpdateThrottlerAsync = new ShopifyThrottlerAsync( 30 );
 		private readonly ShopifyTimeouts _timeouts;
 		private readonly ShopifyCommandFactory _shopifyCommandFactory;
-		private readonly GraphQlPaginationService _graphQlPaginationService;
+		private readonly PaginationService _graphQlPaginationService;
 
 		/// <summary>
 		///	Last service's network activity time. Can be used to monitor service's state.
@@ -65,7 +65,7 @@ namespace ShopifyAccess
 			this._shopifyCommandFactory = shopifyCommandFactory;
 			this._reportGenerator = new ReportGenerator( clientCredentials.ShopName, this._webRequestServices, this._shopifyCommandFactory );
 			this._graphQlThrottler = new ShopifyGraphQlThrottler( clientCredentials.ShopName );
-			this._graphQlPaginationService = new GraphQlPaginationService( this._graphQlThrottler, this._shopName ); 
+			this._graphQlPaginationService = new PaginationService( this._graphQlThrottler, this._shopName ); 
 			this._timeouts = operationsTimeouts;
 		}
 
