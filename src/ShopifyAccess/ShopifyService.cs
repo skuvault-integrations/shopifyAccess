@@ -312,7 +312,6 @@ namespace ShopifyAccess
 		{
 			var productVariants = await this.GetAllProductVariantsInventoryAsync( mark, token );
 			var locations = await this.GetLocationsAsync( token, mark );
-			RemoveUntrackedProductVariants( productVariants );
 			var inventoryLevels = await this.CollectInventoryLevelsFromAllPagesAsync( mark, locations, token );
 
 			foreach( var variant in productVariants )
@@ -333,7 +332,6 @@ namespace ShopifyAccess
 		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark )
 		{
 			var productVariants = await this.GetAllProductVariantsInventoryAsync( mark, token );
-			RemoveUntrackedProductVariants( productVariants );
 
 			var variantIds = productVariants.Select( v => new { Sku = v.Sku.ToLowerInvariant(), v.InventoryItemId } );
 			var inventoryItemIds = skus.Select( s => s.ToLowerInvariant() ).Distinct()
@@ -462,9 +460,14 @@ namespace ShopifyAccess
 			}
 		}
 
+		/// <summary>
+		/// Filter out variants that have inventory untracked or empty SKU
+		/// </summary>
+		/// <param name="variant"></param>
+		/// <returns></returns>
 		private static bool FilterProductVariants( ProductVariant variant )
 		{
-			return variant.InventoryItem.Tracked && !string.IsNullOrEmpty( variant.Sku );
+			return ( variant?.InventoryItem?.Tracked ?? false ) && !string.IsNullOrEmpty( variant.Sku );
 		}
 
 		private async Task< List< ShopifyProductVariant > > GetAllProductVariantsInventoryAsync( Mark mark, CancellationToken token )
@@ -480,7 +483,7 @@ namespace ShopifyAccess
 					mark, token );
 				
 				return response?
-					.Where( x => x != null && !string.IsNullOrEmpty( x.Sku ) )
+					.Where( FilterProductVariants )
 					.Select( y => y.ToShopifyProductVariantForInventory() ).ToList() ?? new List< ShopifyProductVariant >();
 			}
 			finally
