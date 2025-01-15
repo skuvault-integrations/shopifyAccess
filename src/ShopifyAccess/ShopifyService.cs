@@ -507,20 +507,6 @@ namespace ShopifyAccess
 		{
 			productVariants.RemoveAll( v => v.InventoryManagement == InventoryManagementEnum.Blank );
 		}
-
-		private void RemoveQueryPartFromProductsImagesUrl( ShopifyProducts products )
-		{
-			foreach( var product in products.Products )
-			{
-				if ( product.Images == null )
-					return;
-			
-				foreach( var productImage in product.Images )
-				{
-					productImage.Src = productImage.Src.GetUrlWithoutQueryPart();
-				}
-			}
-		}
 		#endregion
 
 		#region Update variants
