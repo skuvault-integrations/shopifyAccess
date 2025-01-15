@@ -96,6 +96,7 @@
     <Compile Include="Cancellation\CancellationTokenTests.cs" />
     <Compile Include="ExtensionsTests.cs" />
     <Compile Include="GraphQl\Helpers\GraphQlIdParserTests.cs" />
+    <Compile Include="GraphQl\Models\Common\Extensions\MediaExtensionsTests.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventoryReport\Extensions\ProductVariantsInventoryReportParserTests.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventoryReport\ProductVariantTests.cs" />
     <Compile Include="GraphQl\Queries\QueryBuilderTests.cs" />
