@@ -48,7 +48,7 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
-		public async Task GetProductsThroughLocationsAsync()
+		public async Task GetProductVariantsInventoryAsync()
 		{
 			var productVariants = await this.Service.GetProductVariantsInventoryAsync( CancellationToken.None, _mark );
 
