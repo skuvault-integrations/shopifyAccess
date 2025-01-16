@@ -12,6 +12,7 @@ namespace ShopifyAccess.GraphQl.Models.Common.Extensions
 		/// </summary>
 		/// <param name="mediaItems"></param>
 		/// <returns></returns>
+		//TODO GUARD-3717 Add tests
 		internal static List< ShopifyProductImage > ToShopifyProductImages( this List< Media > mediaItems )
 		{
 			return mediaItems?.Where( x => x.MediaContentTypeStandardized == MediaContentType.IMAGE && !string.IsNullOrWhiteSpace( x.Preview?.Image?.Url ) )?
