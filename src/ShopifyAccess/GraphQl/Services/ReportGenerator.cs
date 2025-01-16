@@ -75,12 +75,12 @@ namespace ShopifyAccess.GraphQl.Services
 				var request = QueryBuilder.GetReportRequest( type );
 
 				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName, cancellationToken ).Get(
-					() => this._throttler.ExecuteAsync(
-						() => this._webRequestServices.PostDataAsync< BulkOperationRunQueryResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, cancellationToken, mark, GraphQlRequestTimeoutMs )
+					() => this._throttler.ExecuteAsync< BulkOperationRunQueryData >(
+						async () => await this._webRequestServices.PostDataAsync< BulkOperationRunQueryResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, cancellationToken, mark, GraphQlRequestTimeoutMs )
 						, mark )
 				).ConfigureAwait( false );
 
-				return result.Data?.BulkOperationRunQuery?.BulkOperation;
+				return result?.BulkOperationRunQuery?.BulkOperation;
 			}
 			finally
 			{
@@ -97,12 +97,12 @@ namespace ShopifyAccess.GraphQl.Services
 				var request = QueryBuilder.GetCurrentBulkOperationStatusRequest();
 
 				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName, cancellationToken ).Get(
-					() => this._throttler.ExecuteAsync(
-						() => this._webRequestServices.PostDataAsync< GetCurrentBulkOperationResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, cancellationToken, mark, GraphQlRequestTimeoutMs ),
+					() => this._throttler.ExecuteAsync< CurrentBulkOperationData >(
+						async () => await this._webRequestServices.PostDataAsync< GetCurrentBulkOperationResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, cancellationToken, mark, GraphQlRequestTimeoutMs ),
 						mark )
 				).ConfigureAwait( false );
 
-				return result.Data?.CurrentBulkOperation;
+				return result?.CurrentBulkOperation;
 			}
 			finally
 			{
@@ -120,12 +120,12 @@ namespace ShopifyAccess.GraphQl.Services
 				var request = QueryBuilder.GetBulkOperationStatusByIdRequest( gid );
 
 				var result = await ActionPolicies.GetPolicyAsync( mark, this._shopName, cancellationToken ).Get(
-					() => this._throttler.ExecuteAsync(
-						() => this._webRequestServices.PostDataAsync< GetBulkOperationByIdResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, cancellationToken, mark, GraphQlRequestTimeoutMs )
+					() => this._throttler.ExecuteAsync< BulkOperationByIdData >(
+						async () => await this._webRequestServices.PostDataAsync< GetBulkOperationByIdResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(), request, cancellationToken, mark, GraphQlRequestTimeoutMs )
 						, mark )
 				).ConfigureAwait( false );
 
-				return result.Data?.BulkOperation;
+				return result?.BulkOperation;
 			}
 			finally
 			{

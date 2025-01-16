@@ -5,6 +5,7 @@ using Netco.ThrottlerServices;
 using NUnit.Framework;
 using ShopifyAccess.GraphQl;
 using ShopifyAccess.GraphQl.Models;
+using ShopifyAccess.GraphQl.Models.ProductVariantsInventory;
 using ShopifyAccess.Models;
 
 namespace ShopifyAccessTests.GraphQl
@@ -20,7 +21,7 @@ namespace ShopifyAccessTests.GraphQl
 		{
 			// Arrange
 			var funcToThrottleCallCount = 0;
-			var funcToThrottle = new Func< Task< BaseGraphQlResponse > >( () =>
+			var funcToThrottle = new Func< Task< BaseGraphQlResponse< ProductVariant > > >( () =>
 			{
 				funcToThrottleCallCount++;
 				return Task.FromResult( this.GetBaseGraphQlResponse() );
@@ -38,7 +39,7 @@ namespace ShopifyAccessTests.GraphQl
 		{
 			// Arrange
 			var funcToThrottleCallCount = 0;
-			var funcToThrottle = new Func< Task< BaseGraphQlResponse > >( () =>
+			var funcToThrottle = new Func< Task< BaseGraphQlResponse< ProductVariant > > >( () =>
 			{
 				funcToThrottleCallCount++;
 				return Task.FromResult( this.GetThrottledErrorResponse() );
@@ -54,7 +55,7 @@ namespace ShopifyAccessTests.GraphQl
 		{
 			// Arrange
 			var funcToThrottleCallCount = 0;
-			var funcToThrottle = new Func< Task< BaseGraphQlResponse > >( () =>
+			var funcToThrottle = new Func< Task< BaseGraphQlResponse< ProductVariant > > >( () =>
 			{
 				funcToThrottleCallCount++;
 				return Task.FromResult( this.GetUnknownErrorResponse() );
@@ -70,7 +71,7 @@ namespace ShopifyAccessTests.GraphQl
 		{
 			// Arrange
 			var funcToThrottleCallCount = 0;
-			var funcToThrottle = new Func< Task< BaseGraphQlResponse > >( () =>
+			var funcToThrottle = new Func< Task< BaseGraphQlResponse< ProductVariant > > >( () =>
 			{
 				funcToThrottleCallCount++;
 				return Task.FromResult( funcToThrottleCallCount == 0 ? this.GetThrottledErrorResponse() : this.GetBaseGraphQlResponse() );
@@ -112,18 +113,18 @@ namespace ShopifyAccessTests.GraphQl
 			result.Should().Be( 2000 ); // 2 seconds
 		}
 
-		private BaseGraphQlResponse GetBaseGraphQlResponse()
+		private BaseGraphQlResponse< ProductVariant > GetBaseGraphQlResponse()
 		{
-			return new BaseGraphQlResponse
+			return new BaseGraphQlResponse< ProductVariant >
 			{
 				Errors = null,
-				Extensions = new GraphQlExtensions()
+				Extensions = new GraphQlExtensions
 				{
-					Cost = new Cost()
+					Cost = new Cost
 					{
 						ActualQueryCost = 1,
 						RequestedQueryCost = 1,
-						ThrottleStatus = new ThrottleStatus()
+						ThrottleStatus = new ThrottleStatus
 						{
 							CurrentlyAvailable = 1000,
 							MaximumAvailable = 1000,
@@ -134,7 +135,7 @@ namespace ShopifyAccessTests.GraphQl
 			};
 		}
 
-		private BaseGraphQlResponse GetThrottledErrorResponse()
+		private BaseGraphQlResponse< ProductVariant > GetThrottledErrorResponse()
 		{
 			var response = this.GetBaseGraphQlResponse();
 			response.Errors = new[]
@@ -152,7 +153,7 @@ namespace ShopifyAccessTests.GraphQl
 			return response;
 		}
 
-		private BaseGraphQlResponse GetUnknownErrorResponse()
+		private BaseGraphQlResponse< ProductVariant > GetUnknownErrorResponse()
 		{
 			var response = this.GetBaseGraphQlResponse();
 			response.Errors = new[]

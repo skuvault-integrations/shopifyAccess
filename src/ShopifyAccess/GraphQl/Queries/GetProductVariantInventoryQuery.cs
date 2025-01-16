@@ -12,7 +12,7 @@
 		///			It means it's safe to use $locationsCount here as first: param (the first param can't be more than 250)
 		/// Result: A page with a single product variant with inventory levels
 		/// </summary>
-		internal const string Query =
+		internal const string GetFirstVariantQuery =
 			@"query getProductVariantBySku($query: String, $after: String, $locationsCount: Int){
 				productVariants(first: 1, after: $after, query: $query) {
 					nodes {
@@ -22,6 +22,35 @@
 							id
 							tracked
 							inventoryLevels(first: $locationsCount) {
+								nodes {
+									location {
+										id
+										name
+									}
+									quantities(names: [""available""]) {
+										quantity
+									}
+								}
+							}
+						}
+					}
+					pageInfo {
+						endCursor
+						hasNextPage
+					}
+				}
+			}";
+		
+		internal const string GetAllVariantsQuery =
+			@"query getProductVariantBySku($first: Int, $after: String){
+				productVariants(first: $first, after: $after) {
+					nodes {
+						id
+						sku
+						inventoryItem {
+							id
+							tracked
+							inventoryLevels(first: 250) {
 								nodes {
 									location {
 										id

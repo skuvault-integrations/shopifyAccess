@@ -3,13 +3,22 @@
 namespace ShopifyAccess.GraphQl.Models
 {
 	[ DataContract ]
-	internal class BaseGraphQlResponse
+	internal class BaseGraphQlResponse< TData >
 	{
+		[ DataMember( Name = "data" ) ]
+		public TData Data{ get; set; }
+
 		[ DataMember( Name = "errors" ) ]
 		public GraphQlError[] Errors{ get; set; }
 
 		[ DataMember( Name = "extensions" ) ]
 		public GraphQlExtensions Extensions{ get; set; }
+	}
+	
+	[ DataContract ]
+	internal abstract class GraphQlResponseWithPages< TData, TItem > : BaseGraphQlResponse< TData >
+	{
+		public abstract Nodes< TItem > GetItemsAndPagingInfo();
 	}
 
 	[ DataContract ]

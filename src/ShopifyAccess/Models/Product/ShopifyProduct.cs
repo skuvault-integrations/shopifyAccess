@@ -5,12 +5,10 @@ using ShopifyAccess.Models.ProductVariant;
 
 namespace ShopifyAccess.Models.Product
 {
+	//TODO GUARD-3717 [Cleanup] Remove all [ Data* ] attributes since this will not be directly deserialized from GraphQL
 	[ DataContract ]
 	public class ShopifyProduct
 	{
-		[ DataMember( Name = "id" ) ]
-		public long Id { get; set; }
-
 		[ DataMember( Name = "title" ) ]
 		public string Title { get; set; }
 
@@ -29,9 +27,6 @@ namespace ShopifyAccess.Models.Product
 		[ DataMember( Name = "body_html" ) ]
 		public string BodyHtml { get; set; }
 		
-		[ DataMember( Name = "tags" ) ]
-		public string Tags { get; set; }
-
 		[ DataMember( Name = "updated_at" ) ]
 		public DateTime UpdatedAt { get; set; }
 	}
