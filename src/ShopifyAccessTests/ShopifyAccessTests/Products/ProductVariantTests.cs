@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using GraphQlClientGenerator;
 using NUnit.Framework;
 using ShopifyAccess.Models;
 using ShopifyAccess.Models.Product;
@@ -125,6 +126,17 @@ namespace ShopifyAccessTests.Products
 			// Assert
 			productVariants.Should().NotBeEmpty();
 			this.ValidateIfEqual( productVariants, products );
+		}
+		
+		[ Test ]
+		[ Explicit ]
+		public async Task GenerateGraphQlClient()
+		{
+			var url = "https://shopify.dev/admin-graphql-direct-proxy/2024-04";
+			var schema = await GraphQlGenerator.RetrieveSchema(url);
+			var generator = new GraphQlGenerator();
+			//A massive 138,000+ line file
+			var generatedShopifyGraphQlClient = generator.GenerateFullClientCSharpFile(schema, "ShopifyGraphQlClient");
 		}
 
 		[ Test ]
