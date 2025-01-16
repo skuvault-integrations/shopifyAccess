@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -15,15 +16,48 @@ namespace ShopifyAccessTests.GraphQl.Services
 	public class PaginationServiceTests
 	{
 		private static readonly Randomizer _randomizer = new Randomizer();
+		private PaginationService _service;
 		
-		[ Test ]
-		public async Task GetAllPagesAsync_ShouldRequestMorePages_WhenResponseIndicatesThereAreMorePages()
+		[ SetUp ]
+		public void Init()
 		{
-			// Arrange
 			var shopName = _randomizer.GetString();
 			var graphQlThrottler = new ShopifyGraphQlThrottler( shopName );
-			var service = new PaginationService( graphQlThrottler, shopName );
-			var getProductsResponse = new GetProductsResponse
+			this._service = new PaginationService( graphQlThrottler, shopName );
+		}
+		
+		[ Test ]
+		public async Task GetAllPagesAsync_ShouldGetItemsFromAllPages_WhenResponseIndicatesThereAreMorePages()
+		{
+			// Arrange
+			var product1Title = "product1";
+			var cursorForSecondPage = _randomizer.GetString();
+			var getProductsResponse1 = this.CreateGetProductsResponse( product1Title, hasNextPage: true, cursorForSecondPage );
+			var product2Title = "product2";
+			var getProductsResponse2 = this.CreateGetProductsResponse( product2Title, hasNextPage: false );
+			var getProductsResponses = new List< GetProductsResponse > { getProductsResponse1, getProductsResponse2 };
+			
+			var sendRequestDelegateMocker = new GetProductsResponseMocker( getProductsResponses );
+			
+			// Act
+			var result = await this._service.GetAllPagesAsync( sendRequestDelegateMocker.GetResponseAsync, Mark.Create, CancellationToken.None );
+
+			// Assert
+			Assert.Multiple( () =>
+			{
+				Assert.That( result, Has.Count.EqualTo( getProductsResponses.Count ) );
+				Assert.That( result[ 0 ].Title, Is.EqualTo( product1Title ) );
+				Assert.That( result[ 1 ].Title, Is.EqualTo( product2Title ) );
+				Assert.That( sendRequestDelegateMocker.EndCursorsReceived.Count, Is.EqualTo( getProductsResponses.Count ) );
+				Assert.That( sendRequestDelegateMocker.EndCursorsReceived[ 1 ], Is.EqualTo( cursorForSecondPage ) );
+			} );
+		}
+
+		//TODO GUARD-3717 GetAllPagesAsync_ShouldNotRequestMorePages_WhenResponseIndicatesThereAreNoMorePages
+		
+		private GetProductsResponse CreateGetProductsResponse( string productTitle, bool hasNextPage = false, string endCursor = null)
+		{
+			return new GetProductsResponse
 			{
 				Data = new GetProductsData
 				{
@@ -33,40 +67,21 @@ namespace ShopifyAccessTests.GraphQl.Services
 						{
 							new Product
 							{
-								//TODO Return different ones on the 2 pages, to then assert
-								Title = "Product1"
+								Title = productTitle
 							}
 						},
 						PageInfo = new PageInfo
 						{
-							//TODO Somehow on the 1st call return a response with HasNextPage = true & nextCursor
-							//   On the 2nd call return a response with HasNextPage = false
-							//Currently, an infinite loop because there's always more pages
-							HasNextPage = true,
-							EndCursor = _randomizer.GetString()
+							HasNextPage = hasNextPage,
+							EndCursor = endCursor ?? _randomizer.GetString()
 						}
 					}
 				},
-				Extensions = MockQuotaRemaining()
+				Extensions = GetNonThrottledResponseExtensions()
 			};
-			getProductsResponse.GetItemsAndPagingInfo();
-			//TODO How to assert the number of calls and what cursor it received? Try NSubstitute
-			async Task< GraphQlResponseWithPages< GetProductsData, Product > > MockSendRequestDelegate( string nextCursor ) => await Task.FromResult( getProductsResponse );
-
-			// Act
-			var result = await service.GetAllPagesAsync( MockSendRequestDelegate, Mark.Create, CancellationToken.None );
-
-			// Assert
-			Assert.Multiple( () => {
-				//expected number of products from both pages
-				Assert.That( result, Has.Length.EqualTo( 2 ) );
-				//TODO Assert the product titles in the result
-			} );
 		}
-
-		//TODO GetAllPagesAsync_ShouldNotRequestMorePages_WhenResponseIndicatesThereAreNoMorePages
 		
-		private static GraphQlExtensions MockQuotaRemaining()
+		private static GraphQlExtensions GetNonThrottledResponseExtensions()
 		{
 			var requestedQueryCost = _randomizer.Next( 1, 10 );
 			return new GraphQlExtensions
@@ -82,6 +97,30 @@ namespace ShopifyAccessTests.GraphQl.Services
 					RequestedQueryCost = requestedQueryCost
 				}
 			};
+		}
+	}
+	
+	/// <summary>
+	/// Mocks sendRequestAsync responses based on the passed-in getProductsResponses
+	/// </summary>
+	internal class GetProductsResponseMocker
+	{
+		internal List< string > EndCursorsReceived { get; } = new List< string >();
+		private readonly GetProductsResponse [] _getProductsResponses;
+
+		public GetProductsResponseMocker( IEnumerable< GetProductsResponse > getProductsResponses )
+		{
+			this._getProductsResponses = getProductsResponses.ToArray();
+		}
+		
+		internal async Task< GraphQlResponseWithPages< GetProductsData, Product > > GetResponseAsync( string endCursor )
+		{
+			if ( this.EndCursorsReceived.Count > this._getProductsResponses.Length )
+			{
+				return null;
+			}
+			this.EndCursorsReceived.Add( endCursor );
+			return await Task.FromResult( this._getProductsResponses[ this.EndCursorsReceived.Count - 1 ] );
 		}
 	}
 }
