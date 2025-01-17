@@ -37,10 +37,10 @@ namespace ShopifyAccessTests.GraphQl.Services
 			var getProductsResponse2 = this.CreateGetProductsResponse( product2Title, hasNextPage: false );
 			var getProductsResponses = new List< GetProductsResponse > { getProductsResponse1, getProductsResponse2 };
 			
-			var sendRequestDelegateMocker = new GetProductsResponseMocker( getProductsResponses );
+			var getProductsResponseMocker = new GetProductsResponseMocker( getProductsResponses );
 			
 			// Act
-			var result = await this._service.GetAllPagesAsync( sendRequestDelegateMocker.GetResponseAsync, Mark.Create, CancellationToken.None );
+			var result = await this._service.GetAllPagesAsync( getProductsResponseMocker.GetResponseAsync, Mark.Create, CancellationToken.None );
 
 			// Assert
 			Assert.Multiple( () =>
@@ -48,14 +48,38 @@ namespace ShopifyAccessTests.GraphQl.Services
 				Assert.That( result, Has.Count.EqualTo( getProductsResponses.Count ) );
 				Assert.That( result[ 0 ].Title, Is.EqualTo( product1Title ) );
 				Assert.That( result[ 1 ].Title, Is.EqualTo( product2Title ) );
-				Assert.That( sendRequestDelegateMocker.EndCursorsReceived.Count, Is.EqualTo( getProductsResponses.Count ) );
-				Assert.That( sendRequestDelegateMocker.EndCursorsReceived[ 1 ], Is.EqualTo( cursorForSecondPage ) );
+				Assert.That( getProductsResponseMocker.EndCursorsReceived.Count, Is.EqualTo( getProductsResponses.Count ) );
+				Assert.That( getProductsResponseMocker.EndCursorsReceived[ 0 ], Is.Null );
+				Assert.That( getProductsResponseMocker.EndCursorsReceived[ 1 ], Is.EqualTo( cursorForSecondPage ) );
 			} );
 		}
 
-		//TODO GUARD-3717 GetAllPagesAsync_ShouldNotRequestMorePages_WhenResponseIndicatesThereAreNoMorePages
+		[ Test ]
+		public async Task GetAllPagesAsync_ShouldNotRequestMorePages_WhenResponseIndicatesThereAreNoMorePages()
+		{
+			// Arrange
+			var product1Title = "product1";
+			var getProductsResponse1 = this.CreateGetProductsResponse( product1Title, hasNextPage: false );
+			//This shouldn't be called since the above has no more pages
+			var getProductsResponse2 = this.CreateGetProductsResponse( hasNextPage: false );
+			var getProductsResponses = new List< GetProductsResponse > { getProductsResponse1, getProductsResponse2 };
+			
+			var getProductsResponseMocker = new GetProductsResponseMocker( getProductsResponses );
+			
+			// Act
+			var result = await this._service.GetAllPagesAsync( getProductsResponseMocker.GetResponseAsync, Mark.Create, CancellationToken.None );
+
+			// Assert
+			Assert.Multiple( () =>
+			{
+				//Only one product received since the initial response indicated there are no more pages
+				Assert.That( result, Has.Count.EqualTo( 1 ) );
+				Assert.That( result[ 0 ].Title, Is.EqualTo( product1Title ) );
+				Assert.That( getProductsResponseMocker.EndCursorsReceived.Count, Is.EqualTo( 1 ) );
+			} );
+		}
 		
-		private GetProductsResponse CreateGetProductsResponse( string productTitle, bool hasNextPage = false, string endCursor = null)
+		private GetProductsResponse CreateGetProductsResponse( string productTitle = null, bool hasNextPage = false, string endCursor = null)
 		{
 			return new GetProductsResponse
 			{
@@ -67,7 +91,7 @@ namespace ShopifyAccessTests.GraphQl.Services
 						{
 							new Product
 							{
-								Title = productTitle
+								Title = productTitle ?? _randomizer.GetString()
 							}
 						},
 						PageInfo = new PageInfo
@@ -101,21 +125,24 @@ namespace ShopifyAccessTests.GraphQl.Services
 	}
 	
 	/// <summary>
-	/// Mocks sendRequestAsync responses based on the passed-in getProductsResponses
+	/// Mocks sendRequestAsync paginated responses based on the passed-in getProductsResponses. Returns one product per page.
 	/// </summary>
 	internal class GetProductsResponseMocker
 	{
+		/// <summary>
+		/// Contains one item for each call received and the endCursor received in each call
+		/// </summary>
 		internal List< string > EndCursorsReceived { get; } = new List< string >();
-		private readonly GetProductsResponse [] _getProductsResponses;
+		private readonly List< GetProductsResponse> _getProductsResponses;
 
 		public GetProductsResponseMocker( IEnumerable< GetProductsResponse > getProductsResponses )
 		{
-			this._getProductsResponses = getProductsResponses.ToArray();
+			this._getProductsResponses = getProductsResponses.ToList();
 		}
 		
 		internal async Task< GraphQlResponseWithPages< GetProductsData, Product > > GetResponseAsync( string endCursor )
 		{
-			if ( this.EndCursorsReceived.Count > this._getProductsResponses.Length )
+			if ( this.EndCursorsReceived.Count > this._getProductsResponses.Count )
 			{
 				return null;
 			}
