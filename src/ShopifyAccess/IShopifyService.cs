@@ -59,29 +59,13 @@ namespace ShopifyAccess
 		Task< ShopifyLocations > GetActiveLocationsAsync( CancellationToken token, Mark mark = null );
 
 		/// <summary>
-		/// Get all existing products
-		/// </summary>
-		/// <param name="token"></param>
-		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		/// <returns>Products with variants (inventory items)</returns>
-		ShopifyProducts GetProducts( CancellationToken token, Mark mark = null );
-
-		/// <summary>
-		/// Get all existing products async
-		/// </summary>
-		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		/// <param name="token">CancellationToken</param>
-		/// <returns>Products with variants (inventory items)</returns>
-		Task< ShopifyProducts > GetProductsAsync( CancellationToken token, Mark mark = null );
-
-		/// <summary>
 		/// Get products created after the given date async
 		/// </summary>
 		/// <param name="productsStartUtc"></param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <param name="token">CancellationToken</param>
 		/// <returns>Products with variants (inventory items)</returns>
-		Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null );
+		Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark );
 
 		/// <summary>
 		/// Get products created before the given date but updated after async
@@ -90,15 +74,7 @@ namespace ShopifyAccess
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <param name="token">CancellationToken</param>
 		/// <returns>Products with variants (inventory items)</returns>
-		Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark = null );
-
-		/// <summary>
-		/// Get all existing products (through locations)
-		/// </summary>
-		/// <param name="token"></param>
-		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		/// <returns>Products with variants (inventory items)</returns>
-		ShopifyProducts GetProductsInventory( CancellationToken token, Mark mark = null );
+		Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark );
 
 		/// <summary>
 		/// Get all product variants for inventory (through locations)
@@ -115,7 +91,7 @@ namespace ShopifyAccess
 		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns>List of variants (inventory items)</returns>
-		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null );
+		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark );
 
 		/// <summary>
 		/// Get all existing product variants with inventory levels
@@ -124,7 +100,7 @@ namespace ShopifyAccess
 		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns>Product variants with inventory levels</returns>
-		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportAsync( CancellationToken token, Mark mark = null );
+		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportAsync( CancellationToken token, Mark mark );
 
 		/// <summary>
 		/// Get the list of product variants for specified SKUs
@@ -134,15 +110,7 @@ namespace ShopifyAccess
 		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <returns>List of variants (inventory items)</returns>
-		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark = null );
-
-		/// <summary>
-		///     Update inventory levels (inventory items)
-		/// </summary>
-		/// <param name="token">Cancellation tokens</param>
-		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		/// <param name="inventoryLevels"></param>
-		void UpdateInventoryLevels( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, CancellationToken token, Mark mark = null );
+		Task< List< ShopifyProductVariant > > GetProductVariantsInventoryReportBySkusAsync( IEnumerable< string > skus, CancellationToken token, Mark mark );
 
 		/// <summary>
 		///     Update inventory levels (inventory items) async
@@ -150,7 +118,7 @@ namespace ShopifyAccess
 		/// <param name="token">Cancellation tokens</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <param name="inventoryLevels"></param>
-		Task UpdateInventoryLevelsAsync( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, CancellationToken token, Mark mark = null );
+		Task UpdateInventoryLevelsAsync( IEnumerable< ShopifyInventoryLevelForUpdate > inventoryLevels, CancellationToken token, Mark mark );
 
 		/// <summary>
 		/// Get all users

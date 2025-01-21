@@ -5,8 +5,10 @@ using Netco.ThrottlerServices;
 using NUnit.Framework;
 using ShopifyAccess.GraphQl;
 using ShopifyAccess.GraphQl.Models;
-using ShopifyAccess.GraphQl.Models.ProductVariantsInventory;
+using ShopifyAccess.GraphQl.Models.Products;
+using ShopifyAccess.GraphQl.Models.Responses;
 using ShopifyAccess.Models;
+using ProductVariant = ShopifyAccess.GraphQl.Models.ProductVariantsInventory.ProductVariant;
 
 namespace ShopifyAccessTests.GraphQl
 {
@@ -85,6 +87,82 @@ namespace ShopifyAccessTests.GraphQl
 		}
 
 		[ Test ]
+		public async Task ExecuteWithPaginationAsync_ExecuteFunctionOneTime_WhenFunctionSuccess()
+		{
+			// Arrange
+			var funcToThrottleCallCount = 0;
+			var funcToThrottle = new Func< Task< GraphQlResponseWithPages< GetProductsData, Product > > >( () =>
+			{
+				funcToThrottleCallCount++;
+				return Task.FromResult( GetPaginatedGraphQlResponse() );
+			} );
+
+			// Act
+			await this._throttler.ExecuteWithPaginationAsync( funcToThrottle, Mark.Create );
+
+			// Assert
+			Assert.That( funcToThrottleCallCount, Is.EqualTo( 1 ) );
+		}
+
+		[ Test ]
+		public void ExecuteWithPaginationAsync_RetryMaxRetryCountAndThrowsThrottlerException_WhenFunctionFailedWithThrottledCode()
+		{
+			// Arrange
+			var funcToThrottleCallCount = 0;
+			var funcToThrottle = new Func< Task< GraphQlResponseWithPages< GetProductsData, Product > > >( () =>
+			{
+				funcToThrottleCallCount++;
+				return Task.FromResult( GetPaginatedThrottledErrorResponse() );
+			} );
+
+			// Act, Assert
+			Assert.Multiple( () => {
+				Assert.ThrowsAsync< ThrottlerException >( async () => {
+					await this._throttler.ExecuteWithPaginationAsync( funcToThrottle, Mark.Create );
+				} );
+				Assert.That( funcToThrottleCallCount, Is.EqualTo( MaxRetryCount ) );
+			});
+		}
+
+		[ Test ]
+		public void ExecuteWithPaginationAsync_ThrowsSystemException_WhenFunctionFailedWithUnknownError()
+		{
+			// Arrange
+			var funcToThrottleCallCount = 0;
+			var funcToThrottle = new Func< Task< GraphQlResponseWithPages< GetProductsData, Product > > >( () =>
+			{
+				funcToThrottleCallCount++;
+				return Task.FromResult( GetPaginatedUnknownErrorResponse() );
+			} );
+
+			// Act, Assert
+			Assert.Multiple( () => {
+				Assert.ThrowsAsync< SystemException >( async () => {
+					await this._throttler.ExecuteWithPaginationAsync( funcToThrottle, Mark.Create );
+				} );
+				Assert.That( funcToThrottleCallCount, Is.EqualTo( 1 ) );
+			});
+		}
+		
+		[ Test ]
+ 		public async Task ExecuteWithPaginationAsync_RetryAndReturnsResult_WhenFunctionFailedFirstTimeWithThrottledCode_AndSuccessSecondTime()
+		{
+			// Arrange
+			var funcToThrottleCallCount = 0;
+			var funcToThrottle = new Func< Task< GraphQlResponseWithPages< GetProductsData, Product > > >( () =>
+			{
+				funcToThrottleCallCount++;
+				return Task.FromResult( funcToThrottleCallCount == 0 ? GetPaginatedThrottledErrorResponse() : GetPaginatedGraphQlResponse() );
+			} );
+
+			// Act
+			await this._throttler.ExecuteWithPaginationAsync( funcToThrottle, Mark.Create );
+
+			// Assert
+			Assert.That( funcToThrottleCallCount, Is.EqualTo( 1 ) );
+		}
+
+		[ Test ]
 		public async Task WaitIfNeededAsync_DontWait_WhenCurrentlyAvailableMoreThanRequestedQueryCost()
 		{
 			// Arrange
@@ -134,6 +212,28 @@ namespace ShopifyAccessTests.GraphQl
 				}
 			};
 		}
+		
+		private static GraphQlResponseWithPages< GetProductsData, Product > GetPaginatedGraphQlResponse()
+		{
+			return new GetProductsResponse
+			{
+				Errors = null,
+				Extensions = new GraphQlExtensions
+				{
+					Cost = new Cost
+					{
+						ActualQueryCost = 1,
+						RequestedQueryCost = 1,
+						ThrottleStatus = new ThrottleStatus
+						{
+							CurrentlyAvailable = 1000,
+							MaximumAvailable = 1000,
+							RestoreRate = 50
+						}
+					}
+				}
+			};
+		}
 
 		private BaseGraphQlResponse< ProductVariant > GetThrottledErrorResponse()
 		{
@@ -152,10 +252,46 @@ namespace ShopifyAccessTests.GraphQl
 
 			return response;
 		}
+		
+		private static GraphQlResponseWithPages< GetProductsData, Product > GetPaginatedThrottledErrorResponse()
+		{
+			var response = GetPaginatedGraphQlResponse();
+			response.Errors = new[]
+			{
+				new GraphQlError
+				{
+					Message = "Throttled",
+					Extensions = new GraphQlErrorExtensions
+					{
+						Code = "THROTTLED"
+					}
+				}
+			};
+
+			return response;
+		}
 
 		private BaseGraphQlResponse< ProductVariant > GetUnknownErrorResponse()
 		{
 			var response = this.GetBaseGraphQlResponse();
+			response.Errors = new[]
+			{
+				new GraphQlError()
+				{
+					Message = "Unknown",
+					Extensions = new GraphQlErrorExtensions()
+					{
+						Code = "Unknown"
+					}
+				}
+			};
+
+			return response;
+		}
+		
+		private static GraphQlResponseWithPages< GetProductsData, Product > GetPaginatedUnknownErrorResponse()
+		{
+			var response = GetPaginatedGraphQlResponse();
 			response.Errors = new[]
 			{
 				new GraphQlError()

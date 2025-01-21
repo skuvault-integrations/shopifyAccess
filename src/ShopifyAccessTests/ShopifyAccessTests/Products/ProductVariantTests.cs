@@ -16,7 +16,6 @@ namespace ShopifyAccessTests.Products
 	{
 		private static readonly Mark _mark = Mark.Create;
 		
-		//TODO GUARD-3717 [Refactor] Move to GraphQL folder all tests of GetProductsCreatedAfterAsync, GetProductsCreatedBeforeButUpdatedAfterAsync, GetProductVariantsInventoryReportBySkusAsync
 		[ Test ]
 		[ Explicit ]
 		public async Task GetProductsCreatedAfterAsync()
@@ -40,14 +39,6 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
-		public async Task GetProductsCreatedAfterAsync_GetsVariationsWithUntrackedQuantity()
-		{
-			var products = await this.Service.GetProductsCreatedAfterAsync( DateTime.MinValue, CancellationToken.None, _mark );
-
-			products.Products.Any( p => p.Variants.Any( v => v.InventoryManagement == InventoryManagementEnum.Blank ) );
-		}
-
-		[ Test ]
 		public async Task GetProductVariantsInventoryAsync()
 		{
 			var productVariants = await this.Service.GetProductVariantsInventoryAsync( CancellationToken.None, _mark );
@@ -63,10 +54,10 @@ namespace ShopifyAccessTests.Products
 			var initialQuantity = inventoryItem.Available.Value;
 			const int quantity = 39;
 
-			await this.Service.UpdateInventoryLevelsAsync( CreateInventoryLevelForUpdate( inventoryItem, quantity ), CancellationToken.None );
-			var product = ( await this.Service.GetProductVariantsInventoryBySkusAsync( new List< string > { sku }, CancellationToken.None ) ).First();
+			await this.Service.UpdateInventoryLevelsAsync( CreateInventoryLevelForUpdate( inventoryItem, quantity ), CancellationToken.None, _mark );
+			var product = ( await this.Service.GetProductVariantsInventoryBySkusAsync( new List< string > { sku }, CancellationToken.None, _mark ) ).First();
 			var newQuantity = product.InventoryLevels.InventoryLevels.First().Available;
-			await this.Service.UpdateInventoryLevelsAsync( CreateInventoryLevelForUpdate( inventoryItem, initialQuantity ), CancellationToken.None );
+			await this.Service.UpdateInventoryLevelsAsync( CreateInventoryLevelForUpdate( inventoryItem, initialQuantity ), CancellationToken.None, _mark );
 
 			newQuantity.Should().Be( quantity );
 		}
@@ -75,7 +66,7 @@ namespace ShopifyAccessTests.Products
 		public async Task WhenGetProductsCreatedAfterAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
 		{
 			var dateFrom = new DateTime( 2021, 6, 1 );
-			var products = await this.Service.GetProductsCreatedAfterAsync( dateFrom, CancellationToken.None );
+			var products = await this.Service.GetProductsCreatedAfterAsync( dateFrom, CancellationToken.None, _mark );
 			var productsWithImages = products.Products.Where( p => p.Images != null && p.Images.Any() );
 
 			productsWithImages.Should().NotBeNullOrEmpty();
@@ -88,7 +79,7 @@ namespace ShopifyAccessTests.Products
 		public async Task WhenGetProductsCreatedBeforeButUpdatedAfterAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
 		{
 			var dateFrom = new DateTime( 2023, 6, 1 );
-			var products = await this.Service.GetProductsCreatedBeforeButUpdatedAfterAsync( dateFrom, CancellationToken.None );
+			var products = await this.Service.GetProductsCreatedBeforeButUpdatedAfterAsync( dateFrom, CancellationToken.None, _mark );
 			var productsWithImages = products.Products.Where( p => p.Images != null && p.Images.Any() );
 
 			productsWithImages.Should().NotBeNullOrEmpty();
@@ -105,7 +96,7 @@ namespace ShopifyAccessTests.Products
 			var productVariants = await this.Service.GetProductVariantsInventoryAsync( CancellationToken.None, _mark );
 
 			// Act
-			var productVariantsReport = await this.Service.GetProductVariantsInventoryReportAsync( CancellationToken.None );
+			var productVariantsReport = await this.Service.GetProductVariantsInventoryReportAsync( CancellationToken.None, _mark );
 
 			// Assert
 			this.ValidateIfEqual( productVariantsReport, productVariants );
@@ -117,10 +108,10 @@ namespace ShopifyAccessTests.Products
 		{
 			// Arrange
 			var skus = new[] { "AUTO_TEST 2649 1 ' \" \\ ! @ # $ % ^" };
-			var products = await this.Service.GetProductVariantsInventoryBySkusAsync( skus, CancellationToken.None );
+			var products = await this.Service.GetProductVariantsInventoryBySkusAsync( skus, CancellationToken.None, _mark );
 
 			// Act
-			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None );
+			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None, _mark );
 
 			// Assert
 			productVariants.Should().NotBeEmpty();
@@ -133,10 +124,10 @@ namespace ShopifyAccessTests.Products
 		{
 			// Arrange
 			var skus = new[] { "testSKU1" };
-			var products = await this.Service.GetProductVariantsInventoryBySkusAsync( skus, CancellationToken.None );
+			var products = await this.Service.GetProductVariantsInventoryBySkusAsync( skus, CancellationToken.None, _mark );
 
 			// Act
-			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None );
+			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None, _mark );
 
 			// Assert
 			productVariants.Count.Should().BeGreaterThan( 0 );
@@ -151,7 +142,7 @@ namespace ShopifyAccessTests.Products
 			var skus = new[] { "wrong SKU" };
 
 			// Act
-			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None );
+			var productVariants = await this.Service.GetProductVariantsInventoryReportBySkusAsync( skus, CancellationToken.None, _mark );
 
 			// Assert
 			productVariants.Should().BeEmpty();
@@ -176,7 +167,7 @@ namespace ShopifyAccessTests.Products
 
 		private async Task< ShopifyInventoryLevel > GetFirstInventoryItem( string sku )
 		{
-			var product = ( await this.Service.GetProductVariantsInventoryBySkusAsync( new List< string > { sku }, CancellationToken.None ) ).First();
+			var product = ( await this.Service.GetProductVariantsInventoryBySkusAsync( new List< string > { sku }, CancellationToken.None, _mark ) ).First();
 			return product.InventoryLevels.InventoryLevels.First();
 		}
 

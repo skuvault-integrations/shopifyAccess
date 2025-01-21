@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\NUnit.3.13.3\build\NUnit.props" Condition="Exists('..\..\packages\NUnit.3.13.3\build\NUnit.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -65,9 +66,8 @@
     <Reference Include="NSubstitute, Version=4.4.0.0, Culture=neutral, PublicKeyToken=92dd2e9066daa5ca, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NSubstitute.4.4.0\lib\net46\NSubstitute.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=3.5.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NUnit.3.5.0\lib\net45\nunit.framework.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="nunit.framework, Version=3.13.3.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NUnit.3.13.3\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="ServiceStack.Text, Version=4.0.60.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\ServiceStack.Text.4.0.60\lib\net40\ServiceStack.Text.dll</HintPath>
@@ -94,12 +94,16 @@
     </Compile>
     <Compile Include="BaseTests.cs" />
     <Compile Include="Cancellation\CancellationTokenTests.cs" />
-    <Compile Include="EndpointsBuilderTests.cs" />
     <Compile Include="ExtensionsTests.cs" />
     <Compile Include="GraphQl\Helpers\GraphQlIdParserTests.cs" />
+    <Compile Include="GraphQl\Models\Common\Extensions\MediaExtensionsTests.cs" />
+    <Compile Include="GraphQl\Models\Common\WeightTests.cs" />
+    <Compile Include="GraphQl\Models\Products\Extensions\ProductExtensionsTests.cs" />
+    <Compile Include="GraphQl\Models\Products\Extensions\ProductVariantExtensionsTests.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventoryReport\Extensions\ProductVariantsInventoryReportParserTests.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventoryReport\ProductVariantTests.cs" />
     <Compile Include="GraphQl\Queries\QueryBuilderTests.cs" />
+    <Compile Include="GraphQl\Services\PaginationServiceTests.cs" />
     <Compile Include="GraphQl\Services\ReportGeneratorTests.cs" />
     <Compile Include="GraphQl\ShopifyGraphQlThrottlerTests.cs" />
     <Compile Include="Locations\LocationListTests.cs" />
@@ -111,7 +115,6 @@
     <Compile Include="Orders\OrderMapperTests.cs" />
     <Compile Include="Orders\OrdersListTests.cs" />
     <Compile Include="Orders\OrdersTests.cs" />
-    <Compile Include="Products\Models\ShopifyProductVariantTests.cs" />
     <Compile Include="Products\ProductVariantTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\WebRequestServicesTests.cs" />

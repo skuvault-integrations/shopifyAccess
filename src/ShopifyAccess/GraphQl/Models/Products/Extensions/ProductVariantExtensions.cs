@@ -18,7 +18,7 @@ namespace ShopifyAccess.GraphQl.Models.Products.Extensions
 				Weight = ( decimal )(productVariant.InventoryItem?.Measurement?.Weight?.Value ?? default),
 				WeightUnit = productVariant.InventoryItem?.Measurement?.Weight?.UnitStandardized ?? WeightUnit.POUNDS,
 				Price = productVariant.Price ?? default,
-				ImageUrl = productVariant.Image?.Url?.GetUrlWithoutQueryPart(),
+				ImageUrl = productVariant.Image?.Url?.GetUrlWithoutQueryPart() ?? string.Empty,
 				UpdatedAt = productVariant.UpdatedAt ?? default
 			};
 		}

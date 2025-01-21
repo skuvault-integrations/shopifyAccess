@@ -84,7 +84,6 @@
     <Compile Include="GraphQl\Models\Products\ProductVariant.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventory\InventoryLevelsNodes.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventory\InventoryQuantity.cs" />
-    <Compile Include="GraphQl\Models\ProductVariantsInventory\ProductVariants.cs" />
     <Compile Include="GraphQl\Models\Responses\GetBulkOperationByIdResponse.cs" />
     <Compile Include="GraphQl\Models\Responses\BulkOperationRunQueryResponse.cs" />
     <Compile Include="GraphQl\Models\Responses\GetCurrentBulkOperationResponse.cs" />
@@ -102,6 +101,7 @@
     <Compile Include="GraphQl\Queries\GetProductVariantsInventoryReportQuery.cs" />
     <Compile Include="GraphQl\Queries\QueryBuilder.cs" />
     <Compile Include="GraphQl\ReportType.cs" />
+    <Compile Include="GraphQl\Services\PaginationService.cs" />
     <Compile Include="GraphQl\Services\IReportGenerator.cs" />
     <Compile Include="GraphQl\Services\ReportGenerator.cs" />
     <Compile Include="GraphQl\ShopifyGraphQlThrottler.cs" />
@@ -120,7 +120,6 @@
     <Compile Include="Models\Configuration\Authorization\ShopifyAuthorizationConfig.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyCommandEndpointConfig.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyCommandEndpointName.cs" />
-    <Compile Include="Models\Configuration\Command\ShopifyProductCommandEndpointName.cs" />
     <Compile Include="Models\Configuration\ShopifyShop.cs" />
     <Compile Include="Models\Configuration\Command\ShopifyCommand.cs" />
     <Compile Include="Models\Location\ShopifyLocation.cs" />
@@ -141,9 +140,7 @@
     <Compile Include="Models\Order\ShopifyTaxLine.cs" />
     <Compile Include="Models\ProductVariant\ShopifyProductVariant.cs" />
     <Compile Include="Models\ProductVariant\ShopifyInventoryLevelForUpdate.cs" />
-    <Compile Include="Models\ProductVariant\ShopifyProductVariantForUpdate.cs" />
     <Compile Include="Models\Product\ProductsCount.cs" />
-    <Compile Include="Models\Product\ProductsDateFilter.cs" />
     <Compile Include="Models\Product\ShopifyInventoryLevelsModel.cs" />
     <Compile Include="Models\Product\ShopifyProduct.cs" />
     <Compile Include="Models\Product\ShopifyInventoryLevels.cs" />
