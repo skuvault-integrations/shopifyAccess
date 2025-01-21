@@ -40,9 +40,9 @@ namespace ShopifyAccessTests.GraphQl.Models.Common.Extensions
 			Assert.That( result, Is.Empty );
 		}
 
-		[ TestCase( " ") ]
-		[ TestCase( "") ]
-		[ TestCase( null) ]
+		[ TestCase( " " ) ]
+		[ TestCase( "" ) ]
+		[ TestCase( null ) ]
 		public void ToShopifyProductImages_ReturnsEmptyList_WhenMediaItemPreviewImageUrlIsBlank( string blankUrl )
 		{
 			var mediaItems = new List< Media > { new Media { MediaContentType = MediaContentType.IMAGE.ToString(), Preview = new MediaPreview { Image = new Image { Url = blankUrl } } } };
