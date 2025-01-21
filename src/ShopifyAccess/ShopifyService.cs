@@ -205,7 +205,6 @@ namespace ShopifyAccess
 		#endregion
 
 		#region Products
-		//TODO GUARD-3717 [Cleanup] Potentially extract to ShopifyProductsService
 		public async Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark, $"productsStartUtc: '{productsStartUtc}'" );
@@ -226,7 +225,6 @@ namespace ShopifyAccess
 			}
 		}
 		
-		//TODO GUARD-3717 [Cleanup] Potentially extract to ShopifyProductsService
 		public async Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark, $"productsStartUtc: '{productsStartUtc}'" );
@@ -302,7 +300,6 @@ namespace ShopifyAccess
 			return productVariants;
 		}
 
-		//TODO GUARD-3717 [Cleanup] Potentially extract to ShopifyInventoryService
 		private async Task< List< ProductVariant > > GetProductVariantsInventoryReportBySkuAsync( string sku, int locationsCount, Mark mark, CancellationToken token )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark, $"Sku: '{sku}'" );
@@ -375,7 +372,6 @@ namespace ShopifyAccess
 			return ( variant?.InventoryItem?.Tracked ?? false ) && !string.IsNullOrEmpty( variant.Sku );
 		}
 
-		//TODO GUARD-3717 [Cleanup] Potentially extract to ShopifyInventoryService
 		private async Task< List< ShopifyProductVariant > > GetAllProductVariantsInventoryAsync( Mark mark, CancellationToken token )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark );
