@@ -250,7 +250,6 @@ namespace ShopifyAccess
 			}
 		}
 
-		//TODO GUARD-3717 Add unit tests (if possible)
 		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryAsync( CancellationToken token, Mark mark )
 		{
 			var productVariants = await this.GetAllProductVariantsInventoryAsync( mark, token );
