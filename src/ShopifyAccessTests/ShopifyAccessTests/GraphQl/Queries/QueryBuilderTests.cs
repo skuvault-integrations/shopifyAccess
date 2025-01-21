@@ -1,7 +1,9 @@
 ﻿using System;
 using FluentAssertions;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 using ShopifyAccess.GraphQl;
+using ShopifyAccess.GraphQl.Helpers;
 using ShopifyAccess.GraphQl.Queries;
 
 namespace ShopifyAccessTests.GraphQl.Queries
@@ -9,6 +11,8 @@ namespace ShopifyAccessTests.GraphQl.Queries
 	[ TestFixture ]
 	public class QueryBuilderTests
 	{
+		private static readonly Randomizer _randomizer = new Randomizer();
+		
 		[ Test ]
 		public void GetCurrentBulkOperationStatusRequest_EscapeTabCharacters()
 		{
@@ -117,6 +121,79 @@ namespace ShopifyAccessTests.GraphQl.Queries
 
 			// Assert
 			action.Should().Throw< ArgumentException >();
+		}
+
+		[ Test ]
+		public void GetProductsCreatedOnOrAfterRequest_ReturnsRequestQuery()
+		{
+			var createdAtMinUtc = new DateTime( _randomizer.NextLong( DateTime.UtcNow.Ticks ) );
+			var nextCursor = _randomizer.GetString();
+			var productsPerPage = ( int )_randomizer.NextUInt( 1, 250 );
+			
+			var result = QueryBuilder.GetProductsCreatedOnOrAfterRequest( createdAtMinUtc, nextCursor, productsPerPage );
+			
+			Assert.Multiple(() => 
+			{
+				Assert.That( result.Contains( $"created_at:>='{createdAtMinUtc.ToIso8601()}'" ), Is.True );
+				Assert.That( result.Contains( nextCursor ), Is.True );
+				Assert.That( result.Contains( productsPerPage.ToString() ), Is.True );
+			});
+		}
+		
+		[ Test ]
+		public void GetProductsCreatedOnOrAfterRequest_ThrowsArgumentOutOfRangeException_WhenProductsPerPageExceedsMaximum()
+		{
+			var tooManyProductsPerPage = 251;
+			
+			Assert.Throws< ArgumentOutOfRangeException > ( () => QueryBuilder.GetProductsCreatedOnOrAfterRequest( DateTime.MinValue, after: null, tooManyProductsPerPage ) );
+		}
+
+		[ Test ]
+		public void GetProductsCreatedBeforeButUpdatedAfter_ReturnsRequestQuery()
+		{
+			var createdAtMaxAndUpdatedAtMinUtc = new DateTime( _randomizer.NextLong( DateTime.UtcNow.Ticks ) );
+			var nextCursor = _randomizer.GetString();
+			var productsPerPage = ( int )_randomizer.NextUInt( 1, 250 );
+			
+			var result = QueryBuilder.GetProductsCreatedBeforeButUpdatedAfter( createdAtMaxAndUpdatedAtMinUtc, nextCursor, productsPerPage );
+			
+			Assert.Multiple(() => 
+			{
+				Assert.That( result.Contains( $"created_at:<='{createdAtMaxAndUpdatedAtMinUtc.ToIso8601()}' AND updated_at:>='{createdAtMaxAndUpdatedAtMinUtc.ToIso8601()}'" ), Is.True );
+				Assert.That( result.Contains( nextCursor ), Is.True );
+				Assert.That( result.Contains( productsPerPage.ToString() ), Is.True );
+			});
+		}
+		
+		[ Test ]
+		public void GetProductsCreatedBeforeButUpdatedAfter_ThrowsArgumentOutOfRangeException_WhenProductsPerPageExceedsMaximum()
+		{
+			var tooManyProductsPerPage = 251;
+			
+			Assert.Throws< ArgumentOutOfRangeException > ( () => QueryBuilder.GetProductsCreatedBeforeButUpdatedAfter( DateTime.MinValue, after: null, tooManyProductsPerPage ) );
+		}
+
+		[ Test ]
+		public void GetAllProductVariants_ReturnsRequestQuery()
+		{
+			var nextCursor = _randomizer.GetString();
+			var productsPerPage = ( int )_randomizer.NextUInt( 1, 250 );
+			
+			var result = QueryBuilder.GetAllProductVariants( nextCursor, productsPerPage );
+			
+			Assert.Multiple(() => 
+			{
+				Assert.That( result.Contains( nextCursor ), Is.True );
+				Assert.That( result.Contains( productsPerPage.ToString() ), Is.True );
+			});
+		}
+		
+		[ Test ]
+		public void GetAllProductVariants_ThrowsArgumentOutOfRangeException_WhenProductsPerPageExceedsMaximum()
+		{
+			var tooManyProductsPerPage = 251;
+			
+			Assert.Throws< ArgumentOutOfRangeException > ( () => QueryBuilder.GetAllProductVariants( after: null, tooManyProductsPerPage ) );
 		}
 	}
 }

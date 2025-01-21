@@ -67,7 +67,6 @@ namespace ShopifyAccess.GraphQl.Queries
 		/// <param name="after">Pagination cursor to request the next page</param>
 		/// <param name="productsPerPage"></param>
 		/// <returns>GraphQL Query</returns>
-		//TODO GUARD-3717: Add tests for this method
 		public static string GetProductsCreatedOnOrAfterRequest( DateTime createdAtMinUtc, string after = null, int productsPerPage = MaxItemsPerResponse )
 		{
 			if( productsPerPage > MaxItemsPerResponse )
@@ -92,7 +91,6 @@ namespace ShopifyAccess.GraphQl.Queries
 		/// <param name="after">Pagination cursor to request the next page</param>
 		/// <param name="productsPerPage"></param>
 		/// <returns>GraphQL Query</returns>
-		//TODO GUARD-3717: Add tests for this method
 		public static string GetProductsCreatedBeforeButUpdatedAfter( DateTime createdAtMaxAndUpdatedAtMinUtc, string after = null, int productsPerPage = MaxItemsPerResponse )
 		{
 			if( productsPerPage > MaxItemsPerResponse )
@@ -110,7 +108,6 @@ namespace ShopifyAccess.GraphQl.Queries
 			return request.ToJson();
 		}
 		
-		//TODO GUARD-3717: Add tests for this method
 		public static string GetAllProductVariants( string after = null, int productVariantsPerPage = MaxItemsPerResponse )
 		{
 			if( productVariantsPerPage > MaxItemsPerResponse )
