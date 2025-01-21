@@ -97,6 +97,7 @@
     <Compile Include="ExtensionsTests.cs" />
     <Compile Include="GraphQl\Helpers\GraphQlIdParserTests.cs" />
     <Compile Include="GraphQl\Models\Common\Extensions\MediaExtensionsTests.cs" />
+    <Compile Include="GraphQl\Models\Common\WeightTests.cs" />
     <Compile Include="GraphQl\Models\Products\Extensions\ProductExtensionsTests.cs" />
     <Compile Include="GraphQl\Models\Products\Extensions\ProductVariantExtensionsTests.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventoryReport\Extensions\ProductVariantsInventoryReportParserTests.cs" />
