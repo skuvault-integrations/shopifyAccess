@@ -7,7 +7,6 @@ namespace ShopifyAccess.GraphQl.Models.Products.Extensions
 {
 	public static class ProductExtensions
 	{
-		//TODO GUARD-3717: Add tests
 		internal static ShopifyProduct ToShopifyProduct( this Product product )
 		{
 			var productVariants = product.Variants?.Items ?? new List< ProductVariant >();
@@ -15,7 +14,7 @@ namespace ShopifyAccess.GraphQl.Models.Products.Extensions
 			{
 				Title = product.Title,
 				Vendor = product.Vendor,
-				Images = product.Media?.Items?.ToShopifyProductImages(),
+				Images = product.Media?.Items?.ToShopifyProductImages() ?? new List< ShopifyAccess.Models.ShopifyProductImage >(),
 				Variants = productVariants.Select( x => x.ToShopifyProductVariant() ).ToList(),
 				Type = product.ProductType,
 				BodyHtml = product.DescriptionHtml,
