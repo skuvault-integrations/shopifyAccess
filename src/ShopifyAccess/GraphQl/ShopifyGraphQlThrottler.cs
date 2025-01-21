@@ -68,7 +68,6 @@ namespace ShopifyAccess.GraphQl
 		/// <typeparam name="TResponseItem"></typeparam>
 		/// <returns>Function response</returns>
 		/// <exception cref="T:Netco.ThrottlerServices.ThrottlerException">When throttle max retry count reached</exception>
-		//TODO GUARD-3717 Add tests
 		public async Task< GraphQlResponseWithPages< TData, TResponseItem > > ExecuteWithPaginationAsync< TData, TResponseItem >( Func< Task< GraphQlResponseWithPages< TData, TResponseItem > > > funcToThrottle, Mark mark ) 
 		{
 			var retryCount = 1;
