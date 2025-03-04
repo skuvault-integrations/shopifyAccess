@@ -1,5 +1,9 @@
 ﻿namespace ShopifyAccess.Models.Configuration.Authorization
 {
+	/// <summary>
+	/// Authorization scopes our syncs need. NOTE: In v1 we pre-pend "read" or "write" at the beginning. For example, "read_products".
+	/// All scopes - <see href="https://shopify.dev/docs/api/admin-rest/usage/access-scopes"/>
+	/// </summary>
 	public class ShopifyScopeName
 	{
 		public static readonly ShopifyScopeName Content = new ShopifyScopeName( "_content" );
@@ -12,6 +16,7 @@
 		public static readonly ShopifyScopeName Shipping = new ShopifyScopeName( "_shipping" );
 		public static readonly ShopifyScopeName Inventory = new ShopifyScopeName( "_inventory" );
 		public static readonly ShopifyScopeName AllOrders = new ShopifyScopeName( "_all_orders" );
+		public static readonly ShopifyScopeName Locations = new ShopifyScopeName( "_locations" );
 		
 		private ShopifyScopeName( string name )
 		{
