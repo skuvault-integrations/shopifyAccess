@@ -12,6 +12,7 @@
 		public static readonly ShopifyScopeName Shipping = new ShopifyScopeName( "_shipping" );
 		public static readonly ShopifyScopeName Inventory = new ShopifyScopeName( "_inventory" );
 		public static readonly ShopifyScopeName AllOrders = new ShopifyScopeName( "_all_orders" );
+		public static readonly ShopifyScopeName Locations = new ShopifyScopeName( "_locations" );
 		
 		private ShopifyScopeName( string name )
 		{
