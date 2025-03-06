@@ -50,6 +50,11 @@ namespace ShopifyAccess.Misc
 			Trace( mark, "GET request\tRequest: {0} with timeout {1}ms", requestUri, timeout );
 		}
 
+		public static void LogGetResponse( Uri requestUri, string responseHeaders, string responseContent, Mark mark, int timeout )
+		{
+			Trace( mark, "GET response\tRequest: {0} with timeout {1}ms, \tResponse headers: {2}, content: {3}", requestUri, timeout, responseHeaders, responseContent );
+		}
+
 		/// <summary>
 		/// Log the response of a GET call
 		/// </summary>
