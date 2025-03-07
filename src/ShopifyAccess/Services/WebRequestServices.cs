@@ -111,6 +111,12 @@ namespace ShopifyAccess.Services
 				this.RefreshLastNetworkActivityTime();
 				using( var response = await this.HttpClient.GetAsync( uri, linkedCancellationTokenSource.Token ).ConfigureAwait( false ) )
 				{
+					// TODO: PBL-9241 we agreed to add a full response with headers logging for the 'Lighting Supply' tenant
+					if ( uri.ToString().StartsWith( "https://lightingsupply10651-dev.myshopify.com/admin/api/2024-07/orders.json" ) )
+					{
+						await LogResponseContentWithHeadersAsync( uri, response, mark, timeout ).ConfigureAwait( false );
+					}
+
 					await this.ThrowIfErrorAsync( response, mark ).ConfigureAwait( false );
 					var content = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
 					this.RefreshLastNetworkActivityTime();
@@ -290,6 +296,36 @@ namespace ShopifyAccess.Services
 		private void RefreshLastNetworkActivityTime()
 		{
 			this.LastNetworkActivityTime = DateTime.UtcNow;
+		}
+
+		private static async Task LogResponseContentWithHeadersAsync( Uri requestUri, HttpResponseMessage response, Mark mark, int timeout )
+		{
+			var responseHeaders = ReadResponseHeadersAsString( response );
+			string responseContent;
+			try
+			{
+				responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait( false );
+			}
+			catch
+			{
+				responseContent = "Unable to read response contents";
+			}
+
+			ShopifyLogger.LogGetResponse( requestUri, responseHeaders, responseContent, mark, timeout );
+		}
+
+		private static string ReadResponseHeadersAsString( HttpResponseMessage response )
+		{
+			var result = new StringBuilder();
+			foreach(var header in response.Headers )
+			{
+				foreach(var value in header.Value )
+				{
+					result.Append($"{header.Key}: {value}, ");
+				}
+			}
+
+			return result.ToString();
 		}
 	}
 }
