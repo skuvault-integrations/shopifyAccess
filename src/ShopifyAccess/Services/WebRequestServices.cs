@@ -111,8 +111,10 @@ namespace ShopifyAccess.Services
 				this.RefreshLastNetworkActivityTime();
 				using( var response = await this.HttpClient.GetAsync( uri, linkedCancellationTokenSource.Token ).ConfigureAwait( false ) )
 				{
-					// TODO: PBL-9241 we agreed to add a full response with headers logging for the 'Lighting Supply' tenant
-					if ( uri.ToString().StartsWith( "https://lightingsupply10651-dev.myshopify.com/admin/api/2024-07/orders.json" ) )
+					// As discussed in PBL-9241 we added a full response with headers logging for the 'Lighting Supply' tenant
+					// TODO: later we will need remove it in the VT-6816
+					var uriString = uri.ToString();
+					if ( uriString.Contains( "lightingsupply10651-dev.myshopify.com" ) && uriString.Contains( "orders.json" ) )
 					{
 						await LogResponseContentWithHeadersAsync( uri, response, mark, timeout ).ConfigureAwait( false );
 					}
