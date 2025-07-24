@@ -123,6 +123,39 @@ namespace ShopifyAccess.GraphQl.Queries
 			var request = new { query = CleanUpRequest( GetProductVariantInventoryQuery.GetAllVariantsQuery ), variables };
 			return request.ToJson();
 		}
+
+		#region Orders
+		public static string GetOrdersRequest(
+			DateTime dateFromUtc,
+			DateTime dateToUtc,
+			string status = null,
+			string after = null,
+			int ordersPerPage = MaxItemsPerResponse )
+		{
+			if( ordersPerPage > MaxItemsPerResponse )
+			{
+				throw new ArgumentOutOfRangeException( nameof(ordersPerPage), ordersPerPage, $"ordersPerPage should not be greater than {MaxItemsPerResponse}" );
+			}
+
+			var variables = new
+			{
+				createdAtMin = dateFromUtc.ToIso8601(),
+				createdAtMax = dateToUtc.ToIso8601(),
+				status,
+				after,
+				first = ordersPerPage
+			};
+
+			var request = new
+			{
+				query = CleanUpRequest( GetOrdersQuery.Query ),
+				variables
+			};
+
+			return request.ToJson();
+		}
+		
+		#endregion
 		
 		/// <summary>
 		/// Replace characters that are not allowed in the request

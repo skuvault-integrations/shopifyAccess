@@ -14,17 +14,6 @@ namespace ShopifyAccess
 	public interface IShopifyService
 	{
 		/// <summary>
-		/// Get orders by date and fulfillment status
-		/// </summary>
-		/// <param name="status">Fulfillment_status. Shipped, partial, unshipped or any</param>
-		/// <param name="dateFrom">created_at_min. Show orders created after date (format: 2008-01-01 03:00)</param>
-		/// <param name="dateTo">created_at_max. Show orders created before date (format: 2008-01-01 03:00)</param>
-		/// <param name="token"></param>
-		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		/// <returns>Orders collection</returns>
-		ShopifyOrders GetOrders( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo, CancellationToken token, Mark mark = null );
-
-		/// <summary>
 		/// Get shipped orders async
 		/// </summary>
 		/// <param name="dateFrom">created_at_min. Show orders created after date (format: 2008-01-01 03:00)</param>
