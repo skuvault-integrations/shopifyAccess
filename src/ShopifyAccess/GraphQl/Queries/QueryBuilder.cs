@@ -139,9 +139,7 @@ namespace ShopifyAccess.GraphQl.Queries
 
 			var variables = new
 			{
-				createdAtMin = dateFromUtc.ToIso8601(),
-				createdAtMax = dateToUtc.ToIso8601(),
-				status,
+				query = $"created_at:>='{dateFromUtc.ToIso8601()}' created_at:<='{dateToUtc.ToIso8601()}' financial_status:'{status}''",
 				after,
 				first = ordersPerPage
 			};
