@@ -76,9 +76,9 @@ namespace ShopifyAccess
 		{
 			mark = mark.CreateNewIfBlank();
 
-			var response = await this._graphQlPaginationService.GetAllPagesAsync< GetOrdersData, Order >( 
-				async (nextCursor) => await this._webRequestServices.PostDataAsync< GetOrdersResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
-					QueryBuilder.GetOrdersRequest(dateFrom, dateTo, status.ToString(), nextCursor ),
+			var response = await this._graphQlPaginationService.GetAllPagesAsync< GetOrdersData, Order >(
+				async ( nextCursor ) => await this._webRequestServices.PostDataAsync< GetOrdersResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
+					QueryBuilder.GetOrdersRequest( dateFrom, dateTo, status.ToString(), nextCursor ),
 					token, mark, this._timeouts[ ShopifyOperationEnum.GetOrders ] ),
 				mark, token );
 			
