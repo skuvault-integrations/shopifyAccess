@@ -9,7 +9,8 @@ namespace ShopifyAccess.GraphQl.Queries
       node {
         id
         name
-        createdAt        
+        number
+        createdAt
         totalPriceSet {
           shopMoney {
             amount
@@ -29,36 +30,78 @@ namespace ShopifyAccess.GraphQl.Queries
                   currencyCode
                 }
               }
+              totalDiscountSet {
+                shopMoney {
+                  amount
+                  currencyCode
+                }
+              }
+              taxLines {
+                title
+                priceSet {
+                  shopMoney {
+                    amount
+                    currencyCode
+                  }
+                }
+              }
             }
           }
         }
         billingAddress {
-          name
-          address1
-          address2
-          city
-          province
-          country
           zip
-          phone
         }
         shippingAddress {
-          name
-          address1
-          address2
-          city
-          province
-          country
           zip
-          phone
         }
         closedAt
         cancelledAt
         displayFinancialStatus
         displayFulfillmentStatus
         fulfillments(first: 10) {
-          displayStatus
           createdAt
+          status
+          id
+          order {
+            id
+          }
+          updatedAt
+          location {
+            id
+          }
+          fulfillmentLineItems(first: 10) {
+            edges {
+              node {
+                lineItem {
+                  id
+                  sku
+                  quantity
+                  product {
+                    variants(first: 10) {
+                      edges {
+                        node {
+                          inventoryItem {
+                            measurement {
+                              weight {
+                                unit
+                                value
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                  originalUnitPriceSet {
+                    shopMoney {
+                      amount
+                      currencyCode
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
         sourceName
         shippingLine {
@@ -73,7 +116,6 @@ namespace ShopifyAccess.GraphQl.Queries
         discountCodes
         taxLines {
           title
-          price
           rate
         }
         refunds {
