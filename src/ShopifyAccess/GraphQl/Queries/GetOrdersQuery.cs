@@ -4,9 +4,7 @@ namespace ShopifyAccess.GraphQl.Queries
 	{
 		public static readonly string Query = @"query GetOrdersPaginated($query: String!, $first: Int!, $after: String) {
   orders(first: $first, after: $after, query: $query) {
-    edges {
-      cursor
-      node {
+    nodes {
         id
         name
         number
@@ -47,12 +45,6 @@ namespace ShopifyAccess.GraphQl.Queries
               }
             }
           }
-        }
-        billingAddress {
-          zip
-        }
-        shippingAddress {
-          zip
         }
         closedAt
         cancelledAt
@@ -112,18 +104,32 @@ namespace ShopifyAccess.GraphQl.Queries
               currencyCode
             }
           }
+          id
+          code
+          source
         }
         discountCodes
         taxLines {
           title
-          rate
+          priceSet {
+            shopMoney {
+              amount
+            }
+          }
         }
         refunds {
           id
-          createdAt
-          note
+          refundLineItems {
+            nodes {
+              id
+              lineItem {
+                id
+              }
+              quantity
+              restockType
+            }
+          }
         }
-      }
     }
     pageInfo {
       hasNextPage

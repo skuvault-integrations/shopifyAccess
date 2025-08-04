@@ -16,6 +16,8 @@ namespace ShopifyAccess.Models.Order
 			{ "error", ShopifyOrderFulfillmentStatusEnum.Error },
 			{ "failure", ShopifyOrderFulfillmentStatusEnum.Failure },
 		};
+		
+		public ShopifyFulfillment(){}
 
 		public ShopifyFulfillment( string status )
 		{

@@ -7,13 +7,14 @@ using ShopifyAccess.Models.Order.Discounts;
 
 namespace ShopifyAccess.GraphQl.Models.Orders
 {
+	[ DataContract ]
 	internal class Order
 	{
 		[ DataMember( Name = "id" ) ]
-		public long Id { get; set; }
+		public string Id { get; set; }
 
 		[ DataMember( Name = "totalPriceSet" ) ]
-		public Money Total { get; set; }
+		public ShopifyPriceSet Total { get; set; }
 
 		[ DataMember( Name = "createdAt" ) ]
 		public DateTime CreatedAt { get; set; }
@@ -21,8 +22,8 @@ namespace ShopifyAccess.GraphQl.Models.Orders
 		[ DataMember( Name = "lineItems" ) ]
 		public Nodes< OrderItem > OrderItems { get; set; }
 
-		[ DataMember( Name = "orderNumber" ) ]
-		public int OrderNumber { get; set; }
+		[ DataMember( Name = "number" ) ]
+		public int Number { get; set; }
 
 		[ DataMember( Name = "billingAddress" ) ]
 		public ShopifyBillingAddress BillingAddress { get; set; }
@@ -40,7 +41,7 @@ namespace ShopifyAccess.GraphQl.Models.Orders
 		public ShopifyFinancialStatus FinancialStatus { get; set; }
 
 		[ DataMember( Name = "fulfillments" ) ]
-		public IEnumerable< ShopifyFulfillment > Fulfillments { get; set; }
+		public IEnumerable< Fulfillment > Fulfillments { get; set; }
 		
 		[ DataMember( Name = "displayFulfillmentStatus" ) ]
 		private string RawFulfillmentStatus { get; set; }
@@ -72,22 +73,19 @@ namespace ShopifyAccess.GraphQl.Models.Orders
 			set => this.RawSourceName = value.ToString();
 		}
 
-		[ DataMember( Name = "location_id" ) ]
-		public string LocationId { get; set; }
-
 		[ DataMember( Name = "name" ) ]
 		public string Name { get; set; }
 
 		[ DataMember( Name = "shippingLines" ) ]
-		public IList<ShopifyOrderShippingLine> ShippingLines { get; set; }
+		public IList<ShippingLine> ShippingLines { get; set; }
 
 		[ DataMember( Name = "discountCodes" ) ]
-		public IEnumerable< ShopifyDiscountCode > DiscountCodes { get; set; }
+		public string[] DiscountCodes { get; set; }
 
 		[ DataMember( Name = "taxLines" ) ]
-		public IEnumerable< ShopifyTaxLine > TaxLines { get; set; }
+		public IEnumerable< TaxLine > TaxLines { get; set; }
 
 		[ DataMember( Name = "refunds" ) ]
-		public IEnumerable< ShopifyOrderRefund > Refunds { get; set; }
+		public IEnumerable< Refund > Refunds { get; set; }
 	}
 }
