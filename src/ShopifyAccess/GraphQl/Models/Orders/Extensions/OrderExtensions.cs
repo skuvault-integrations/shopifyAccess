@@ -48,7 +48,7 @@ namespace ShopifyAccess.GraphQl.Models.Orders.Extensions
 				Title = item.Title,
 				TotalDiscount = item.TotalDiscount?.ShopMoney?.Amount ?? 0,
 				TotalDiscountSet = item.TotalDiscount,
-				TaxLines = item.TaxLines.Select( i => i.ToShopifyTaxLine() )
+				TaxLines = item.TaxLines?.Select( i => i.ToShopifyTaxLine() )
 			};
 		}
 
@@ -70,8 +70,10 @@ namespace ShopifyAccess.GraphQl.Models.Orders.Extensions
 				CreatedAt = fulfillment.CreatedAt,
 				UpdatedAt = fulfillment.UpdatedAt,
 				Items = lineItemDetails.Select( i => i.ToShopifyOrderFulfillmentItem() ),
-				OrderId = orderId
-				// TODO: Add tracking info
+				OrderId = orderId,
+				TrackingCompany = fulfillment.TrackingInfo?.FirstOrDefault()?.TrackingCompany,
+				TrackingNumber = fulfillment.TrackingInfo?.FirstOrDefault()?.TrackingNumber,
+				TrackingUrl = fulfillment.TrackingInfo?.FirstOrDefault()?.TrackingUrl
 			};
 		}
 

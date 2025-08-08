@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using ShopifyAccess.GraphQl.Models.Products;
 using ShopifyAccess.Models.Order;
@@ -21,9 +22,25 @@ namespace ShopifyAccess.GraphQl.Models.Orders
 
 		[DataMember(Name = "location")]
 		public FulfillmentLocation Location { get; set; }
+		
+		[DataMember(Name = "trackingInfo")]
+		public IEnumerable<TrackingInfo> TrackingInfo { get; set; }
 
 		[DataMember(Name = "fulfillmentLineItems")]
 		public Nodes<FulfillmentLineItem> FulfillmentLineItems { get; set; }
+	}
+	
+	[ DataContract ]
+	internal class TrackingInfo
+	{
+		[DataMember(Name = "company")]
+		public string TrackingCompany { get; set; }
+		
+		[DataMember(Name = "number")]
+		public string TrackingNumber { get; set; }
+		
+		[DataMember(Name = "url")]
+		public string TrackingUrl { get; set; }
 	}
 	
 	internal class FulfillmentLocation
