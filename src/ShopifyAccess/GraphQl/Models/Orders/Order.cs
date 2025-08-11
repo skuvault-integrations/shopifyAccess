@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using ShopifyAccess.Models.Order;
-using ShopifyAccess.Models.Order.Discounts;
 
 namespace ShopifyAccess.GraphQl.Models.Orders
 {
