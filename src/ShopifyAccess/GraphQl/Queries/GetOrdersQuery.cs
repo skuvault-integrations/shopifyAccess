@@ -15,7 +15,7 @@ namespace ShopifyAccess.GraphQl.Queries
           currencyCode
         }
       }
-      lineItems(first: 100) {
+      lineItems(first: 250) {
         nodes {
           id
           title
@@ -48,7 +48,7 @@ namespace ShopifyAccess.GraphQl.Queries
       cancelledAt
       displayFinancialStatus
       displayFulfillmentStatus
-      fulfillments(first: 10) {
+      fulfillments(first: 250) {
         createdAt
         status
         id
@@ -64,7 +64,7 @@ namespace ShopifyAccess.GraphQl.Queries
           number
           url
         }
-        fulfillmentLineItems(first: 10) {
+        fulfillmentLineItems(first: 250) {
           nodes {
             lineItem {
               id
@@ -104,7 +104,7 @@ namespace ShopifyAccess.GraphQl.Queries
       }
       refunds {
         id
-        refundLineItems(first: 10) {
+        refundLineItems(first: 250) {
           nodes {
             id
             lineItem {
