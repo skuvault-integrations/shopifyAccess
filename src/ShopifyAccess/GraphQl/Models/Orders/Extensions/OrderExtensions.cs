@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using ServiceStack;
 using ShopifyAccess.GraphQl.Helpers;
@@ -32,8 +33,7 @@ namespace ShopifyAccess.GraphQl.Models.Orders.Extensions
 				RawSourceName = order.RawSourceName,
 				ShippingLines = order.ShippingLines?.Select( s => s.ToShopifyShippingLine() ).ToList(),
 				DiscountCodes = order.DiscountCodes.Select( o => new ShopifyDiscountCode( o ) ),
-				TaxLines = order.TaxLines.Select( t => t.ToShopifyTaxLine() ),
-				Refunds = order.Refunds.Select( r => r.ToShopifyRefund( orderId ) ),
+				TaxLines = order.TaxLines.Select( t => t.ToShopifyTaxLine() )
 			};
 		}
 
@@ -71,9 +71,9 @@ namespace ShopifyAccess.GraphQl.Models.Orders.Extensions
 				UpdatedAt = fulfillment.UpdatedAt,
 				Items = lineItemDetails.Select( i => i.ToShopifyOrderFulfillmentItem() ),
 				OrderId = orderId,
-				TrackingCompany = fulfillment.TrackingInfo?.FirstOrDefault()?.TrackingCompany,
-				TrackingNumber = fulfillment.TrackingInfo?.FirstOrDefault()?.TrackingNumber,
-				TrackingUrl = fulfillment.TrackingInfo?.FirstOrDefault()?.TrackingUrl
+				TrackingCompany = fulfillment.TrackingInfo?.LastOrDefault()?.TrackingCompany,
+				TrackingNumber = fulfillment.TrackingInfo?.LastOrDefault()?.TrackingNumber,
+				TrackingUrl = fulfillment.TrackingInfo?.LastOrDefault()?.TrackingUrl
 			};
 		}
 
@@ -84,8 +84,8 @@ namespace ShopifyAccess.GraphQl.Models.Orders.Extensions
 				Id = GraphQlIdParser.LineItem.GetId( lineItemDetail.Id ),
 				Price = lineItemDetail.OriginalUnitPriceSet.ShopMoney.Amount,
 				Quantity = lineItemDetail.Quantity,
-				Sku = lineItemDetail.Sku
-				//Grams = lineItemDetail.Product.Variants.Items.FirstOrDefault()?.InventoryItem.Measurement.Weight.Value
+				Sku = lineItemDetail.Sku,
+				Grams = Convert.ToInt32(lineItemDetail.Variant?.InventoryItem?.Measurement?.Weight?.Value)
 			};
 		}
 
@@ -98,27 +98,6 @@ namespace ShopifyAccess.GraphQl.Models.Orders.Extensions
 				Price = shippingLine.OriginalPriceSet.ShopMoney.Amount,
 				Code = shippingLine.Code,
 				Source = shippingLine.Source
-			};
-		}
-
-		internal static ShopifyOrderRefund ToShopifyRefund( this Refund refund, long orderId )
-		{
-			return new ShopifyOrderRefund
-			{
-				Id = GraphQlIdParser.Refund.GetId( refund.Id ),
-				OrderId = orderId,
-				RefundLineItems = refund.RefundLineItems.Items.Select( x => x.ToShopifyRefundItem() )
-			};
-		}
-
-		internal static ShopifyOrderRefundLineItem ToShopifyRefundItem( this RefundLineItem lineItem )
-		{
-			return new ShopifyOrderRefundLineItem
-			{
-				Id = lineItem.Id,
-				Quantity = lineItem.Quantity,
-				RestockType = lineItem.RestockType,
-				LineItemId = lineItem.LineItem.Id
 			};
 		}
 	}

@@ -83,8 +83,5 @@ namespace ShopifyAccess.GraphQl.Models.Orders
 
 		[ DataMember( Name = "taxLines" ) ]
 		public IEnumerable< TaxLine > TaxLines { get; set; }
-
-		[ DataMember( Name = "refunds" ) ]
-		public IEnumerable< Refund > Refunds { get; set; }
 	}
 }

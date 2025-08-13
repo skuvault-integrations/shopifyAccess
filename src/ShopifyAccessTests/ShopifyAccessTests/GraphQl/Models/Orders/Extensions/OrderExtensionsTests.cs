@@ -39,7 +39,6 @@ namespace ShopifyAccessTests.GraphQl.Models.Orders.Extensions
             Assert.AreEqual( order.ShippingLines.Count, result.ShippingLines.Count );
             Assert.AreEqual( order.DiscountCodes.Length, result.DiscountCodes.Count() );
             Assert.AreEqual( order.TaxLines.Count(), result.TaxLines.Count() );
-            Assert.AreEqual( order.Refunds.Count(), result.Refunds.Count() );
         }
 
         [ Test ]
@@ -150,26 +149,6 @@ namespace ShopifyAccessTests.GraphQl.Models.Orders.Extensions
                 TaxLines = new List< TaxLine >
                 {
                     new TaxLine { Title = "taxLine1" }
-                },
-                Refunds = new List< Refund >
-                {
-                    new Refund
-                    {
-                        Id = "gid://shopify/Refund/123",
-                        RefundLineItems = new Nodes< RefundLineItem >
-                        {
-                            Items = new List< RefundLineItem >
-                            {
-                                new RefundLineItem
-                                {
-                                    Id = 123,
-                                    Quantity = 1,
-                                    RestockType = "return",
-                                    LineItem = new RefundItem() { Id = 1234 }
-                                }
-                            }
-                        }
-                    }
                 }
             };
         }

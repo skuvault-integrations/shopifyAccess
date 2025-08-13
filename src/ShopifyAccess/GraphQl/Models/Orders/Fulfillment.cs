@@ -71,5 +71,8 @@ namespace ShopifyAccess.GraphQl.Models.Orders
 
 		[ DataMember( Name = "originalUnitPriceSet" ) ]
 		public ShopifyPriceSet OriginalUnitPriceSet{ get; set; }
+		
+		[ DataMember( Name = "variant" ) ]
+		public ProductVariant Variant { get; set; }
 	}
 }

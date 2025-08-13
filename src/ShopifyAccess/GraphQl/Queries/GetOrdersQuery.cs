@@ -15,7 +15,7 @@ namespace ShopifyAccess.GraphQl.Queries
           currencyCode
         }
       }
-      lineItems(first: 250) {
+      lineItems(first: 100) {
         nodes {
           id
           title
@@ -48,7 +48,7 @@ namespace ShopifyAccess.GraphQl.Queries
       cancelledAt
       displayFinancialStatus
       displayFulfillmentStatus
-      fulfillments(first: 250) {
+      fulfillments(first: 100) {
         createdAt
         status
         id
@@ -64,9 +64,19 @@ namespace ShopifyAccess.GraphQl.Queries
           number
           url
         }
-        fulfillmentLineItems(first: 250) {
+        fulfillmentLineItems(first: 100) {
           nodes {
             lineItem {
+              variant {
+                inventoryItem {
+                  measurement {
+                    weight {
+                      value
+                      unit
+                    }
+                  }
+                }
+              }
               id
               sku
               quantity
@@ -99,19 +109,6 @@ namespace ShopifyAccess.GraphQl.Queries
         priceSet {
           shopMoney {
             amount
-          }
-        }
-      }
-      refunds {
-        id
-        refundLineItems(first: 250) {
-          nodes {
-            id
-            lineItem {
-              id
-            }
-            quantity
-            restockType
           }
         }
       }
