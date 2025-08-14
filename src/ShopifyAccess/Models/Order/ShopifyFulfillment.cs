@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
+using ShopifyAccess.GraphQl.Models.Common;
 
 namespace ShopifyAccess.Models.Order
 {
@@ -59,9 +61,12 @@ namespace ShopifyAccess.Models.Order
 		
 		public int Quantity { get; set; }
 		
+		// TODO GUARD-3910: Remove this field, as we’ll be using Weight instead.
 		public int Grams { get; set; }
 		
 		public decimal Price { get; set; }
+		
+		public Weight Weight { get; set; }
 	}
 
 	public enum ShopifyOrderFulfillmentStatusEnum

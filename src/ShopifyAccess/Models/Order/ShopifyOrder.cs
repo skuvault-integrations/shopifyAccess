@@ -67,6 +67,7 @@ namespace ShopifyAccess.Models.Order
 
 		public IEnumerable< ShopifyTaxLine > TaxLines { get; set; }
 
+		// TODO GUARD-3910: Remove refund fields since they’re not currently used in the app.
 		public IEnumerable< ShopifyOrderRefund > Refunds { get; set; }
 
 		public bool IsShipped => this.ClosedAt.HasValue;
@@ -74,6 +75,7 @@ namespace ShopifyAccess.Models.Order
 		public bool IsCancelled => this.CancelledAt.HasValue;
 	}
 	
+	// TODO GUARD-3910: Remove refund fields since they’re not currently used in the app.
 	public sealed class ShopifyOrderRefund
 	{
 		public long Id { get; set; }
@@ -81,6 +83,7 @@ namespace ShopifyAccess.Models.Order
 		public IEnumerable< ShopifyOrderRefundLineItem > RefundLineItems { get; set; }
 	}
 	
+	// TODO GUARD-3910: Remove refund fields since they’re not currently used in the app.
 	public sealed class ShopifyOrderRefundLineItem
 	{
 		public long Id { get; set; }
