@@ -15,7 +15,7 @@ namespace ShopifyAccess.GraphQl.Queries
           currencyCode
         }
       }
-      lineItems(first: 100) {
+      lineItems(first: 250) {
         nodes {
           id
           title
@@ -64,7 +64,7 @@ namespace ShopifyAccess.GraphQl.Queries
           number
           url
         }
-        fulfillmentLineItems(first: 100) {
+        fulfillmentLineItems(first: 250) {
           nodes {
             lineItem {
               variant {
