@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using ServiceStack;
 using ShopifyAccess.GraphQl.Helpers;
+using ShopifyAccess.GraphQl.Models.Common;
 using ShopifyAccess.Models.Order;
 using ShopifyAccess.Models.Order.Discounts;
 
@@ -85,7 +86,7 @@ namespace ShopifyAccess.GraphQl.Models.Orders.Extensions
 				Price = lineItemDetail.OriginalUnitPriceSet.ShopMoney.Amount,
 				Quantity = lineItemDetail.Quantity,
 				Sku = lineItemDetail.Sku,
-				Grams = Convert.ToInt32(lineItemDetail.Variant?.InventoryItem?.Measurement?.Weight?.Value)
+				Weight = new Weight { Value = lineItemDetail.Variant?.InventoryItem?.Measurement?.Weight?.Value }
 			};
 		}
 
