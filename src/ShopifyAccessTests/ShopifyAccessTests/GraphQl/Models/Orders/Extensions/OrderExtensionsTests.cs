@@ -90,13 +90,13 @@ namespace ShopifyAccessTests.GraphQl.Models.Orders.Extensions
             {
                 ShopMoney = new Money
                 {
-                    Amount = 25.50m,
+                    Amount = 25,
                     CurrencyCode = "USD"
                 },
                 PresentmentMoney = new Money
                 {
-                    Amount = 30.75m,
-                    CurrencyCode = "EUR"
+                    Amount = 30,
+                    CurrencyCode = "USD"
                 }
             };
 
@@ -116,8 +116,8 @@ namespace ShopifyAccessTests.GraphQl.Models.Orders.Extensions
             // Arrange
             var money = new Money
             {
-                Amount = 12.34m,
-                CurrencyCode = "GBP"
+                Amount = 12,
+                CurrencyCode = "USD"
             };
 
             // Act
