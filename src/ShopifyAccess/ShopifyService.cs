@@ -13,6 +13,7 @@ using ShopifyAccess.GraphQl.Models.Products;
 using ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions;
 using ShopifyAccess.GraphQl.Models.Responses;
 using ShopifyAccess.GraphQl.Queries;
+using ShopifyAccess.GraphQl.Queries.Orders;
 using ShopifyAccess.GraphQl.Services;
 using ShopifyAccess.Misc;
 using ShopifyAccess.Models;
@@ -118,7 +119,7 @@ namespace ShopifyAccess
 
 			var response = await this._graphQlPaginationService.GetAllPagesAsync< GetOrdersData, Order >(
 				async ( nextCursor ) => await this._webRequestServices.PostDataAsync< GetOrdersResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
-					QueryBuilder.GetOrdersRequest( dateFrom, dateTo, status.ToString(), nextCursor ),
+					OrderQueryBuilder.GetOrdersRequest( dateFrom, dateTo, status.ToString(), nextCursor ),
 					token, mark, this._timeouts[ ShopifyOperationEnum.GetOrders ] ),
 				mark, token );
 

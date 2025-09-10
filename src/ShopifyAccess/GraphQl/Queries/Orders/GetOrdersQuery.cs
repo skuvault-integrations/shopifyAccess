@@ -1,4 +1,4 @@
-namespace ShopifyAccess.GraphQl.Queries
+namespace ShopifyAccess.GraphQl.Queries.Orders
 {
 	public static class GetOrdersQuery
 	{

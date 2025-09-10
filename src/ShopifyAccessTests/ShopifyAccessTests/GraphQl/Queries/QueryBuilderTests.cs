@@ -5,7 +5,6 @@ using NUnit.Framework.Internal;
 using ShopifyAccess.GraphQl;
 using ShopifyAccess.GraphQl.Helpers;
 using ShopifyAccess.GraphQl.Queries;
-using ShopifyAccess.Models.Order;
 
 namespace ShopifyAccessTests.GraphQl.Queries
 {
@@ -195,29 +194,6 @@ namespace ShopifyAccessTests.GraphQl.Queries
 			var tooManyProductsPerPage = 251;
 			
 			Assert.Throws< ArgumentOutOfRangeException > ( () => QueryBuilder.GetAllProductVariants( after: null, tooManyProductsPerPage ) );
-		}
-
-		[ Test ]
-		public void GetOrders_ThrowsArgumentOutOfRangeException_WhenOrdersPerPageExceedsMaximum()
-		{
-			var tooManyOrdersPerPage = 251;
-
-			Assert.Throws< ArgumentOutOfRangeException >( () => QueryBuilder.GetOrdersRequest( DateTime.UtcNow.AddDays( -1 ), DateTime.UtcNow, status : ShopifyOrderStatus.any.ToString(), after : null, tooManyOrdersPerPage ) );
-		}
-		
-		[ Test ]
-		public void GetOrders_ReturnsRequestQuery()
-		{
-			var nextCursor = _randomizer.GetString();
-			var ordersPerPage = ( int )_randomizer.NextUInt( 1, 250 );
-			
-			var result = QueryBuilder.GetOrdersRequest( DateTime.UtcNow.AddDays( -1 ), DateTime.UtcNow, status : ShopifyOrderStatus.any.ToString(), after : nextCursor, ordersPerPage );
-			
-			Assert.Multiple(() => 
-			{
-				Assert.That( result.Contains( nextCursor ), Is.True );
-				Assert.That( result.Contains( ordersPerPage.ToString() ), Is.True );
-			});
 		}
 	}
 }
