@@ -72,7 +72,47 @@ namespace ShopifyAccess
 		}
 
 		#region GetOrders
+		
+		// TODO GUARD-3910 Remove this legacy method and switch to the GraphQL version.
 		public async Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo, CancellationToken token, Mark mark = null )
+		{
+			mark = mark.CreateNewIfBlank();
+
+			var updatedOrdersEndpoint = EndpointsBuilder.CreateUpdatedOrdersEndpoint( status, dateFrom, dateTo );
+			var orders = await this.CollectOrdersFromAllPagesAsync( updatedOrdersEndpoint, mark, token, this._timeouts[ ShopifyOperationEnum.GetOrders ] );
+
+			return orders;
+		}
+
+		// TODO GUARD-3910 Remove this helper method.
+		private async Task< ShopifyOrders > CollectOrdersFromAllPagesAsync( string mainUpdatedOrdersEndpoint, Mark mark, CancellationToken token, int timeout )
+		{
+			var orders = new ShopifyOrders();
+			var compositeUpdatedOrdersEndpoint = mainUpdatedOrdersEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
+
+			do
+			{
+				var updatedOrdersWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
+					() => this._throttlerAsync.ExecuteAsync(
+						() => this._webRequestServices.GetResponsePageAsync< ShopifyOrders >( _shopifyCommandFactory.CreateGetOrdersCommand(),
+							compositeUpdatedOrdersEndpoint, token, mark, timeout ) ) );
+
+				if( updatedOrdersWithinPage.Response.Orders.Count == 0 )
+					break;
+
+				foreach( var order in updatedOrdersWithinPage.Response.Orders )
+					ProcessRefundOrderLineItems( order );
+
+				orders.Orders.AddRange( updatedOrdersWithinPage.Response.Orders );
+
+				compositeUpdatedOrdersEndpoint = updatedOrdersWithinPage.NextPageQueryStr;
+			} while( compositeUpdatedOrdersEndpoint != string.Empty );
+
+			return orders;
+		}
+
+		// TODO GUARD-3910 Remove the 'V2' suffix
+		public async Task< ShopifyOrders > GetOrdersV2Async( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo, CancellationToken token, Mark mark = null )
 		{
 			mark = mark.CreateNewIfBlank();
 
@@ -81,7 +121,7 @@ namespace ShopifyAccess
 					QueryBuilder.GetOrdersRequest( dateFrom, dateTo, status.ToString(), nextCursor ),
 					token, mark, this._timeouts[ ShopifyOperationEnum.GetOrders ] ),
 				mark, token );
-			
+
 			var orders = response.ToShopifyOrders();
 
 			return orders;

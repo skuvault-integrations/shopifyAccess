@@ -5,10 +5,10 @@ namespace ShopifyAccess.Models.Order
 	[ DataContract ]
 	public class ShopifyPriceSet
 	{
-		[ DataMember( Name = "shopMoney" ) ]
+		[ DataMember( Name = "shop_money" ) ]
 		public ShopifyMoney ShopMoney { get; set; }
 
-		[ DataMember( Name = "presentmentMoney" ) ]
+		[ DataMember( Name = "presentment_money" ) ]
 		public ShopifyMoney PresentmentMoney { get; set; }
 	}
 
@@ -18,7 +18,7 @@ namespace ShopifyAccess.Models.Order
 		[ DataMember( Name = "amount" ) ]
 		public decimal Amount { get; set; }
 
-		[ DataMember( Name = "currencyCode" ) ]
+		[ DataMember( Name = "currency_code" ) ]
 		public string CurrencyCode { get; set; }
 	}
 }

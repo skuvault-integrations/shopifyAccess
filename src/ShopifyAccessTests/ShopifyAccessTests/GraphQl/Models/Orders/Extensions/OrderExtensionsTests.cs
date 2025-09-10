@@ -81,6 +81,52 @@ namespace ShopifyAccessTests.GraphQl.Models.Orders.Extensions
             Assert.AreEqual( fulfillment.TrackingInfo.FirstOrDefault()?.TrackingUrl, result.TrackingUrl );
             Assert.AreEqual( fulfillment.FulfillmentLineItems.Items.Count, result.Items.Count() );
         }
+        
+        [Test]
+        public void ToShopifyPriceSet_MapsAllProperties()
+        {
+            // Arrange
+            var priceSet = new PriceSet
+            {
+                ShopMoney = new Money
+                {
+                    Amount = 25.50m,
+                    CurrencyCode = "USD"
+                },
+                PresentmentMoney = new Money
+                {
+                    Amount = 30.75m,
+                    CurrencyCode = "EUR"
+                }
+            };
+
+            // Act
+            var result = priceSet.ToShopifyPriceSet();
+
+            // Assert
+            Assert.AreEqual(priceSet.ShopMoney.Amount, result.ShopMoney.Amount);
+            Assert.AreEqual(priceSet.ShopMoney.CurrencyCode, result.ShopMoney.CurrencyCode);
+            Assert.AreEqual(priceSet.PresentmentMoney.Amount, result.PresentmentMoney.Amount);
+            Assert.AreEqual(priceSet.PresentmentMoney.CurrencyCode, result.PresentmentMoney.CurrencyCode);
+        }
+        
+        [Test]
+        public void ToShopifyMoney_MapsAllProperties()
+        {
+            // Arrange
+            var money = new Money
+            {
+                Amount = 12.34m,
+                CurrencyCode = "GBP"
+            };
+
+            // Act
+            var result = money.ToShopifyMoney();
+
+            // Assert
+            Assert.AreEqual(money.Amount, result.Amount);
+            Assert.AreEqual(money.CurrencyCode, result.CurrencyCode);
+        }
 
         private static Order CreateOrder()
         {
@@ -90,7 +136,7 @@ namespace ShopifyAccessTests.GraphQl.Models.Orders.Extensions
                 Number = 1001,
                 Name = "#1001",
                 CreatedAt = DateTime.UtcNow,
-                Total = new ShopifyPriceSet { ShopMoney = new ShopifyMoney { Amount = 10 } },
+                Total = new PriceSet { ShopMoney = new Money { Amount = 10 } },
                 OrderItems = new Nodes< OrderItem >
                 {
                     Items = new List< OrderItem >
@@ -100,7 +146,7 @@ namespace ShopifyAccessTests.GraphQl.Models.Orders.Extensions
                             Id = "item1",
                             Sku = "SKU1",
                             Quantity = 2,
-                            Price = new ShopifyPriceSet { ShopMoney = new ShopifyMoney { Amount = 5 } },
+                            Price = new PriceSet { ShopMoney = new Money { Amount = 5 } },
                             Title = "Test Item"
                         }
                     }
@@ -121,9 +167,9 @@ namespace ShopifyAccessTests.GraphQl.Models.Orders.Extensions
                                     LineItem = new LineItemDetail
                                     {
                                         Id = "gid://shopify/LineItem/123",
-                                        OriginalUnitPriceSet = new ShopifyPriceSet
+                                        OriginalUnitPriceSet = new PriceSet
                                         {
-                                            ShopMoney = new ShopifyMoney { Amount = 2 }
+                                            ShopMoney = new Money { Amount = 2 }
                                         },
                                         Quantity = 1,
                                         Sku = "SKU1"
@@ -140,7 +186,7 @@ namespace ShopifyAccessTests.GraphQl.Models.Orders.Extensions
                     {
                         Id = "shipline1",
                         Title = "Standard",
-                        OriginalPriceSet = new ShopifyPriceSet { ShopMoney = new ShopifyMoney { Amount = 3 } },
+                        OriginalPriceSet = new PriceSet { ShopMoney = new Money { Amount = 3 } },
                         Code = "STD",
                         Source = "shopify"
                     }
@@ -169,9 +215,9 @@ namespace ShopifyAccessTests.GraphQl.Models.Orders.Extensions
                             LineItem = new LineItemDetail
                             {
                                 Id = "gid://shopify/LineItem/123",
-                                OriginalUnitPriceSet = new ShopifyPriceSet
+                                OriginalUnitPriceSet = new PriceSet
                                 {
-                                    ShopMoney = new ShopifyMoney { Amount = 2 }
+                                    ShopMoney = new Money { Amount = 2 }
                                 },
                                 Quantity = 2,
                                 Sku = "SKU1"

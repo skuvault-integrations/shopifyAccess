@@ -16,13 +16,13 @@ namespace ShopifyAccess.GraphQl.Models.Orders
 		public int Quantity { get; set; }
 
 		[ DataMember( Name = "originalUnitPriceSet" ) ]
-		public ShopifyPriceSet Price { get; set; }
+		public PriceSet Price { get; set; }
 
 		[ DataMember( Name = "title" ) ]
 		public string Title { get; set; }
 
 		[ DataMember( Name = "totalDiscountSet" ) ]
-		public ShopifyPriceSet TotalDiscount { get; set; }
+		public PriceSet TotalDiscount { get; set; }
 
 		[ DataMember( Name = "taxLines" ) ]
 		public IEnumerable< TaxLine > TaxLines { get; set; }

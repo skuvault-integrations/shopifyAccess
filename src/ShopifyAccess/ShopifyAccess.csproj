@@ -77,8 +77,10 @@
     <Compile Include="GraphQl\Models\Nodes.cs" />
     <Compile Include="GraphQl\Models\Orders\Extensions\OrderExtensions.cs" />
     <Compile Include="GraphQl\Models\Orders\Fulfillment.cs" />
+    <Compile Include="GraphQl\Models\Orders\Money.cs" />
     <Compile Include="GraphQl\Models\Orders\Order.cs" />
     <Compile Include="GraphQl\Models\Orders\OrderItem.cs" />
+    <Compile Include="GraphQl\Models\Orders\PriceSet.cs" />
     <Compile Include="GraphQl\Models\Orders\ShippingLine.cs" />
     <Compile Include="GraphQl\Models\Orders\TaxLine.cs" />
     <Compile Include="GraphQl\Models\PageInfo.cs" />

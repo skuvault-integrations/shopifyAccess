@@ -20,6 +20,16 @@ namespace ShopifyAccessTests.Orders
 
 			orders.Count.Should().BeGreaterThan( 0 );
 		}
+		
+		[ Test ]
+		[ Explicit ]
+		public async Task GetOrdersV2Async_ReturnsItems_WhenAnyOrderStatusRequested()
+		{
+			var orders = await this.Service.GetOrdersV2Async( ShopifyOrderStatus.any, DateTime.UtcNow.AddDays( -200 ), DateTime.UtcNow, CancellationToken.None );
+
+			orders.Count.Should().BeGreaterThan( 0 );
+		}
+
 
 		[ Test ]
 		public async Task GetOrdersAsync_ThrowsShopifyUnauthorizedException_WhenIncorrectToken()

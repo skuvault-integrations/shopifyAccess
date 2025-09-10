@@ -44,6 +44,12 @@ namespace ShopifyAccess.GraphQl.Queries
           }
         }
       }
+      billingAddress {
+        zip
+      }
+      shippingAddress {
+        zip
+      }
       closedAt
       cancelledAt
       displayFinancialStatus

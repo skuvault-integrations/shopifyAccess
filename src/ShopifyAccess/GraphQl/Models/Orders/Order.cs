@@ -13,7 +13,7 @@ namespace ShopifyAccess.GraphQl.Models.Orders
 		public string Id { get; set; }
 
 		[ DataMember( Name = "totalPriceSet" ) ]
-		public ShopifyPriceSet Total { get; set; }
+		public PriceSet Total { get; set; }
 
 		[ DataMember( Name = "createdAt" ) ]
 		public DateTime CreatedAt { get; set; }

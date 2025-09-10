@@ -48,7 +48,7 @@ namespace ShopifyAccess.GraphQl.Models.Orders.Extensions
 				Price = item.Price?.ShopMoney?.Amount ?? 0,
 				Title = item.Title,
 				TotalDiscount = item.TotalDiscount?.ShopMoney?.Amount ?? 0,
-				TotalDiscountSet = item.TotalDiscount,
+				TotalDiscountSet = item.TotalDiscount.ToShopifyPriceSet(),
 				TaxLines = item.TaxLines?.Select( i => i.ToShopifyTaxLine() )
 			};
 		}
@@ -58,7 +58,7 @@ namespace ShopifyAccess.GraphQl.Models.Orders.Extensions
 			return new ShopifyTaxLine
 			{
 				Title = taxLine.Title,
-				PriceSet = taxLine.PriceSet,
+				PriceSet = taxLine.PriceSet.ToShopifyPriceSet(),
 			};
 		}
 
@@ -99,6 +99,30 @@ namespace ShopifyAccess.GraphQl.Models.Orders.Extensions
 				Price = shippingLine.OriginalPriceSet.ShopMoney.Amount,
 				Code = shippingLine.Code,
 				Source = shippingLine.Source
+			};
+		}
+
+		internal static ShopifyPriceSet ToShopifyPriceSet( this PriceSet priceSet )
+		{
+			if( priceSet == null )
+				return null;
+
+			return new ShopifyPriceSet
+			{
+				ShopMoney = priceSet.ShopMoney?.ToShopifyMoney(),
+				PresentmentMoney = priceSet.PresentmentMoney?.ToShopifyMoney()
+			};
+		}
+
+		internal static ShopifyMoney ToShopifyMoney( this Money money )
+		{
+			if( money == null )
+				return null;
+
+			return new ShopifyMoney
+			{
+				Amount = money.Amount,
+				CurrencyCode = money.CurrencyCode
 			};
 		}
 	}
