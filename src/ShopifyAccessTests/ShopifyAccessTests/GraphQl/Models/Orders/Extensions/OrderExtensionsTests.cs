@@ -12,7 +12,6 @@ namespace ShopifyAccessTests.GraphQl.Models.Orders.Extensions
     [TestFixture]
     public class OrderExtensionsTests
     {
-
         [ Test ]
         public void ToShopifyOrder_MapsAllPropertiesCorrectly()
         {
