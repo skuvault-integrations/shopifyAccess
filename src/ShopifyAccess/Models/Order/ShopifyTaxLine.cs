@@ -7,7 +7,7 @@ namespace ShopifyAccess.Models.Order
 	{
 		[ DataMember( Name = "title" ) ]
 		public string Title{ get; set; }
-		
+
 		[ DataMember( Name = "price_set" ) ]
 		public ShopifyPriceSet PriceSet{ get; set; }
 	}

@@ -6,6 +6,6 @@ namespace ShopifyAccess.Models.Order
 	public class OrdersCount
 	{
 		[ DataMember( Name = "count" ) ]
-		public int Count { get; set; }
+		public int Count{ get; set; }
 	}
 }

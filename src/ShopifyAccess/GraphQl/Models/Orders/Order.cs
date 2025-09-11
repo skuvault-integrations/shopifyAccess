@@ -10,40 +10,40 @@ namespace ShopifyAccess.GraphQl.Models.Orders
 	internal class Order
 	{
 		[ DataMember( Name = "id" ) ]
-		public string Id { get; set; }
+		public string Id{ get; set; }
 
 		[ DataMember( Name = "totalPriceSet" ) ]
-		public PriceSet Total { get; set; }
+		public PriceSet Total{ get; set; }
 
 		[ DataMember( Name = "createdAt" ) ]
-		public DateTime CreatedAt { get; set; }
+		public DateTime CreatedAt{ get; set; }
 
 		[ DataMember( Name = "lineItems" ) ]
-		public Nodes< OrderItem > OrderItems { get; set; }
+		public Nodes< OrderItem > OrderItems{ get; set; }
 
 		[ DataMember( Name = "number" ) ]
-		public int Number { get; set; }
+		public int Number{ get; set; }
 
 		[ DataMember( Name = "billingAddress" ) ]
-		public ShopifyBillingAddress BillingAddress { get; set; }
+		public ShopifyBillingAddress BillingAddress{ get; set; }
 
 		[ DataMember( Name = "shippingAddress" ) ]
-		public ShopifyShippingAddress ShippingAddress { get; set; }
+		public ShopifyShippingAddress ShippingAddress{ get; set; }
 
 		[ DataMember( Name = "closedAt" ) ]
-		public DateTime? ClosedAt { get; set; }
+		public DateTime? ClosedAt{ get; set; }
 
 		[ DataMember( Name = "cancelledAt" ) ]
-		public DateTime? CancelledAt { get; set; }
+		public DateTime? CancelledAt{ get; set; }
 
 		[ DataMember( Name = "displayFinancialStatus" ) ]
-		public ShopifyFinancialStatus FinancialStatus { get; set; }
+		public ShopifyFinancialStatus FinancialStatus{ get; set; }
 
 		[ DataMember( Name = "fulfillments" ) ]
-		public IEnumerable< Fulfillment > Fulfillments { get; set; }
-		
+		public IEnumerable< Fulfillment > Fulfillments{ get; set; }
+
 		[ DataMember( Name = "displayFulfillmentStatus" ) ]
-		private string RawFulfillmentStatus { get; set; }
+		private string RawFulfillmentStatus{ get; set; }
 
 		[ JsonIgnore ]
 		public FulfillmentStatusEnum FulfillmentStatus
@@ -58,7 +58,7 @@ namespace ShopifyAccess.GraphQl.Models.Orders
 		}
 
 		[ DataMember( Name = "sourceName" ) ]
-		public string RawSourceName { get; set; }
+		public string RawSourceName{ get; set; }
 
 		[ JsonIgnore ]
 		public ShopifySourceNameEnum SourceName
@@ -73,15 +73,15 @@ namespace ShopifyAccess.GraphQl.Models.Orders
 		}
 
 		[ DataMember( Name = "name" ) ]
-		public string Name { get; set; }
+		public string Name{ get; set; }
 
 		[ DataMember( Name = "shippingLines" ) ]
-		public IList<ShippingLine> ShippingLines { get; set; }
+		public IList< ShippingLine > ShippingLines{ get; set; }
 
 		[ DataMember( Name = "discountCodes" ) ]
-		public string[] DiscountCodes { get; set; }
+		public string[] DiscountCodes{ get; set; }
 
 		[ DataMember( Name = "taxLines" ) ]
-		public IEnumerable< TaxLine > TaxLines { get; set; }
+		public IEnumerable< TaxLine > TaxLines{ get; set; }
 	}
 }

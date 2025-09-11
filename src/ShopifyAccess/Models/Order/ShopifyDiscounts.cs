@@ -9,17 +9,18 @@ namespace ShopifyAccess.Models.Order.Discounts
 		{
 			this.TypeValue = typeValue;
 		}
-		
+
 		[ DataMember( Name = "code" ) ]
 		public string Code{ get; set; }
-		
+
 		[ DataMember( Name = "amount" ) ]
 		public decimal Amount{ get; set; }
-		
+
 		[ DataMember( Name = "type" ) ]
-		private string TypeValue { get; set; }
+		private string TypeValue{ get; set; }
+
 		public ShopifyDiscountTypeEnum Type
-		{ 
+		{
 			get
 			{
 				switch( this.TypeValue )
@@ -31,7 +32,7 @@ namespace ShopifyAccess.Models.Order.Discounts
 					default:
 						return ShopifyDiscountTypeEnum.Undefined;
 				}
-			} 
+			}
 		}
 	}
 
