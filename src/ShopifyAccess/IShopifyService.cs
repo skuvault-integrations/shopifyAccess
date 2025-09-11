@@ -13,26 +13,19 @@ namespace ShopifyAccess
 {
 	public interface IShopifyService
 	{
-		/// <summary>
-		/// Get orders by date and fulfillment status
-		/// </summary>
-		/// <param name="status">Fulfillment_status. Shipped, partial, unshipped or any</param>
-		/// <param name="dateFrom">created_at_min. Show orders created after date (format: 2008-01-01 03:00)</param>
-		/// <param name="dateTo">created_at_max. Show orders created before date (format: 2008-01-01 03:00)</param>
-		/// <param name="token"></param>
-		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		/// <returns>Orders collection</returns>
-		ShopifyOrders GetOrders( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo, CancellationToken token, Mark mark = null );
-
+		// TODO GUARD-3910 Remove this legacy method and switch to the GraphQL version.
+		Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo, CancellationToken token, Mark mark = null );
+		
 		/// <summary>
 		/// Get shipped orders async
 		/// </summary>
-		/// <param name="dateFrom">created_at_min. Show orders created after date (format: 2008-01-01 03:00)</param>
-		/// <param name="dateTo">created_at_max. Show orders created before date (format: 2008-01-01 03:00)</param>
-		/// <param name="status">fulfillment_status. Shipped,partial, unshipped or any</param>
+		/// <param name="dateFrom">Show orders created after date (format: 2008-01-01 03:00)</param>
+		/// <param name="dateTo">Show orders created before date (format: 2008-01-01 03:00)</param>
+		/// <param name="status">Shipped,partial, unshipped or any</param>
 		/// <param name="token">CancellationToken</param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
-		Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo, CancellationToken token, Mark mark = null );
+		// TODO GUARD-3910 Remove the 'V2' suffix, it was only used to distinguish from the legacy REST version.
+		Task< ShopifyOrders > GetOrdersV2Async( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo, CancellationToken token, Mark mark = null );
 
 		/// <summary>
 		/// get locations

@@ -9,7 +9,7 @@ namespace ShopifyAccess.GraphQl.Queries
 		/// <summary>
 		/// A global Shopify GraphQL limit. If request more than this many items, Shopify will return an error
 		/// </summary>
-		private const int MaxItemsPerResponse = 250;
+		internal const int MaxItemsPerResponse = 250;
 
 		public static string GetCurrentBulkOperationStatusRequest()
 		{
@@ -129,7 +129,7 @@ namespace ShopifyAccess.GraphQl.Queries
 		/// </summary>
 		/// <param name="request"></param>
 		/// <returns></returns>
-		private static string CleanUpRequest( string request )
+		internal static string CleanUpRequest( string request )
 		{
 			return request.Replace( '\t', ' ' );
 		}

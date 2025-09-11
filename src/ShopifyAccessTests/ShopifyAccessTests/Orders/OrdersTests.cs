@@ -1,6 +1,6 @@
-﻿using NUnit.Framework;
+﻿using System.Collections.Generic;
+using NUnit.Framework;
 using NUnit.Framework.Internal;
-using ServiceStack.Text;
 using ShopifyAccess;
 using ShopifyAccess.Models.Order;
 
@@ -17,8 +17,7 @@ namespace ShopifyAccessTests.Orders
 			// Arrange
 			var quantity = _randomizer.Next( 2, int.MaxValue );
 			var refundQuantity = _randomizer.Next( 1, quantity - 1 );
-			var shopifyOrderJson = GenerateShopifyOrderJsonWithRefund( quantity, refundQuantity );
-			var shopifyOrder = JsonSerializer.DeserializeFromString< ShopifyOrder >( shopifyOrderJson );
+			var shopifyOrder = GenerateShopifyOrderJsonWithRefund( quantity, refundQuantity );
 			
 			// Act
 			ShopifyService.ProcessRefundOrderLineItems( shopifyOrder );	
@@ -32,8 +31,7 @@ namespace ShopifyAccessTests.Orders
 		{
 			// Arrange
 			var quantity = _randomizer.Next( 2, int.MaxValue );
-			var shopifyOrderJson = GenerateShopifyOrderJsonWithRefund( quantity, quantity, restockType: "cancel" );
-			var shopifyOrder = JsonSerializer.DeserializeFromString< ShopifyOrder >( shopifyOrderJson );
+			var shopifyOrder = GenerateShopifyOrderJsonWithRefund( quantity, quantity, restockType: "cancel" );
 			
 			// Act
 			ShopifyService.ProcessRefundOrderLineItems( shopifyOrder );
@@ -42,29 +40,37 @@ namespace ShopifyAccessTests.Orders
 			Assert.That( shopifyOrder.OrderItems.Count, Is.EqualTo( 0 ) );
 		}
 
-		private static string GenerateShopifyOrderJsonWithRefund( int orderQuantity, int refundQuantity, string restockType = "" )
+		private static ShopifyOrder GenerateShopifyOrderJsonWithRefund( int orderQuantity, int refundQuantity, string restockType = "" )
 		{
 			var lineItemId = _randomizer.Next();
-			return @"
-			{			  
-				""line_items"": [
-			    {
-					""id"": " + lineItemId + @",
-					""quantity"": " + orderQuantity + @"
-			    }
-			  ],
-			  ""refunds"": [
-			    {
-					""refund_line_items"": [
-			        {
-						""line_item_id"": " + lineItemId + @",
-						""quantity"": " + refundQuantity + @",
-						""restock_type"": " + restockType + @"
-			        }
-			      ]
-			    }
-			  ]
-			}";
+			var shopifyOrderWithRefund = new ShopifyOrder()
+			{
+				OrderItems = new List< ShopifyOrderItem >()
+				{
+					new ShopifyOrderItem()
+					{
+						Id = lineItemId.ToString(),
+						Quantity = orderQuantity,
+					}
+				},
+				Refunds = new List< ShopifyOrderRefund >()
+				{
+					new ShopifyOrderRefund()
+					{
+						RefundLineItems = new List< ShopifyOrderRefundLineItem >()
+						{
+							new ShopifyOrderRefundLineItem()
+							{
+								LineItemId = lineItemId,
+								Quantity = refundQuantity,
+								RestockType = restockType
+							}
+						}
+					}
+				}
+			};
+
+			return shopifyOrderWithRefund;
 		}
 	}
 }

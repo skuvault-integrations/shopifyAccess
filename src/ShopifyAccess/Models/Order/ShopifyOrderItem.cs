@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using ShopifyAccess.Models.Order.Discounts;
 
 namespace ShopifyAccess.Models.Order
 {
@@ -8,16 +7,16 @@ namespace ShopifyAccess.Models.Order
 	public class ShopifyOrderItem
 	{
 		[ DataMember( Name = "id" ) ]
-		public string Id { get; set; }
+		public string Id{ get; set; }
 
 		[ DataMember( Name = "sku" ) ]
-		public string Sku { get; set; }
+		public string Sku{ get; set; }
 
 		[ DataMember( Name = "quantity" ) ]
-		public int Quantity { get; set; }
+		public int Quantity{ get; set; }
 
 		[ DataMember( Name = "price" ) ]
-		public decimal Price { get; set; }
+		public decimal Price{ get; set; }
 
 		[ DataMember( Name = "title" ) ]
 		public string Title{ get; set; }

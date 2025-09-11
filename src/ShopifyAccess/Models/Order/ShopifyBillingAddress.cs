@@ -6,6 +6,6 @@ namespace ShopifyAccess.Models.Order
 	public sealed class ShopifyBillingAddress
 	{
 		[ DataMember( Name = "zip" ) ]
-		public string Zip { get; set; }
+		public string Zip{ get; set; }
 	}
 }

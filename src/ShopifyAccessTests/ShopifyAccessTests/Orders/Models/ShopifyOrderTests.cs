@@ -1,6 +1,7 @@
 using FluentAssertions;
+using Newtonsoft.Json;
 using NUnit.Framework;
-using ServiceStack.Text;
+using ShopifyAccess.GraphQl.Models.Orders;
 using ShopifyAccess.Models.Order;
 
 namespace ShopifyAccessTests.Orders.Models
@@ -12,13 +13,13 @@ namespace ShopifyAccessTests.Orders.Models
 		public void Deserialize_ReturnsFulfillmentStatus_IgnoringCase( string rawFulfillmentStatus, FulfillmentStatusEnum expectedFulfillmentStatus )
 		{
 			// Arrange
-			var json = "{\"id\":0,\"total_price\":0,\"created_at\":\"\\/Date(-62135596800000-0000)\\/\",\"order_number\":0,\"financial_status\":\"Undefined\",\"fulfillment_status\":\"" + rawFulfillmentStatus + "\",\"source_name\":\"web\"}";
+			var json = "{ \"id\": \"gid://shopify/Order/6026305732922\", \"number\": 1024, \"createdAt\": \"2024-07-12T17:14:07Z\", \"totalPriceSet\": { \"shopMoney\": { \"amount\": \"0.0\", \"currencyCode\": \"USD\" } }, \"displayFulfillmentStatus\": \" " + rawFulfillmentStatus + " \", \"fulfillments\": [], \"sourceName\": \" web \" }";
 
 			// Act
-			var shopifyOrder = JsonSerializer.DeserializeFromString< ShopifyOrder >( json );
+			var order = JsonConvert.DeserializeObject< Order >( json );
 
 			// Assert
-			shopifyOrder.FulfillmentStatus.Should().Be( expectedFulfillmentStatus );
+			order.FulfillmentStatus.Should().Be( expectedFulfillmentStatus );
 		}
 
 		[ TestCase( "" ) ]
@@ -27,26 +28,26 @@ namespace ShopifyAccessTests.Orders.Models
 		public void Deserialize_ReturnsUndefined_WhenFulfillmentStatusIsNotValid( string rawFulfillmentStatus )
 		{
 			// Arrange
-			var json = "{\"id\":0,\"total_price\":0,\"created_at\":\"\\/Date(-62135596800000-0000)\\/\",\"order_number\":0,\"financial_status\":\"Undefined\",\"fulfillment_status\":\"" + rawFulfillmentStatus + "\",\"source_name\":\"web\"}";
+			var json = "{ \"id\": \"gid://shopify/Order/6026305732922\", \"number\": 1024, \"createdAt\": \"2024-07-12T17:14:07Z\", \"totalPriceSet\": { \"shopMoney\": { \"amount\": \"0.0\", \"currencyCode\": \"USD\" } }, \"displayFulfillmentStatus\": \" " + rawFulfillmentStatus + " \", \"fulfillments\": [], \"sourceName\": \" web \" }";
 
 			// Act
-			var shopifyOrder = JsonSerializer.DeserializeFromString< ShopifyOrder >( json );
+			var order = JsonConvert.DeserializeObject< Order >( json );
 
 			// Assert
-			shopifyOrder.FulfillmentStatus.Should().Be( FulfillmentStatusEnum.Undefined );
+			order.FulfillmentStatus.Should().Be( FulfillmentStatusEnum.Undefined );
 		}
 
 		[ TestCase( "Web", ShopifySourceNameEnum.web ) ]
 		public void Deserialize_ReturnsSourceName_IgnoringCase( string rawSourceName, ShopifySourceNameEnum expectedSourceName )
 		{
 			// Arrange
-			var json = "{\"id\":0,\"total_price\":0,\"created_at\":\"\\/Date(-62135596800000-0000)\\/\",\"order_number\":0,\"financial_status\":\"Undefined\",\"fulfillment_status\":\"\",\"source_name\":\"" + rawSourceName + "\"}";
+			var json = "{ \"id\": \"gid://shopify/Order/6026305732922\", \"number\": 1024, \"createdAt\": \"2024-07-12T17:14:07Z\", \"totalPriceSet\": { \"shopMoney\": { \"amount\": \"0.0\", \"currencyCode\": \"USD\" } }, \"displayFinancialStatus\": \"PAID\", \"fulfillments\": [], \"sourceName\": \" " + rawSourceName + "\" }";
 
 			// Act
-			var shopifyOrder = JsonSerializer.DeserializeFromString< ShopifyOrder >( json );
+			var order = JsonConvert.DeserializeObject< Order >( json );
 
 			// Assert
-			shopifyOrder.SourceName.Should().Be( expectedSourceName );
+			order.SourceName.Should().Be( expectedSourceName );
 		}
 
 		[ TestCase( "" ) ]
@@ -55,13 +56,13 @@ namespace ShopifyAccessTests.Orders.Models
 		public void Deserialize_ReturnsUndefined_WhenSourceNameIsNotValid( string rawSourceName )
 		{
 			// Arrange
-			var json = "{\"id\":0,\"total_price\":0,\"created_at\":\"\\/Date(-62135596800000-0000)\\/\",\"order_number\":0,\"financial_status\":\"Undefined\",\"fulfillment_status\":\"\",\"source_name\":\"" + rawSourceName + "\"}";
+			var json = "{ \"id\": \"gid://shopify/Order/6026305732922\", \"number\": 1024, \"createdAt\": \"2024-07-12T17:14:07Z\", \"totalPriceSet\": { \"shopMoney\": { \"amount\": \"0.0\", \"currencyCode\": \"USD\" } }, \"displayFinancialStatus\": \"PAID\", \"fulfillments\": [], \"sourceName\": \" " + rawSourceName + "\" }";
 
 			// Act
-			var shopifyOrder = JsonSerializer.DeserializeFromString< ShopifyOrder >( json );
+			var order = JsonConvert.DeserializeObject< Order >( json );
 
 			// Assert
-			shopifyOrder.SourceName.Should().Be( ShopifySourceNameEnum.Undefined );
+			order.SourceName.Should().Be( ShopifySourceNameEnum.Undefined );
 		}
 	}
 }

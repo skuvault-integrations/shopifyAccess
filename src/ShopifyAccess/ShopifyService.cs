@@ -7,10 +7,13 @@ using CuttingEdge.Conditions;
 using Netco.Extensions;
 using ServiceStack;
 using ShopifyAccess.GraphQl;
+using ShopifyAccess.GraphQl.Models;
+using ShopifyAccess.GraphQl.Models.Orders;
 using ShopifyAccess.GraphQl.Models.Products;
 using ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions;
 using ShopifyAccess.GraphQl.Models.Responses;
 using ShopifyAccess.GraphQl.Queries;
+using ShopifyAccess.GraphQl.Queries.Orders;
 using ShopifyAccess.GraphQl.Services;
 using ShopifyAccess.Misc;
 using ShopifyAccess.Models;
@@ -70,22 +73,57 @@ namespace ShopifyAccess
 		}
 
 		#region GetOrders
-		public ShopifyOrders GetOrders( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo, CancellationToken token, Mark mark = null )
-		{
-			mark = mark.CreateNewIfBlank();
-
-			var updatedOrdersEndpoint = EndpointsBuilder.CreateUpdatedOrdersEndpoint( status, dateFrom, dateTo );
-			var orders = this.CollectOrdersFromAllPages( updatedOrdersEndpoint, mark, token, this._timeouts[ ShopifyOperationEnum.GetOrders ] );
-
-			return orders;
-		}
-
+		
+		// TODO GUARD-3910 Remove this legacy method and switch to the GraphQL version.
 		public async Task< ShopifyOrders > GetOrdersAsync( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo, CancellationToken token, Mark mark = null )
 		{
 			mark = mark.CreateNewIfBlank();
 
 			var updatedOrdersEndpoint = EndpointsBuilder.CreateUpdatedOrdersEndpoint( status, dateFrom, dateTo );
 			var orders = await this.CollectOrdersFromAllPagesAsync( updatedOrdersEndpoint, mark, token, this._timeouts[ ShopifyOperationEnum.GetOrders ] );
+
+			return orders;
+		}
+
+		// TODO GUARD-3910 Remove this helper method.
+		private async Task< ShopifyOrders > CollectOrdersFromAllPagesAsync( string mainUpdatedOrdersEndpoint, Mark mark, CancellationToken token, int timeout )
+		{
+			var orders = new ShopifyOrders();
+			var compositeUpdatedOrdersEndpoint = mainUpdatedOrdersEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
+
+			do
+			{
+				var updatedOrdersWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
+					() => this._throttlerAsync.ExecuteAsync(
+						() => this._webRequestServices.GetResponsePageAsync< ShopifyOrders >( _shopifyCommandFactory.CreateGetOrdersCommand(),
+							compositeUpdatedOrdersEndpoint, token, mark, timeout ) ) );
+
+				if( updatedOrdersWithinPage.Response.Orders.Count == 0 )
+					break;
+
+				foreach( var order in updatedOrdersWithinPage.Response.Orders )
+					ProcessRefundOrderLineItems( order );
+
+				orders.Orders.AddRange( updatedOrdersWithinPage.Response.Orders );
+
+				compositeUpdatedOrdersEndpoint = updatedOrdersWithinPage.NextPageQueryStr;
+			} while( compositeUpdatedOrdersEndpoint != string.Empty );
+
+			return orders;
+		}
+
+		// TODO GUARD-3910 Remove the 'V2' suffix
+		public async Task< ShopifyOrders > GetOrdersV2Async( ShopifyOrderStatus status, DateTime dateFrom, DateTime dateTo, CancellationToken token, Mark mark = null )
+		{
+			mark = mark.CreateNewIfBlank();
+
+			var response = await this._graphQlPaginationService.GetAllPagesAsync< GetOrdersData, Order >(
+				async ( nextCursor ) => await this._webRequestServices.PostDataAsync< GetOrdersResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
+					OrderQueryBuilder.GetOrdersRequest( dateFrom, dateTo, status.ToString(), nextCursor ),
+					token, mark, this._timeouts[ ShopifyOperationEnum.GetOrders ] ),
+				mark, token );
+
+			var orders = response.ToShopifyOrders();
 
 			return orders;
 		}
@@ -113,55 +151,6 @@ namespace ShopifyAccess
 			var allLocations = await this.GetLocationsAsync( token, mark ).ConfigureAwait( false );
 			var activeLocations = allLocations?.Locations?.Where( x => x.IsActive ) ?? new ShopifyLocation[] {};
 			return new ShopifyLocations( activeLocations.ToList() );
-		}
-
-		private ShopifyOrders CollectOrdersFromAllPages( string mainUpdatedOrdersEndpoint, Mark mark, CancellationToken token, int timeout )
-		{
-			var orders = new ShopifyOrders();
-			var compositeUpdatedOrdersEndpoint = mainUpdatedOrdersEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
-
-			do
-			{
-				var updatedOrdersWithinPage = ActionPolicies.GetPolicy( mark, this._shopName, token ).Get(
-					() => this._throttler.Execute(
-						() => this._webRequestServices.GetResponsePage< ShopifyOrders >( _shopifyCommandFactory.CreateGetOrdersCommand(), 
-							compositeUpdatedOrdersEndpoint, token, mark, timeout ) ) );
-
-				if( updatedOrdersWithinPage.Response.Orders.Count == 0 )
-					break;
-
-				orders.Orders.AddRange( updatedOrdersWithinPage.Response.Orders );
-
-				compositeUpdatedOrdersEndpoint = updatedOrdersWithinPage.NextPageQueryStr;
-			} while( compositeUpdatedOrdersEndpoint != string.Empty );
-
-			return orders;
-		}
-
-		private async Task< ShopifyOrders > CollectOrdersFromAllPagesAsync( string mainUpdatedOrdersEndpoint, Mark mark, CancellationToken token, int timeout )
-		{
-			var orders = new ShopifyOrders();
-			var compositeUpdatedOrdersEndpoint = mainUpdatedOrdersEndpoint.ConcatEndpoints( EndpointsBuilder.CreateGetEndpoint( new ShopifyCommandEndpointConfig( RequestMaxLimit ) ) );
-
-			do
-			{
-				var updatedOrdersWithinPage = await ActionPolicies.GetPolicyAsync( mark, this._shopName, token ).Get(
-					() => this._throttlerAsync.ExecuteAsync(
-						() => this._webRequestServices.GetResponsePageAsync< ShopifyOrders >( _shopifyCommandFactory.CreateGetOrdersCommand(), 
-							compositeUpdatedOrdersEndpoint, token, mark, timeout ) ) );
-
-				if( updatedOrdersWithinPage.Response.Orders.Count == 0 )
-					break;
-
-				foreach( var order in updatedOrdersWithinPage.Response.Orders )
-					ProcessRefundOrderLineItems( order );
-
-				orders.Orders.AddRange( updatedOrdersWithinPage.Response.Orders );
-
-				compositeUpdatedOrdersEndpoint = updatedOrdersWithinPage.NextPageQueryStr;
-			} while( compositeUpdatedOrdersEndpoint != string.Empty );
-
-			return orders;
 		}
 
 		internal static void ProcessRefundOrderLineItems( ShopifyOrder order )
