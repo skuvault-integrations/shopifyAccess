@@ -64,7 +64,7 @@ namespace ShopifyAccess.GraphQl.Models.Orders.Extensions
 		internal static ShopifyFulfillment ToShopifyFulfillment( this Fulfillment fulfillment, long orderId )
 		{
 			var lineItemDetails = fulfillment.FulfillmentLineItems?.Items?.Select( x => x.LineItem );
-			var trackingInfo = fulfillment.TrackingInfo?.LastOrDefault();
+			var trackingInfo = fulfillment.TrackingInfo?.FirstOrDefault();
 
 			return new ShopifyFulfillment
 			{
