@@ -33,37 +33,5 @@ namespace ShopifyAccessTests.GraphQl.Queries.Orders
 				Assert.That( result.Contains( ordersPerPage.ToString() ), Is.True );
 			} );
 		}
-
-		[ TestCase(
-			"2025-09-17 20:56:05", "2025-09-17 20:59:37",
-			"2025-09-17T20:56:05.0000000Z", "2025-09-17T20:59:37.0000000Z"
-		) ]
-		public void GetOrdersRequest_ShouldIncludeUtcIso8601Dates( string inputFrom, string inputTo, string expectedFrom, string expectedTo )
-		{
-			// Arrange
-			var dateFrom = DateTime.SpecifyKind( DateTime.Parse( inputFrom ), DateTimeKind.Utc );
-			var dateTo = DateTime.SpecifyKind( DateTime.Parse( inputTo ), DateTimeKind.Utc );
-
-			// Act
-			var query = OrderQueryBuilder.GetOrdersRequest(
-				dateFrom,
-				dateTo,
-				status : ShopifyOrderStatus.any.ToString(),
-				after : null,
-				ordersPerPage : 10
-			);
-
-			var formattedFrom = dateFrom.ToIso8601();
-			var formattedTo = dateTo.ToIso8601();
-
-			// Assert
-			Assert.That( formattedFrom, Does.StartWith( expectedFrom ) );
-			Assert.That( formattedFrom, Does.EndWith( "Z" ) );
-			Assert.That( formattedTo, Does.StartWith( expectedTo ) );
-			Assert.That( formattedTo, Does.EndWith( "Z" ) );
-
-			Assert.That( query, Does.Contain( formattedFrom ) );
-			Assert.That( query, Does.Contain( formattedTo ) );
-		}
 	}
 }

@@ -20,7 +20,7 @@ namespace ShopifyAccess.GraphQl.Queries.Orders
 
 			var variables = new
 			{
-				query = $"updated_at:>='{dateFromUtc.ToUniversalTime().ToIso8601()}' AND updated_at:<='{dateToUtc.ToUniversalTime().ToIso8601()}' AND status:'{status}'",
+				query = $"updated_at:>='{dateFromUtc.ToIso8601()}' AND updated_at:<='{dateToUtc.ToIso8601()}' AND status:'{status}'",
 				after,
 				first = ordersPerPage
 			};
