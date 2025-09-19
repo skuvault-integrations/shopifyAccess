@@ -1,6 +1,7 @@
 using System;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
+using ShopifyAccess.GraphQl.Helpers;
 using ShopifyAccess.GraphQl.Queries.Orders;
 using ShopifyAccess.Models.Order;
 
