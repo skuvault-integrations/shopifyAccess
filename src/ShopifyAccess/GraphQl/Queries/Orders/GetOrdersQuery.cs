@@ -115,6 +115,7 @@ namespace ShopifyAccess.GraphQl.Queries.Orders
         priceSet {
           shopMoney {
             amount
+            currencyCode
           }
         }
       }
