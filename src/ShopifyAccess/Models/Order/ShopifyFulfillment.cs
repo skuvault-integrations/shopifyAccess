@@ -37,7 +37,7 @@ namespace ShopifyAccess.Models.Order
 		public long OrderId{ get; set; }
 
 		[ DataMember( Name = "status" ) ]
-		private string StatusValue{ get; set; }
+		public string StatusValue{ get; set; }
 
 		public ShopifyOrderFulfillmentStatusEnum Status
 		{

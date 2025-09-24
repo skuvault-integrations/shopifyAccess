@@ -73,6 +73,7 @@ namespace ShopifyAccess.GraphQl.Models.Orders.Extensions
 				UpdatedAt = fulfillment.UpdatedAt,
 				Items = lineItemDetails?.Select( i => i.ToShopifyOrderFulfillmentItem() ),
 				OrderId = orderId,
+				StatusValue = fulfillment.Status,
 				TrackingCompany = trackingInfo?.TrackingCompany,
 				TrackingNumber = trackingInfo?.TrackingNumber,
 				TrackingUrl = trackingInfo?.TrackingUrl
