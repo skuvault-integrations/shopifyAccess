@@ -11,6 +11,11 @@ namespace ShopifyAccess.GraphQl.Queries
 		/// </summary>
 		internal const int MaxItemsPerResponse = 250;
 
+		/// <summary>
+		/// The maximum number of variants per product GraphQL will return as part of the product query
+		/// </summary>
+		internal const int MaxVariantsPerProduct = 250;
+
 		public static string GetCurrentBulkOperationStatusRequest()
 		{
 			var request = new { query = CleanUpRequest( CurrentBulkOperationQuery.Query ) };
@@ -78,12 +83,13 @@ namespace ShopifyAccess.GraphQl.Queries
 			{
 				query = $"created_at:>='{createdAtMinUtc.ToIso8601()}'",
 				after,
-				first = productsPerPage
+				first = productsPerPage,
+				maxVariantsPerProduct = MaxVariantsPerProduct
 			};
 			var request = new { query = CleanUpRequest( GetProductsQuery.Query ), variables };
 			return request.ToJson();
 		}
-		
+
 		/// <summary>
 		/// Create a query to get products created before but updated after the specified date/time, inclusive.
 		/// </summary>
@@ -102,7 +108,8 @@ namespace ShopifyAccess.GraphQl.Queries
 			{
 				query = $"created_at:<='{createdAtMaxAndUpdatedAtMinUtc.ToIso8601()}' AND updated_at:>='{createdAtMaxAndUpdatedAtMinUtc.ToIso8601()}'",
 				after,
-				first = productsPerPage
+				first = productsPerPage,
+				maxVariantsPerProduct = MaxVariantsPerProduct
 			};
 			var request = new { query = CleanUpRequest( GetProductsQuery.Query ), variables };
 			return request.ToJson();

@@ -1,32 +1,41 @@
 using System;
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace ShopifyAccess.GraphQl.Models.Products
 {
 	internal class Product
 	{
-		[ DataMember( Name = "title" ) ]
+		[ JsonProperty( "title" ) ]
 		public string Title{ get; set; }
-		
-		[ DataMember( Name = "variants" ) ]
-		public Nodes< Products.ProductVariant > Variants{ get; set; }
 
-		[ DataMember( Name = "vendor" ) ]
+		[ JsonProperty( "variants" ) ]
+		public Nodes< ProductVariant > Variants{ get; set; }
+
+		[ JsonProperty( "variantsCount" ) ]
+		public VariantsCount TotalVariantsCount{ get; set; }
+
+		[ JsonProperty( "vendor" ) ]
 		public string Vendor{ get; set; }
-		
-		[ DataMember( Name = "media" ) ]
+
+		[ JsonProperty( "media" ) ]
 		public Nodes< Common.Media > Media{ get; set; }
 
-		[ DataMember( Name = "productType" ) ]
+		[ JsonProperty( "productType" ) ]
 		public string ProductType{ get; set; }
 
-		[ DataMember( Name = "descriptionHtml" ) ]
+		[ JsonProperty( "descriptionHtml" ) ]
 		public string DescriptionHtml{ get; set; }
 
-		[ DataMember( Name = "updatedAt" ) ]
+		[ JsonProperty( "updatedAt" ) ]
 		public DateTime? UpdatedAt{ get; set; }
-		
-		[ DataMember( Name = "createdAt" ) ]
+
+		[ JsonProperty( "createdAt" ) ]
 		public DateTime? CreatedAt{ get; set; }
+	}
+
+	internal class VariantsCount
+	{
+		[ JsonProperty( "count" ) ]
+		public int? Count{ get; set; }
 	}
 }

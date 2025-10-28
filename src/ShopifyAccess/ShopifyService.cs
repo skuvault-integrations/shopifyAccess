@@ -206,6 +206,8 @@ namespace ShopifyAccess
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
 					mark, token );
 
+				//TODO GUARD-3946 For products with product.TotalVariantsCount > QueryBuilder.MaxVariantsPerProduct, get additional variants by pages, by productIds of some sort
+
 				return response?.ToShopifyProducts();
 			}
 			finally

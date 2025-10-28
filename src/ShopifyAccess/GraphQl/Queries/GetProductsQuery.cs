@@ -11,11 +11,12 @@ namespace ShopifyAccess.GraphQl.Queries
 		/// <param name="$after">Cursor for pagination</param>
 		//Assumption: No product has more than 250 variants. If not correct, will have to get variants in pages if a product has more than 250
 		internal const string Query =
-			@"query ($query: String, $first: Int, $after: String) {
+			//TODO GUARD-3946 Get each product's id, to retrieve variants via another query for products that have > 250 variants
+			@"query ($query: String, $first: Int, $after: String, $maxVariantsPerProduct: Int) {
 				products(query: $query, first: $first, after: $after) {
 					nodes {
 						title
-						variants(first: 250) {
+						variants(first: $maxVariantsPerProduct) {
 							nodes {
 								sku
 								title
@@ -35,6 +36,9 @@ namespace ShopifyAccess.GraphQl.Queries
 								}
 								updatedAt
 							}
+						}
+						variantsCount {
+							count
 						}
 						vendor
 						media(first: 250)

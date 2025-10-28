@@ -16,6 +16,7 @@ namespace ShopifyAccess.GraphQl.Models.Products.Extensions
 				Vendor = product.Vendor,
 				Images = product.Media?.Items?.ToShopifyProductImages() ?? new List< ShopifyAccess.Models.ShopifyProductImage >(),
 				Variants = productVariants.Select( x => x.ToShopifyProductVariant() ).ToList(),
+				TotalVariantsCount = product.TotalVariantsCount?.Count ?? default, 
 				Type = product.ProductType,
 				BodyHtml = product.DescriptionHtml,
 				UpdatedAt = product.UpdatedAt ?? default
