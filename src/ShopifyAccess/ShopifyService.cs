@@ -206,16 +206,16 @@ namespace ShopifyAccess
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
 					mark, token );
 
-				//TODO GUARD-3946 For products with product.TotalVariantsCount > QueryBuilder.MaxVariantsPerProduct, get additional variants by pages, by productIds of some sort
+				var productVariants = await this.GetAdditionalProductVariantsAsync( response, token, mark );
 
-				return response?.ToShopifyProducts();
+				return response?.ToShopifyProducts( productVariants );
 			}
 			finally
 			{
 				ShopifyLogger.LogOperationEnd( this._shopName, mark );
 			}
 		}
-		
+
 		public async Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark, $"productsStartUtc: '{productsStartUtc}'" );
@@ -233,13 +233,30 @@ namespace ShopifyAccess
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
 					mark, token );
 
-				return response?.ToShopifyProducts();
+				var productVariants = await this.GetAdditionalProductVariantsAsync( response, token, mark );
+
+				return response?.ToShopifyProducts( productVariants );
 			}
 			finally
 			{
 				ShopifyLogger.LogOperationEnd( this._shopName, mark );
 			}
 		}
+
+		/// <summary>
+		/// Get additiona variants for products that have more than <see cref="QueryBuilder.MaxVariantsPerProduct"/> variants
+		/// </summary>
+		/// <param name="products"></param>
+		/// <param name="token"></param>
+		/// <param name="mark"></param>
+		/// <returns>Dictionary of productId (key), productVariants (value)</returns>
+		private async Task< IDictionary< string, List< ProductVariant > > > GetAdditionalProductVariantsAsync( List< Product > products, CancellationToken token, Mark mark )
+		{
+			//TODO GUARD-3946 For products with product.TotalVariantsCount > QueryBuilder.MaxVariantsPerProduct, get additional variants by pages, by productIds of some sort
+			//	Add unit tests confirming that this path gets executed
+			return null;
+		}
+
 
 		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryAsync( CancellationToken token, Mark mark )
 		{

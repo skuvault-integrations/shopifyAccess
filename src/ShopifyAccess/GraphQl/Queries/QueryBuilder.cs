@@ -82,6 +82,8 @@ namespace ShopifyAccess.GraphQl.Queries
 			var variables = new
 			{
 				query = $"created_at:>='{createdAtMinUtc.ToIso8601()}'",
+				//TODO GUARD-3946 Everything below this line is identical in this method and GetProductsCreatedBeforeButUpdatedAfter.
+				//	Extract into a common if makes sense and doesn't make code harder to understand
 				after,
 				first = productsPerPage,
 				maxVariantsPerProduct = MaxVariantsPerProduct
