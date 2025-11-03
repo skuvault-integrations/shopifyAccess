@@ -64,7 +64,32 @@ namespace ShopifyAccess.GraphQl.Queries
 			var request = new { query = CleanUpRequest( query ) };
 			return request.ToJson();
 		}
-		
+
+		/// <summary>
+		/// Create a query to get products created after the specified date/time, inclusive.
+		/// </summary>
+		/// <param name="createdAtMinUtc"></param>
+		/// <param name="after">Pagination cursor to request the next page</param>
+		/// <param name="productsPerPage"></param>
+		/// <returns>GraphQL Query</returns>
+		//TODO GUARD-3954 Remove on feature cleanup
+		public static string GetProductsCreatedOnOrAfterRequestLegacy( DateTime createdAtMinUtc, string after = null, int productsPerPage = MaxItemsPerResponse )
+		{
+			if( productsPerPage > MaxItemsPerResponse )
+			{
+				throw new ArgumentOutOfRangeException( nameof(productsPerPage), productsPerPage, $"productsPerPage should not be greater than {MaxItemsPerResponse}" );
+			}
+			
+			var variables = new
+			{
+				query = $"created_at:>='{createdAtMinUtc.ToIso8601()}'",
+				after,
+				first = productsPerPage
+			};
+			var request = new { query = CleanUpRequest( GetProductsQuery.QueryLegacy ), variables };
+			return request.ToJson();
+		}
+
 		/// <summary>
 		/// Create a query to get products created after the specified date/time, inclusive.
 		/// </summary>
@@ -89,6 +114,31 @@ namespace ShopifyAccess.GraphQl.Queries
 				maxVariantsPerProduct = MaxVariantsPerProduct
 			};
 			var request = new { query = CleanUpRequest( GetProductsQuery.Query ), variables };
+			return request.ToJson();
+		}
+
+		/// <summary>
+		/// Create a query to get products created before but updated after the specified date/time, inclusive.
+		/// </summary>
+		/// <param name="createdAtMaxAndUpdatedAtMinUtc"></param>
+		/// <param name="after">Pagination cursor to request the next page</param>
+		/// <param name="productsPerPage"></param>
+		/// <returns>GraphQL Query</returns>
+		//TODO GUARD-3954 Remove on feature cleanup
+		public static string GetProductsCreatedBeforeButUpdatedAfterLegacy( DateTime createdAtMaxAndUpdatedAtMinUtc, string after = null, int productsPerPage = MaxItemsPerResponse )
+		{
+			if( productsPerPage > MaxItemsPerResponse )
+			{
+				throw new ArgumentOutOfRangeException( nameof(productsPerPage), productsPerPage, $"productsPerPage should not be greater than {MaxItemsPerResponse}" );
+			}
+			
+			var variables = new
+			{
+				query = $"created_at:<='{createdAtMaxAndUpdatedAtMinUtc.ToIso8601()}' AND updated_at:>='{createdAtMaxAndUpdatedAtMinUtc.ToIso8601()}'",
+				after,
+				first = productsPerPage
+			};
+			var request = new { query = CleanUpRequest( GetProductsQuery.QueryLegacy ), variables };
 			return request.ToJson();
 		}
 

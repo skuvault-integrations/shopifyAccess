@@ -15,20 +15,48 @@ namespace ShopifyAccessTests.Products
 	public class ProductVariantTests : BaseTests
 	{
 		private static readonly Mark _mark = Mark.Create;
-		
+
 		[ Test ]
 		[ Explicit ]
+		//TODO GUARD-3954 Remove on feature cleanup
+		public async Task GetProductsCreatedAfterLegacyAsync()
+		{
+			var productsStartUtc = DateTime.Parse( "2025-01-06T17:14:34Z" ); 
+
+			var products = await this.Service.GetProductsCreatedAfterLegacyAsync( productsStartUtc, CancellationToken.None, _mark );
+
+			Assert.That( products.Products, Is.Not.Empty );
+		}
+
+		[ Test ]
+		[ Explicit ]
+		//TODO GUARD-3946 Run test
 		public async Task GetProductsCreatedAfterAsync()
 		{
 			var productsStartUtc = DateTime.Parse( "2025-01-06T17:14:34Z" ); 
 
 			var products = await this.Service.GetProductsCreatedAfterAsync( productsStartUtc, CancellationToken.None, _mark );
 
+			//TODO GUARD-3945 Temp useful query:
+			//	Newtonsoft.Json.JsonConvert.SerializeObject( products.Products.Where(x => x.Variants.Count > 1).Select(y => new {Title = y.Title, Variants = Newtonsoft.Json.JsonConvert.SerializeObject(y.Variants.Select(a => new {Sku = a.Sku}))} ) )
 			Assert.That( products.Products, Is.Not.Empty );
 		}
-		
+
 		[ Test ]
 		[ Explicit ]
+		//TODO GUARD-3954 Remove on feature cleanup
+		public async Task GetProductsCreatedBeforeButUpdatedAfterLegacyAsync()
+		{
+			var productsStartUtc = DateTime.Parse( "2025-01-13T20:52:49Z" );
+
+			var products = await this.Service.GetProductsCreatedBeforeButUpdatedAfterLegacyAsync( productsStartUtc, CancellationToken.None, _mark );
+
+			Assert.That( products.Products, Is.Not.Empty );
+		}
+
+		[ Test ]
+		[ Explicit ]
+		//TODO GUARD-3946 Rerun tests
 		public async Task GetProductsCreatedBeforeButUpdatedAfterAsync()
 		{
 			var productsStartUtc = DateTime.Parse( "2025-01-13T20:52:49Z" );
@@ -63,6 +91,21 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
+		//TODO GUARD-3954 Remove on feature cleanup
+		public async Task WhenGetProductsCreatedAfterLegacyAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
+		{
+			var dateFrom = new DateTime( 2021, 6, 1 );
+			var products = await this.Service.GetProductsCreatedAfterLegacyAsync( dateFrom, CancellationToken.None, _mark );
+			var productsWithImages = products.Products.Where( p => p.Images != null && p.Images.Any() );
+
+			productsWithImages.Should().NotBeNullOrEmpty();
+
+			var imagesUrlsQueries = productsWithImages.SelectMany( p => p.Images ).Select( i => new Uri( i.Src ).Query ).Where( q => !string.IsNullOrWhiteSpace( q ) );
+			imagesUrlsQueries.Should().BeEmpty();
+		}
+
+		[ Test ]
+		//TODO GUARD-3946 Run test
 		public async Task WhenGetProductsCreatedAfterAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
 		{
 			var dateFrom = new DateTime( 2021, 6, 1 );
@@ -76,6 +119,21 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
+		//TODO GUARD-3954 Remove on feature cleanup
+		public async Task WhenGetProductsCreatedBeforeButUpdatedAfterLegacyAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
+		{
+			var dateFrom = new DateTime( 2023, 6, 1 );
+			var products = await this.Service.GetProductsCreatedBeforeButUpdatedAfterLegacyAsync( dateFrom, CancellationToken.None, _mark );
+			var productsWithImages = products.Products.Where( p => p.Images != null && p.Images.Any() );
+
+			productsWithImages.Should().NotBeNullOrEmpty();
+
+			var imagesUrlsQueries = productsWithImages.SelectMany( p => p.Images ).Select( i => new Uri( i.Src ).Query ).Where( q => !string.IsNullOrWhiteSpace( q ) );
+			imagesUrlsQueries.Should().BeEmpty();
+		}
+
+		[ Test ]
+		//TODO GUARD-3946 Run test
 		public async Task WhenGetProductsCreatedBeforeButUpdatedAfterAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
 		{
 			var dateFrom = new DateTime( 2023, 6, 1 );

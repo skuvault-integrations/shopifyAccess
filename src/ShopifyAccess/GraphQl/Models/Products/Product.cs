@@ -9,7 +9,8 @@ namespace ShopifyAccess.GraphQl.Models.Products
 		public string Title{ get; set; }
 
 		[ JsonProperty( "variants" ) ]
-		public Nodes< ProductVariant > Variants{ get; set; }
+		//TODO GUARD-3946 Potentially, not get variants in GetProducts query at all, in which case this will be removed in the cleanup
+		public Nodes< ProductVariant > First250Variants{ get; set; }
 
 		[ JsonProperty( "variantsCount" ) ]
 		public VariantsCount TotalVariantsCount{ get; set; }

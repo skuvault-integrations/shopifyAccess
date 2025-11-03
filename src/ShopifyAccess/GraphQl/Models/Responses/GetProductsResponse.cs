@@ -26,6 +26,15 @@ namespace ShopifyAccess.GraphQl.Models.Responses
 
 	internal static class GetProductsResponseExtensions
 	{
+		//TODO GUARD-3954 Remove on feature cleanup
+		internal static ShopifyProducts ToShopifyProductsLegacy( this List< Products.Product > responseProducts )
+		{
+			return responseProducts != null
+				? new ShopifyProducts
+					{ Products = responseProducts.Select( x => x.ToShopifyProductLegacy() ).ToList() }
+				: new ShopifyProducts();
+		}
+
 		/// <summary>
 		/// Convert Products API response payload to SkuVault ShopifyProduct 
 		/// </summary>
@@ -35,11 +44,19 @@ namespace ShopifyAccess.GraphQl.Models.Responses
 		//TODO GUARD-3946 Add tests of additionalProductVariants cases
 		internal static ShopifyProducts ToShopifyProducts( this List< Product > responseProducts, IDictionary< string, List< ProductVariant > > additionalProductVariants )
 		{
-			//TODO GUARD-3946 Append additionalProductVariants to each product that has them
-			return responseProducts != null
-				? new ShopifyProducts
-					{ Products = responseProducts.Select( x => x.ToShopifyProduct() ).ToList() }
-				: new ShopifyProducts();
+			if( responseProducts == null || !responseProducts.Any() )
+			{
+				return new ShopifyProducts();
+			}
+
+			var shopifyProducts = new ShopifyProducts();
+			foreach( var product in responseProducts )
+			{
+				//TODO GUARD-3946 Append or populate additionalProductVariants to each product that has them
+				var productVariants = new List< Products.ProductVariant >(); 
+				shopifyProducts.Products.Add( product.ToShopifyProduct( productVariants ) );
+			}
+			return shopifyProducts;
 		}
 	}
 }

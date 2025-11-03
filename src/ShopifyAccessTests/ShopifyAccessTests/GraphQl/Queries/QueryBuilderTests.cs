@@ -123,14 +123,15 @@ namespace ShopifyAccessTests.GraphQl.Queries
 			action.Should().Throw< ArgumentException >();
 		}
 
+		//TODO GUARD-3946 Make copies of all Legacy tests and then run them
 		[ Test ]
-		public void GetProductsCreatedOnOrAfterRequest_ReturnsRequestQuery()
+		public void GetProductsCreatedOnOrAfterRequestLegacy_ReturnsRequestQuery()
 		{
 			var createdAtMinUtc = new DateTime( _randomizer.NextLong( DateTime.UtcNow.Ticks ) );
 			var nextCursor = _randomizer.GetString();
 			var productsPerPage = ( int )_randomizer.NextUInt( 1, 250 );
 			
-			var result = QueryBuilder.GetProductsCreatedOnOrAfterRequest( createdAtMinUtc, nextCursor, productsPerPage );
+			var result = QueryBuilder.GetProductsCreatedOnOrAfterRequestLegacy( createdAtMinUtc, nextCursor, productsPerPage );
 			
 			Assert.Multiple(() => 
 			{
@@ -141,21 +142,21 @@ namespace ShopifyAccessTests.GraphQl.Queries
 		}
 		
 		[ Test ]
-		public void GetProductsCreatedOnOrAfterRequest_ThrowsArgumentOutOfRangeException_WhenProductsPerPageExceedsMaximum()
+		public void GetProductsCreatedOnOrAfterRequestLegacy_ThrowsArgumentOutOfRangeException_WhenProductsPerPageExceedsMaximum()
 		{
 			var tooManyProductsPerPage = 251;
 			
-			Assert.Throws< ArgumentOutOfRangeException > ( () => QueryBuilder.GetProductsCreatedOnOrAfterRequest( DateTime.MinValue, after: null, tooManyProductsPerPage ) );
+			Assert.Throws< ArgumentOutOfRangeException > ( () => QueryBuilder.GetProductsCreatedOnOrAfterRequestLegacy( DateTime.MinValue, after: null, tooManyProductsPerPage ) );
 		}
 
 		[ Test ]
-		public void GetProductsCreatedBeforeButUpdatedAfter_ReturnsRequestQuery()
+		public void GetProductsCreatedBeforeButUpdatedAfterLegacy_ReturnsRequestQuery()
 		{
 			var createdAtMaxAndUpdatedAtMinUtc = new DateTime( _randomizer.NextLong( DateTime.UtcNow.Ticks ) );
 			var nextCursor = _randomizer.GetString();
 			var productsPerPage = ( int )_randomizer.NextUInt( 1, 250 );
 			
-			var result = QueryBuilder.GetProductsCreatedBeforeButUpdatedAfter( createdAtMaxAndUpdatedAtMinUtc, nextCursor, productsPerPage );
+			var result = QueryBuilder.GetProductsCreatedBeforeButUpdatedAfterLegacy( createdAtMaxAndUpdatedAtMinUtc, nextCursor, productsPerPage );
 			
 			Assert.Multiple(() => 
 			{
@@ -166,11 +167,11 @@ namespace ShopifyAccessTests.GraphQl.Queries
 		}
 		
 		[ Test ]
-		public void GetProductsCreatedBeforeButUpdatedAfter_ThrowsArgumentOutOfRangeException_WhenProductsPerPageExceedsMaximum()
+		public void GetProductsCreatedBeforeButUpdatedAfterLegacy_ThrowsArgumentOutOfRangeException_WhenProductsPerPageExceedsMaximum()
 		{
 			var tooManyProductsPerPage = 251;
 			
-			Assert.Throws< ArgumentOutOfRangeException > ( () => QueryBuilder.GetProductsCreatedBeforeButUpdatedAfter( DateTime.MinValue, after: null, tooManyProductsPerPage ) );
+			Assert.Throws< ArgumentOutOfRangeException > ( () => QueryBuilder.GetProductsCreatedBeforeButUpdatedAfterLegacy( DateTime.MinValue, after: null, tooManyProductsPerPage ) );
 		}
 
 		[ Test ]

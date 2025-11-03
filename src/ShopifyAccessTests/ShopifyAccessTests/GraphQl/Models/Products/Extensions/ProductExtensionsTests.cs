@@ -10,23 +10,24 @@ using ShopifyAccess.GraphQl.Models.Products.Extensions;
 
 namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 {
+	//TODO GUARD-3946 Make copies of Legacy tests
 	public class ProductExtensionsTests
 	{
 		private static readonly Randomizer _randomizer = new Randomizer();
 		
 		[ Test ]
-		public void ToShopifyProduct_ShouldMapAllFieldsCorrectly_WhenAllTopLevelFieldsProvided()
+		public void ToShopifyProductLegacy_ShouldMapAllFieldsCorrectly_WhenAllTopLevelFieldsProvided()
 		{
 			var product = CreateProduct();
 			
-			var shopifyProduct = product.ToShopifyProduct();
+			var shopifyProduct = product.ToShopifyProductLegacy();
 			
 			Assert.Multiple(() =>
 			{
 				Assert.That( shopifyProduct.Title, Is.EqualTo( product.Title ) );
 				Assert.That( shopifyProduct.Vendor, Is.EqualTo( product.Vendor ) );
 				Assert.That( shopifyProduct.Images.Single().Src, Is.EqualTo( product.Media.Items.Single().Preview.Image.Url ) );
-				Assert.That( shopifyProduct.Variants.Single().Sku, Is.EqualTo( product.Variants.Items.Single().Sku ) );
+				Assert.That( shopifyProduct.Variants.Single().Sku, Is.EqualTo( product.First250Variants.Items.Single().Sku ) );
 				Assert.That( shopifyProduct.Type, Is.EqualTo( product.ProductType ) );
 				Assert.That( shopifyProduct.BodyHtml, Is.EqualTo( product.DescriptionHtml ) );
 				Assert.That( shopifyProduct.UpdatedAt, Is.EqualTo( product.UpdatedAt.Value ) );
@@ -34,34 +35,34 @@ namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 		}
 
 		[ Test ]
-		public void ToShopifyProduct_ShouldReturnEmptyProductVariantsList_WhenVariantsListIsNull()
+		public void ToShopifyProductLegacy_ShouldReturnEmptyProductVariantsList_WhenVariantsListIsNull()
 		{
 			var product = CreateProduct();
-			product.Variants = null; 
+			product.First250Variants = null; 
 			
-			var shopifyProduct = product.ToShopifyProduct();
+			var shopifyProduct = product.ToShopifyProductLegacy();
 			
 			Assert.That( shopifyProduct.Variants, Is.Empty );
 		}
 		
 		[ Test ]
-		public void ToShopifyProduct_ShouldReturnEmptyImagesList_WhenProductMediaListIsNull()
+		public void ToShopifyProductLegacy_ShouldReturnEmptyImagesList_WhenProductMediaListIsNull()
 		{
 			var product = CreateProduct();
 			product.Media = null;
 			
-			var shopifyProduct = product.ToShopifyProduct();
+			var shopifyProduct = product.ToShopifyProductLegacy();
 			
 			Assert.That( shopifyProduct.Images, Is.Empty );
 		}
 		
 		[ Test ]
-		public void ToShopifyProduct_ShouldDefaultUpdatedAtDate_WhenDatePassedIsNull()
+		public void ToShopifyProductLegacy_ShouldDefaultUpdatedAtDate_WhenDatePassedIsNull()
 		{
 			var product = CreateProduct();
 			product.UpdatedAt = null;
 			
-			var shopifyProduct = product.ToShopifyProduct();
+			var shopifyProduct = product.ToShopifyProductLegacy();
 			
 			Assert.That( shopifyProduct.UpdatedAt, Is.EqualTo( default( DateTime ) ) );
 		}
@@ -73,7 +74,7 @@ namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 				Title = _randomizer.GetString(),
 				Vendor = _randomizer.GetString(),
 				Media = CreateMediaItems(),
-				Variants = CreateVariants(),
+				First250Variants = CreateVariants(),
 				ProductType = _randomizer.GetString(),  
 				DescriptionHtml = _randomizer.GetString(),
 				UpdatedAt = DateTime.UtcNow

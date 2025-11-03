@@ -9,9 +9,71 @@ namespace ShopifyAccess.GraphQl.Queries
 		/// <param name="$query">Filter</param>
 		/// <param name="$first">Number of products to return</param>
 		/// <param name="$after">Cursor for pagination</param>
-		//Assumption: No product has more than 250 variants. If not correct, will have to get variants in pages if a product has more than 250
+		//Limitation: Only gets 250 variants per product, which can no longer be the case for some tenants (see GUARD-3946)
+		//TODO GUARD-3954 Remove on feature cleanup
+		internal const string QueryLegacy =
+			@"query ($query: String, $first: Int, $after: String) {
+				products(query: $query, first: $first, after: $after) {
+					nodes {
+						title
+						variants(first: 250) {
+							nodes {
+								sku
+								title
+								barcode
+								inventoryItem {
+									measurement {
+										weight {
+											value
+											unit
+										}
+									}
+								}
+								price
+								image
+								{
+									url
+								}
+								updatedAt
+							}
+						}
+						vendor
+						media(first: 250)
+						{
+							nodes
+							{
+								mediaContentType
+								preview
+								{
+									image
+									{
+										url
+									}
+								}
+							}
+						}
+						productType
+						descriptionHtml
+						updatedAt
+						createdAt
+					}
+					pageInfo {
+						endCursor
+						hasNextPage
+					}
+				}
+			}";
+
+		/// <summary>
+		/// Query to get products, for the products sync
+		/// https://shopify.dev/docs/api/admin-graphql/2024-04/queries/products 
+		/// </summary>
+		///	<remarks>Only gets the first 250 product variants</remarks>
+		/// <param name="$query">Filter</param>
+		/// <param name="$first">Number of products to return</param>
+		/// <param name="$after">Cursor for pagination</param>
 		internal const string Query =
-			//TODO GUARD-3946 Get each product's id, to retrieve variants via another query for products that have > 250 variants
+			//TODO GUARD-3946 11.3 NEXT Get each product's id, to retrieve variants via another query for products that have > 250 variants
 			@"query ($query: String, $first: Int, $after: String, $maxVariantsPerProduct: Int) {
 				products(query: $query, first: $first, after: $after) {
 					nodes {

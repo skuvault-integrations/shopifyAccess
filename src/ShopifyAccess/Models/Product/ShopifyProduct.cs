@@ -10,8 +10,6 @@ namespace ShopifyAccess.Models.Product
 
 		public List< ShopifyProductVariant > Variants { get; set; }
 
-		public int TotalVariantsCount { get; set; }
-
 		public string Type { get; set; }
 
 		public List< ShopifyProductImage > Images { get; set; }
