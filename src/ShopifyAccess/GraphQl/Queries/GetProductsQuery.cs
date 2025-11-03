@@ -73,11 +73,11 @@ namespace ShopifyAccess.GraphQl.Queries
 		/// <param name="$first">Number of products to return</param>
 		/// <param name="$after">Cursor for pagination</param>
 		internal const string Query =
-			//TODO GUARD-3946 11.3 NEXT Get each product's id, to retrieve variants via another query for products that have > 250 variants
 			@"query ($query: String, $first: Int, $after: String, $maxVariantsPerProduct: Int) {
 				products(query: $query, first: $first, after: $after) {
 					nodes {
 						title
+						id
 						variants(first: $maxVariantsPerProduct) {
 							nodes {
 								sku

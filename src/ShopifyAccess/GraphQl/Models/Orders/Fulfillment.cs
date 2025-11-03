@@ -65,11 +65,6 @@ namespace ShopifyAccess.GraphQl.Models.Orders
 		[ DataMember( Name = "quantity" ) ]
 		public int Quantity{ get; set; }
 
-		//TODO GUARD-3946 Problem: this is not requested by query GetOrdersPaginated > fulfillments > fulfillmentLineItems > nodes > lineItem
-		//	So removed, to avoid unnecessary C# dependence. Confirm
-		//[ DataMember( Name = "product" ) ]
-		//public Product Product{ get; set; }
-
 		[ DataMember( Name = "originalUnitPriceSet" ) ]
 		public PriceSet OriginalUnitPriceSet{ get; set; }
 

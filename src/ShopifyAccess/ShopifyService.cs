@@ -425,6 +425,8 @@ namespace ShopifyAccess
 			return ( variant?.InventoryItem?.Tracked ?? false ) && !string.IsNullOrEmpty( variant.Sku );
 		}
 
+		//TODO GUARD-3964 Create a similar method that would get product variants by parent productIds,
+		//	but without inventory info or inventory-related filtering
 		private async Task< List< ShopifyProductVariant > > GetAllProductVariantsInventoryAsync( Mark mark, CancellationToken token )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark );
