@@ -13,7 +13,7 @@
         <Description>A library that provides tools to issue requests to the Shopify API</Description>
         <RepositoryUrl>https://github.com/skuvault-integrations/shopifyAccess</RepositoryUrl>
         <PackageTags>requests, skuvault, shopify</PackageTags>
-        <PackageId>SkuVault.Magento.Access</PackageId>
+        <PackageId>SkuVault.Shopify.Access</PackageId>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
