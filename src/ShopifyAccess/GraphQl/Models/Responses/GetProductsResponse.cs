@@ -42,7 +42,7 @@ namespace ShopifyAccess.GraphQl.Models.Responses
 		/// <param name="additionalProductVariants">Dictionary of productId (key), productVariants (value)</param>
 		/// <returns></returns>
 		//TODO GUARD-3946 Add tests of additionalProductVariants cases
-		internal static ShopifyProducts ToShopifyProducts( this List< Product > responseProducts, IDictionary< string, List< ProductVariant > > additionalProductVariants )
+		internal static ShopifyProducts ToShopifyProducts( this List< Product > responseProducts, IDictionary< string, List< ShopifyAccess.GraphQl.Models.Products.ProductVariant > > additionalProductVariants )
 		{
 			if( responseProducts == null || !responseProducts.Any() )
 			{
@@ -53,7 +53,7 @@ namespace ShopifyAccess.GraphQl.Models.Responses
 			foreach( var product in responseProducts )
 			{
 				//TODO GUARD-3946 Append or populate additionalProductVariants to each product that has them
-				var productVariants = new List< Products.ProductVariant >(); 
+				additionalProductVariants.TryGetValue( product.Id, out var productVariants ); 
 				shopifyProducts.Products.Add( product.ToShopifyProduct( productVariants ) );
 			}
 			return shopifyProducts;

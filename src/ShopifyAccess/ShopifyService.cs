@@ -290,18 +290,30 @@ namespace ShopifyAccess
 		}
 
 		/// <summary>
-		/// Get additional variants for products that have more than <see cref="QueryBuilder.MaxVariantsPerProduct"/> variants
+		/// Get additional variants for products that have more than <see cref="QueryBuilder.MaxItemsPerResponse"/> variants
 		/// </summary>
 		/// <param name="products"></param>
 		/// <param name="token"></param>
 		/// <param name="mark"></param>
 		/// <returns>Dictionary of productId (key), productVariants (value)</returns>
-		private async Task< IDictionary< string, List< ProductVariant > > > GetAdditionalProductVariantsAsync( List< Product > products, CancellationToken token, Mark mark )
+		//TODO GUARD-3946 Add unit tests confirming that this path gets executed
+		private async Task< IDictionary< string, List< ShopifyAccess.GraphQl.Models.Products.ProductVariant > > > GetAdditionalProductVariantsAsync( List< Product > products, CancellationToken token, Mark mark )
 		{
-			//TODO GUARD-3946 11.3 NEXT For products with product.TotalVariantsCount > QueryBuilder.MaxVariantsPerProduct, get additional variants by pages, by productIds of some sort
-			//	Or possibly, get all product variants here and none in the original GetProducts query
-			//TODO GUARD-3946 Add unit tests confirming that this path gets executed
-			return null;
+			//TODO GUARD-3946 Or possibly, get all product variants here and none in the original GetProducts query
+			var productIdsWithExtraVariants = products.Where( x => ( x.TotalVariantsCount?.Count ?? 0 ) > QueryBuilder.MaxItemsPerResponse )
+				.Select( p => p.Id ).Distinct().ToList();
+			var additionalProductVariants = new Dictionary< string, List< ShopifyAccess.GraphQl.Models.Products.ProductVariant > >();
+			foreach( var productIdWithExtraVariants in productIdsWithExtraVariants )
+			{
+				//TODO GUARD-3946 Might be easier to just append to the original product.Variations list, if possible/feasible
+				var productVariants = ( await this.GetProductVariantsByProductIdAsync( productIdWithExtraVariants, mark, token ) )?.ToList()
+				                      ??  new List< ShopifyAccess.GraphQl.Models.Products.ProductVariant >();
+				if( productVariants.Any() )
+				{
+					additionalProductVariants.Add( productIdWithExtraVariants, productVariants.ToList() );
+				}
+			}
+			return additionalProductVariants;
 		}
 
 		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryAsync( CancellationToken token, Mark mark )
@@ -425,8 +437,6 @@ namespace ShopifyAccess
 			return ( variant?.InventoryItem?.Tracked ?? false ) && !string.IsNullOrEmpty( variant.Sku );
 		}
 
-		//TODO GUARD-3964 Create a similar method that would get product variants by parent productIds,
-		//	but without inventory info or inventory-related filtering
 		private async Task< List< ShopifyProductVariant > > GetAllProductVariantsInventoryAsync( Mark mark, CancellationToken token )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark );
@@ -442,6 +452,27 @@ namespace ShopifyAccess
 				return response?
 					.Where( FilterProductVariants )
 					.Select( y => y.ToShopifyProductVariantForInventory() ).ToList() ?? new List< ShopifyProductVariant >();
+			}
+			finally
+			{
+				ShopifyLogger.LogOperationEnd( this._shopName, mark );
+			}
+		}
+
+		//TODO GUARD-3946 Add unit and integration tests
+		internal async Task< IEnumerable< ShopifyAccess.GraphQl.Models.Products.ProductVariant > > GetProductVariantsByProductIdAsync( string productId, Mark mark, CancellationToken token )
+		{
+			ShopifyLogger.LogOperationStart( this._shopName, mark );
+
+			try
+			{
+				var response = await this._graphQlPaginationService.GetAllPagesAsync< GetProductVariantsData, ShopifyAccess.GraphQl.Models.Products.ProductVariant >( 
+					async (nextCursor) => await this._webRequestServices.PostDataAsync< GetProductVariantsResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
+						QueryBuilder.GetProductVariants( productId, nextCursor ),
+						token, mark, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] ),
+					mark, token );
+
+				return response?.ToList() ?? new List< ShopifyAccess.GraphQl.Models.Products.ProductVariant >();
 			}
 			finally
 			{

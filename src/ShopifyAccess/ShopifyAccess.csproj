@@ -103,13 +103,15 @@
     <Compile Include="GraphQl\Models\Responses\GetOrdersResponse.cs" />
     <Compile Include="GraphQl\Models\Responses\GetProductsResponse.cs" />
     <Compile Include="GraphQl\Models\Responses\GetProductVariantsInventoryResponse.cs" />
+    <Compile Include="GraphQl\Models\Responses\GetProductVariantsResponse.cs" />
     <Compile Include="GraphQl\Queries\BulkOperationByIdQuery.cs" />
     <Compile Include="GraphQl\Queries\CurrentBulkOperationQuery.cs" />
-    <Compile Include="GraphQl\Queries\GetProductsQuery.cs" />
     <Compile Include="GraphQl\Queries\GetProductVariantInventoryQuery.cs" />
     <Compile Include="GraphQl\Queries\GetProductVariantsInventoryReportQuery.cs" />
     <Compile Include="GraphQl\Queries\Orders\GetOrdersQuery.cs" />
     <Compile Include="GraphQl\Queries\Orders\OrderQueryBuilder.cs" />
+    <Compile Include="GraphQl\Queries\Products\GetProductsQuery.cs" />
+    <Compile Include="GraphQl\Queries\Products\GetProductVariantsQuery.cs" />
     <Compile Include="GraphQl\Queries\QueryBuilder.cs" />
     <Compile Include="GraphQl\ReportType.cs" />
     <Compile Include="GraphQl\Services\PaginationService.cs" />

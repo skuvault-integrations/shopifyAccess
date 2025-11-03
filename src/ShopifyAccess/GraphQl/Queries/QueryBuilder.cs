@@ -1,6 +1,7 @@
 ﻿using System;
 using ServiceStack;
 using ShopifyAccess.GraphQl.Helpers;
+using ShopifyAccess.GraphQl.Queries.Products;
 
 namespace ShopifyAccess.GraphQl.Queries
 {
@@ -111,7 +112,7 @@ namespace ShopifyAccess.GraphQl.Queries
 				//	Extract into a common if makes sense and doesn't make code harder to understand
 				after,
 				first = productsPerPage,
-				maxVariantsPerProduct = MaxVariantsPerProduct
+				maxVariantsPerProduct = MaxItemsPerResponse
 			};
 			var request = new { query = CleanUpRequest( GetProductsQuery.Query ), variables };
 			return request.ToJson();
@@ -161,7 +162,7 @@ namespace ShopifyAccess.GraphQl.Queries
 				query = $"created_at:<='{createdAtMaxAndUpdatedAtMinUtc.ToIso8601()}' AND updated_at:>='{createdAtMaxAndUpdatedAtMinUtc.ToIso8601()}'",
 				after,
 				first = productsPerPage,
-				maxVariantsPerProduct = MaxVariantsPerProduct
+				maxVariantsPerProduct = MaxItemsPerResponse
 			};
 			var request = new { query = CleanUpRequest( GetProductsQuery.Query ), variables };
 			return request.ToJson();
@@ -182,7 +183,20 @@ namespace ShopifyAccess.GraphQl.Queries
 			var request = new { query = CleanUpRequest( GetProductVariantInventoryQuery.GetAllVariantsQuery ), variables };
 			return request.ToJson();
 		}
-		
+
+		//TODO GUARD-3946 Create tests
+		public static string GetProductVariants( string productId, string after )
+		{
+			var variables = new
+			{
+				query = $"product_id:{productId}",
+				after,
+				first = MaxItemsPerResponse
+			};
+			var request = new { query = CleanUpRequest( GetProductVariantsQuery.GetVariantsQueryByProductId ), variables };
+			return request.ToJson();
+		}
+
 		/// <summary>
 		/// Replace characters that are not allowed in the request
 		/// </summary>
