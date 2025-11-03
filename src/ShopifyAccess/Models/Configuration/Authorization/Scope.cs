@@ -1,4 +1,4 @@
-﻿using CuttingEdge.Conditions;
+﻿using System;
 
 namespace ShopifyAccess.Models.Configuration.Authorization
 {
@@ -8,8 +8,16 @@ namespace ShopifyAccess.Models.Configuration.Authorization
 
 		public Scope( ShopifyScopeAccessLevel scopeAccessLevel, ShopifyScopeName scopeName )
 		{
-			Condition.Requires( scopeAccessLevel, "scopeAccessLevel" ).IsGreaterThan( ShopifyScopeAccessLevel.Undefined );
-			Condition.Requires( scopeName, "scopeName" ).IsNotNull();
+			if( scopeAccessLevel <= ShopifyScopeAccessLevel.Undefined )
+			{
+				throw new ArgumentOutOfRangeException( nameof(scopeAccessLevel), scopeAccessLevel, "scopeAccessLevel must be greater than ShopifyScopeAccessLevel.Undefined" );
+			}
+
+			if( scopeName == null )
+			{
+				throw new ArgumentNullException( nameof(scopeName), "scopeName must not be null" );
+			}
+
 
 			this.Description = string.Concat( scopeAccessLevel.ToString().ToLowerInvariant(), scopeName.Name );
 		}

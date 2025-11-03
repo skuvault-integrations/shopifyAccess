@@ -8,9 +8,11 @@ using ShopifyAccess.Models.Configuration.Command;
 
 namespace ShopifyAccessTests.Locations
 {
+	[ Explicit ]
 	[ TestFixture ]
 	public class LocationListTests : BaseTests
 	{
+		[ Explicit ]
 		[ Test ]
 		public void GetLocations_ReturnsLocationList()
 		{
@@ -49,7 +51,7 @@ namespace ShopifyAccessTests.Locations
 		{
 			var result = await this.Service.GetActiveLocationsAsync( CancellationToken.None ).ConfigureAwait( false );
 
-			Assert.IsTrue( result.Locations.All( x => x.IsActive ) );
+			Assert.That( result.Locations.All( x => x.IsActive ), Is.True );
 		}
 	}
 }

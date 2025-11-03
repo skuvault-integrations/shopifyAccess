@@ -1,4 +1,4 @@
-﻿using CuttingEdge.Conditions;
+﻿using System;
 using ShopifyAccess.Services;
 
 namespace ShopifyAccess.Models.Configuration.Authorization
@@ -12,8 +12,15 @@ namespace ShopifyAccess.Models.Configuration.Authorization
 		public ShopifyAuthorizationConfig( string apiKey, string secret, string shopName )
 			: base( shopName )
 		{
-			Condition.Requires( apiKey, "apiKey" ).IsNotNullOrWhiteSpace();
-			Condition.Requires( secret, "secret" ).IsNotNullOrWhiteSpace();
+			if( string.IsNullOrWhiteSpace( apiKey ) )
+			{
+				throw new ArgumentException( "apiKey must not be null or whitespace", nameof(apiKey) );
+			}
+
+			if( string.IsNullOrWhiteSpace( secret ) )
+			{
+				throw new ArgumentException( "secret must not be null or whitespace", nameof(secret) );
+			}
 
 			this.ApiKey = apiKey;
 			this.Secret = secret;
@@ -22,9 +29,7 @@ namespace ShopifyAccess.Models.Configuration.Authorization
 		public ShopifyAuthorizationConfig( string apiKey, string secret, string shopName, Scopes scopes )
 			: this( apiKey, secret, shopName )
 		{
-			Condition.Requires( scopes, "scopes" ).IsNotNull();
-
-			this.Scopes = scopes;
+			this.Scopes = scopes ?? throw new ArgumentNullException( nameof(scopes), "scopes must not be null" );
 		}
 
 		//TODO GUARD-2753 Tech debt:

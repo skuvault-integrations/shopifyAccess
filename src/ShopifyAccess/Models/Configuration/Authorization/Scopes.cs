@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using CuttingEdge.Conditions;
+﻿using System;
+using System.Linq;
 
 namespace ShopifyAccess.Models.Configuration.Authorization
 {
@@ -9,7 +9,10 @@ namespace ShopifyAccess.Models.Configuration.Authorization
 
 		public Scopes( params Scope[] scopes )
 		{
-			Condition.Requires( scopes, "scopes" ).IsNotEmpty();
+			if( scopes == null || !scopes.Any() )
+			{
+				throw new ArgumentException( "scopes must not be empty", nameof(scopes) );
+			}
 
 			this.ScopesString = string.Join( ",", scopes.Select( s => s.Description ) );
 		}

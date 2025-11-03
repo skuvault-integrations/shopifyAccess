@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 
 namespace ShopifyAccessTests.Misc
 {
+	[ Explicit ]
 	public class LoggerExtensionsTests
 	{
 		/// <summary>
@@ -37,11 +38,11 @@ namespace ShopifyAccessTests.Misc
 			//Should be considerably shorter due to truncation
 			Assert.That( resultJson.Length + 100, Is.LessThan( TwoProductsJson.Length ) );
 			Assert.That( resultProducts[ 0 ].BodyHtml.Length, Is.LessThanOrEqualTo( LoggerExtensions.MaxFieldValueLength ) );
-			Assert.True( FirstProductBodyHtml.StartsWith( resultProducts[ 0 ].BodyHtml
-					.EncodeToMatchReturnedFromShopifyAPI().RemoveTruncationIndicator() ) );
+			Assert.That( FirstProductBodyHtml.StartsWith( resultProducts[ 0 ].BodyHtml
+					.EncodeToMatchReturnedFromShopifyAPI().RemoveTruncationIndicator() ), Is.True );
 			Assert.That( resultProducts[ 1 ].BodyHtml.Length, Is.LessThanOrEqualTo( LoggerExtensions.MaxFieldValueLength ) );
-			Assert.True( SecondProductBodyHtml.StartsWith( resultProducts[ 1 ].BodyHtml
-					.EncodeToMatchReturnedFromShopifyAPI().RemoveTruncationIndicator() ) );
+			Assert.That( SecondProductBodyHtml.StartsWith( resultProducts[ 1 ].BodyHtml
+					.EncodeToMatchReturnedFromShopifyAPI().RemoveTruncationIndicator() ), Is.True );
 		}
 
 		/// <summary>

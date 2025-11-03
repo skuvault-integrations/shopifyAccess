@@ -1,4 +1,4 @@
-﻿using CuttingEdge.Conditions;
+﻿using System;
 
 namespace ShopifyAccess.Models.Configuration.Command
 {
@@ -8,7 +8,11 @@ namespace ShopifyAccess.Models.Configuration.Command
 
 		public ShopifyCommandEndpointConfig( int limit )
 		{
-			Condition.Requires( limit, "limit" ).IsGreaterThan( 0 );
+			if( limit <= 0 )
+			{
+				throw new ArgumentOutOfRangeException( nameof(limit), limit, "limit must be greater than 0" );
+			}
+
 
 			this.Limit = limit;
 		}

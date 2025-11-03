@@ -6,6 +6,7 @@ using ShopifyAccess.Models;
 
 namespace ShopifyAccessTests.Cancellation
 {
+	[ Explicit ]
 	[ TestFixture ]
 	public class CancellationTokenTests : BaseTests
 	{

@@ -47,7 +47,7 @@ namespace ShopifyAccessTests
 			var result = HMacSignatureUtils.VerifyOAuthRequest(ShopifyOAuthQueryStringRequest, ShopifyOAuthSecretKey);
 
 			// Assert
-			Assert.IsTrue(result);
+			Assert.That(result, Is.True);
 		}
 
 		[Test]
@@ -59,7 +59,7 @@ namespace ShopifyAccessTests
 			var result = HMacSignatureUtils.VerifyOAuthRequest(ShopifyOAuthQueryStringRequest + "_", ShopifyOAuthSecretKey);
 
 			// Assert
-			Assert.IsFalse(result);
+			Assert.That(result, Is.False);
 		}
 
 		[Test]
@@ -71,7 +71,7 @@ namespace ShopifyAccessTests
 			var result = HMacSignatureUtils.VerifyOAuthRequest(ShopifyOAuthQueryStringRequest, ShopifyOAuthSecretKey + "_");
 
 			// Assert
-			Assert.IsFalse(result);
+			Assert.That(result, Is.False);
 		}
 
 		[Test]
@@ -89,7 +89,7 @@ namespace ShopifyAccessTests
 			var result = HMacSignatureUtils.VerifyWebhookRequest(headers, ShopifyWebhookBodyRequest, ShopifyWebhookSecretKey);
 
 			// Assert
-			Assert.IsTrue(result);
+			Assert.That(result, Is.True );
 		}
 
 		[Test]
@@ -107,7 +107,7 @@ namespace ShopifyAccessTests
 			var result = HMacSignatureUtils.VerifyWebhookRequest(headers, ShopifyWebhookBodyRequest, ShopifyWebhookSecretKey);
 
 			// Assert
-			Assert.IsTrue(result);
+			Assert.That(result, Is.True);
 		}
 
 		[Test]
@@ -125,7 +125,7 @@ namespace ShopifyAccessTests
 			var result = HMacSignatureUtils.VerifyWebhookRequest(headers, ShopifyWebhookBodyRequest + "_", ShopifyWebhookSecretKey);
 
 			// Assert
-			Assert.IsFalse(result);
+			Assert.That(result, Is.False);
 		}
 
 		[Test]
@@ -143,7 +143,7 @@ namespace ShopifyAccessTests
 			var result = HMacSignatureUtils.VerifyWebhookRequest(headers, ShopifyWebhookBodyRequest, ShopifyWebhookSecretKey + "_");
 
 			// Assert
-			Assert.IsFalse(result);
+			Assert.That(result, Is.False);
 		}
 
 		[Test]
@@ -161,7 +161,7 @@ namespace ShopifyAccessTests
 			var result = HMacSignatureUtils.VerifyWebhookRequest(headers, ShopifyWebhookBodyRequest, ShopifyWebhookSecretKey);
 
 			// Assert
-			Assert.IsFalse(result);
+			Assert.That(result, Is.False);
 		}
 
 		[Test]
@@ -174,7 +174,7 @@ namespace ShopifyAccessTests
 			var result = HMacSignatureUtils.VerifyWebhookRequest(headers, ShopifyWebhookBodyRequest, ShopifyWebhookSecretKey);
 
 			// Assert
-			Assert.IsFalse(result);
+			Assert.That(result, Is.False);
 		}
 	}
 }

@@ -24,20 +24,20 @@ namespace ShopifyAccessTests.GraphQl.Models.Orders.Extensions
             var result = order.ToShopifyOrder();
 
             // Assert
-            Assert.AreEqual( 123, result.Id );
-            Assert.AreEqual( order.Number, result.OrderNumber );
-            Assert.AreEqual( order.Name, result.Name );
-            Assert.AreEqual( order.CreatedAt, result.CreatedAt );
-            Assert.AreEqual( 10, result.Total );
-            Assert.AreEqual( order.BillingAddress, result.BillingAddress );
-            Assert.AreEqual( order.ShippingAddress, result.ShippingAddress );
-            Assert.AreEqual( "456", result.LocationId );
-            Assert.AreEqual( order.RawSourceName, result.RawSourceName );
-            Assert.AreEqual( order.OrderItems.Items.Count, result.OrderItems.Count );
-            Assert.AreEqual( order.Fulfillments.Count(), result.Fulfillments.Count() );
-            Assert.AreEqual( order.ShippingLines.Count, result.ShippingLines.Count );
-            Assert.AreEqual( order.DiscountCodes.Length, result.DiscountCodes.Count() );
-            Assert.AreEqual( order.TaxLines.Count(), result.TaxLines.Count() );
+            Assert.That( result.Id, Is.EqualTo( 123 ) );
+            Assert.That( result.OrderNumber, Is.EqualTo( order.Number ) );
+            Assert.That( result.Name, Is.EqualTo( order.Name ) );
+            Assert.That( result.CreatedAt, Is.EqualTo( order.CreatedAt ) );
+            Assert.That( result.Total, Is.EqualTo( 10 ) );
+            Assert.That( result.BillingAddress, Is.EqualTo( order.BillingAddress ) );
+            Assert.That( result.ShippingAddress, Is.EqualTo( order.ShippingAddress ) );
+            Assert.That( result.LocationId, Is.EqualTo( "456" ) );
+            Assert.That( result.RawSourceName, Is.EqualTo( order.RawSourceName ) );
+            Assert.That( result.OrderItems.Count, Is.EqualTo( order.OrderItems.Items.Count ) );
+            Assert.That( result.Fulfillments.Count(), Is.EqualTo( order.Fulfillments.Count() ) );
+            Assert.That( result.ShippingLines.Count, Is.EqualTo( order.ShippingLines.Count ) );
+            Assert.That( result.DiscountCodes.Count(), Is.EqualTo( order.DiscountCodes.Length ) );
+            Assert.That( result.TaxLines.Count(), Is.EqualTo( order.TaxLines.Count() ) );
         }
 
         [ Test ]
@@ -58,8 +58,8 @@ namespace ShopifyAccessTests.GraphQl.Models.Orders.Extensions
             var result = item.ToShopifyOrderItem();
 
             // Assert
-            Assert.AreEqual( 0, result.Price );
-            Assert.AreEqual( 0, result.TotalDiscount );
+            Assert.That( result.Price, Is.EqualTo( 0 ) );
+            Assert.That( result.TotalDiscount, Is.EqualTo( 0 ) );
         }
 
         [ Test ]
@@ -73,12 +73,12 @@ namespace ShopifyAccessTests.GraphQl.Models.Orders.Extensions
             var result = fulfillment.ToShopifyFulfillment( orderId );
 
             // Assert
-            Assert.AreEqual( 789, result.Id );
-            Assert.AreEqual( orderId, result.OrderId );
-            Assert.AreEqual( fulfillment.TrackingInfo.FirstOrDefault()?.TrackingCompany, result.TrackingCompany );
-            Assert.AreEqual( fulfillment.TrackingInfo.FirstOrDefault()?.TrackingNumber, result.TrackingNumber );
-            Assert.AreEqual( fulfillment.TrackingInfo.FirstOrDefault()?.TrackingUrl, result.TrackingUrl );
-            Assert.AreEqual( fulfillment.FulfillmentLineItems.Items.Count, result.Items.Count() );
+            Assert.That( result.Id, Is.EqualTo( 789 ) );
+            Assert.That( result.OrderId, Is.EqualTo( orderId ) );
+            Assert.That( result.TrackingCompany, Is.EqualTo( fulfillment.TrackingInfo.FirstOrDefault()?.TrackingCompany ) );
+            Assert.That( result.TrackingNumber, Is.EqualTo( fulfillment.TrackingInfo.FirstOrDefault()?.TrackingNumber ) );
+            Assert.That( result.TrackingUrl, Is.EqualTo( fulfillment.TrackingInfo.FirstOrDefault()?.TrackingUrl ) );
+            Assert.That( result.Items.Count(), Is.EqualTo( fulfillment.FulfillmentLineItems.Items.Count ) );
         }
         
         [Test]
@@ -103,10 +103,10 @@ namespace ShopifyAccessTests.GraphQl.Models.Orders.Extensions
             var result = priceSet.ToShopifyPriceSet();
 
             // Assert
-            Assert.AreEqual(priceSet.ShopMoney.Amount, result.ShopMoney.Amount);
-            Assert.AreEqual(priceSet.ShopMoney.CurrencyCode, result.ShopMoney.CurrencyCode);
-            Assert.AreEqual(priceSet.PresentmentMoney.Amount, result.PresentmentMoney.Amount);
-            Assert.AreEqual(priceSet.PresentmentMoney.CurrencyCode, result.PresentmentMoney.CurrencyCode);
+            Assert.That(result.ShopMoney.Amount, Is.EqualTo(priceSet.ShopMoney.Amount));
+            Assert.That(result.ShopMoney.CurrencyCode, Is.EqualTo(priceSet.ShopMoney.CurrencyCode));
+            Assert.That(result.PresentmentMoney.Amount, Is.EqualTo(priceSet.PresentmentMoney.Amount));
+            Assert.That(result.PresentmentMoney.CurrencyCode, Is.EqualTo(priceSet.PresentmentMoney.CurrencyCode));
         }
         
         [Test]
@@ -123,8 +123,8 @@ namespace ShopifyAccessTests.GraphQl.Models.Orders.Extensions
             var result = money.ToShopifyMoney();
 
             // Assert
-            Assert.AreEqual(money.Amount, result.Amount);
-            Assert.AreEqual(money.CurrencyCode, result.CurrencyCode);
+            Assert.That(result.Amount, Is.EqualTo(money.Amount));
+            Assert.That(result.CurrencyCode, Is.EqualTo(money.CurrencyCode));
         }
 
         private static Order CreateOrder()

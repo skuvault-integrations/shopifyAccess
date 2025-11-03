@@ -1,187 +1,36 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CD127B8E-FF1C-4960-B4AC-D193721EA57A}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ShopifyAccess</RootNamespace>
-    <AssemblyName>ShopifyAccess</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>ShopifyAccess</RootNamespace>
+        <AssemblyName>SkuVault.Shopify.Access</AssemblyName>
+        <LangVersion>latest</LangVersion>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>SkuVault.Shopify.Access</Title>
+        <Authors>Skuvault Inc.</Authors>
+        <Company>SkuVault Inc.</Company>
+        <Summary>A library that provides tools to issue requests to the Shopify API</Summary>
+        <Description>A library that provides tools to issue requests to the Shopify API</Description>
+        <RepositoryUrl>https://github.com/skuvault-integrations/shopifyAccess</RepositoryUrl>
+        <PackageTags>requests, skuvault, shopify</PackageTags>
+        <PackageId>SkuVault.Magento.Access</PackageId>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="CuttingEdge.Conditions">
-      <HintPath>..\packages\CuttingEdge.Conditions.1.2.0.0\lib\NET35\CuttingEdge.Conditions.dll</HintPath>
-    </Reference>
-    <Reference Include="Netco, Version=1.5.4.0, Culture=neutral, PublicKeyToken=9d732c15ac2ec2c9, processorArchitecture=MSIL">
-      <HintPath>..\packages\Netco.1.5.4\lib\net45\Netco.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="ServiceStack.Text, Version=4.0.60.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ServiceStack.Text.4.0.60\lib\net40\ServiceStack.Text.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Net.Http.WebRequest" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <!-- NuGet Package References -->
+    <PackageReference Include="Netco" Version="3.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="ServiceStack.Text" Version="5.14.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.10" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="..\Global\GlobalAssemblyInfo.cs">
-      <Link>Properties\GlobalAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="Exceptions\ShopifyHttpRequestExceptions.cs" />
-    <Compile Include="GraphQl\BulkOperationStatus.cs" />
-    <Compile Include="GraphQl\Helpers\DateTimeExtensions.cs" />
-    <Compile Include="GraphQl\Helpers\GraphQlIdParser.cs" />
-    <Compile Include="GraphQl\Models\BaseGraphQlResponse.cs" />
-    <Compile Include="GraphQl\Models\Common\Extensions\MediaExtensions.cs" />
-    <Compile Include="GraphQl\Models\Common\Image.cs" />
-    <Compile Include="GraphQl\Models\Common\Media.cs" />
-    <Compile Include="GraphQl\Models\Common\Weight.cs" />
-    <Compile Include="GraphQl\Models\Common\WeightUnit.cs" />
-    <Compile Include="GraphQl\Models\Nodes.cs" />
-    <Compile Include="GraphQl\Models\Orders\Extensions\OrderExtensions.cs" />
-    <Compile Include="GraphQl\Models\Orders\Fulfillment.cs" />
-    <Compile Include="GraphQl\Models\Orders\Money.cs" />
-    <Compile Include="GraphQl\Models\Orders\Order.cs" />
-    <Compile Include="GraphQl\Models\Orders\OrderItem.cs" />
-    <Compile Include="GraphQl\Models\Orders\PriceSet.cs" />
-    <Compile Include="GraphQl\Models\Orders\ShippingLine.cs" />
-    <Compile Include="GraphQl\Models\Orders\TaxLine.cs" />
-    <Compile Include="GraphQl\Models\PageInfo.cs" />
-    <Compile Include="GraphQl\Models\Products\Extensions\ProductExtensions.cs" />
-    <Compile Include="GraphQl\Models\Products\Extensions\ProductVariantExtensions.cs" />
-    <Compile Include="GraphQl\Models\Products\InventoryItem.cs" />
-    <Compile Include="GraphQl\Models\Products\InventoryItemMeasurement.cs" />
-    <Compile Include="GraphQl\Models\Products\Product.cs" />
-    <Compile Include="GraphQl\Models\Products\ProductVariant.cs" />
-    <Compile Include="GraphQl\Models\ProductVariantsInventory\InventoryLevelsNodes.cs" />
-    <Compile Include="GraphQl\Models\ProductVariantsInventory\InventoryQuantity.cs" />
-    <Compile Include="GraphQl\Models\Responses\GetBulkOperationByIdResponse.cs" />
-    <Compile Include="GraphQl\Models\Responses\BulkOperationRunQueryResponse.cs" />
-    <Compile Include="GraphQl\Models\Responses\GetCurrentBulkOperationResponse.cs" />
-    <Compile Include="GraphQl\Models\ProductVariantsInventory\Extensions\ProductVariantsInventoryReportParser.cs" />
-    <Compile Include="GraphQl\Models\ProductVariantsInventory\InventoryItem.cs" />
-    <Compile Include="GraphQl\Models\ProductVariantsInventory\InventoryLevel.cs" />
-    <Compile Include="GraphQl\Models\ProductVariantsInventory\Location.cs" />
-    <Compile Include="GraphQl\Models\ProductVariantsInventory\ProductVariant.cs" />
-    <Compile Include="GraphQl\Models\Responses\GetOrdersResponse.cs" />
-    <Compile Include="GraphQl\Models\Responses\GetProductsResponse.cs" />
-    <Compile Include="GraphQl\Models\Responses\GetProductVariantsInventoryResponse.cs" />
-    <Compile Include="GraphQl\Queries\BulkOperationByIdQuery.cs" />
-    <Compile Include="GraphQl\Queries\CurrentBulkOperationQuery.cs" />
-    <Compile Include="GraphQl\Queries\GetProductsQuery.cs" />
-    <Compile Include="GraphQl\Queries\GetProductVariantInventoryQuery.cs" />
-    <Compile Include="GraphQl\Queries\GetProductVariantsInventoryReportQuery.cs" />
-    <Compile Include="GraphQl\Queries\Orders\GetOrdersQuery.cs" />
-    <Compile Include="GraphQl\Queries\Orders\OrderQueryBuilder.cs" />
-    <Compile Include="GraphQl\Queries\QueryBuilder.cs" />
-    <Compile Include="GraphQl\ReportType.cs" />
-    <Compile Include="GraphQl\Services\PaginationService.cs" />
-    <Compile Include="GraphQl\Services\IReportGenerator.cs" />
-    <Compile Include="GraphQl\Services\ReportGenerator.cs" />
-    <Compile Include="GraphQl\ShopifyGraphQlThrottler.cs" />
-    <Compile Include="IShopifyService.cs" />
-    <Compile Include="Misc\ActionPolicies.cs" />
-    <Compile Include="Misc\Extensions.cs" />
-    <Compile Include="Misc\LoggerExtensions.cs" />
-    <Compile Include="Misc\ShopifyLogger.cs" />
-    <Compile Include="Misc\ShopifyThrottler.cs" />
-    <Compile Include="Models\Configuration\Command\ShopifyApiVersion.cs" />
-    <Compile Include="Models\Configuration\Command\ShopifyCommandFactory.cs" />
-    <Compile Include="Models\Configuration\Command\ShopifyOrderCommandEndpoint.cs" />
-    <Compile Include="Models\Configuration\Authorization\Scope.cs" />
-    <Compile Include="Models\Configuration\Authorization\Scopes.cs" />
-    <Compile Include="Models\Configuration\Command\ShopifyClientCredentials.cs" />
-    <Compile Include="Models\Configuration\Authorization\ShopifyAuthorizationConfig.cs" />
-    <Compile Include="Models\Configuration\Command\ShopifyCommandEndpointConfig.cs" />
-    <Compile Include="Models\Configuration\Command\ShopifyCommandEndpointName.cs" />
-    <Compile Include="Models\Configuration\ShopifyShop.cs" />
-    <Compile Include="Models\Configuration\Command\ShopifyCommand.cs" />
-    <Compile Include="Models\Location\ShopifyLocation.cs" />
-    <Compile Include="Models\Location\ShopifyLocations.cs" />
-    <Compile Include="Models\Mark.cs" />
-    <Compile Include="Models\Order\OrdersCount.cs" />
-    <Compile Include="Models\Order\ShopifyBillingAddress.cs" />
-    <Compile Include="Models\Order\ShopifyDiscounts.cs" />
-    <Compile Include="Models\Order\ShopifyFulfillment.cs" />
-    <Compile Include="Models\Order\ShopifyOrder.cs" />
-    <Compile Include="Models\Order\ShopifyOrderShippingLine.cs" />
-    <Compile Include="Models\Order\ShopifyOrderItem.cs" />
-    <Compile Include="Models\Configuration\Authorization\ShopifyScopeName.cs" />
-    <Compile Include="Models\Configuration\Authorization\TokenRequestResult.cs" />
-    <Compile Include="Models\Order\ShopifyOrders.cs" />
-    <Compile Include="Models\Order\ShopifyPriceSet.cs" />
-    <Compile Include="Models\Order\ShopifyShippingAddress.cs" />
-    <Compile Include="Models\Order\ShopifyTaxLine.cs" />
-    <Compile Include="Models\ProductVariant\ShopifyProductVariant.cs" />
-    <Compile Include="Models\ProductVariant\ShopifyInventoryLevelForUpdate.cs" />
-    <Compile Include="Models\Product\ProductsCount.cs" />
-    <Compile Include="Models\Product\ShopifyInventoryLevelsModel.cs" />
-    <Compile Include="Models\Product\ShopifyProduct.cs" />
-    <Compile Include="Models\Product\ShopifyInventoryLevels.cs" />
-    <Compile Include="Models\Product\ShopifyProducts.cs" />
-    <Compile Include="Models\ShopifyProductImage.cs" />
-    <Compile Include="Models\ShopifyTimeouts.cs" />
-    <Compile Include="Models\User\ShopifyUser.cs" />
-    <Compile Include="Models\User\ShopifyUsers.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\EndpointsBuilder.cs" />
-    <Compile Include="Services\PagedResponseService.cs" />
-    <Compile Include="Utils\HMacSignatureUtils.cs" />
-    <Compile Include="Services\WebRequestServices.cs" />
-    <Compile Include="ShopifyFactory.cs" />
-    <Compile Include="ShopifyService.cs" />
+    <InternalsVisibleTo Include="ShopifyAccessTests" />
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="packages.config" />
+    <Folder Include="Properties\" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Docs\AuthorizationFlowShopifyToSv.md" />
-    <Content Include="Docs\AuthorizationFlowSvToShopify.md" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

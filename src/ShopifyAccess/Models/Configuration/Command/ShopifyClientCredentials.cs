@@ -1,4 +1,4 @@
-﻿using CuttingEdge.Conditions;
+﻿using System;
 
 namespace ShopifyAccess.Models.Configuration.Command
 {
@@ -9,7 +9,11 @@ namespace ShopifyAccess.Models.Configuration.Command
 		public ShopifyClientCredentials( string shopName, string accessToken )
 			: base( shopName )
 		{
-			Condition.Requires( accessToken, "accessToken" ).IsNotNullOrWhiteSpace();
+			if( string.IsNullOrWhiteSpace( accessToken ) )
+			{
+				throw new ArgumentException( "accessToken must not be null or whitespace", nameof(accessToken) );
+			}
+
 
 			this.AccessToken = accessToken;
 		}

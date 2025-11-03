@@ -7,7 +7,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using CuttingEdge.Conditions;
 using Newtonsoft.Json;
 using ServiceStack;
 using ShopifyAccess.Exceptions;
@@ -31,7 +30,10 @@ namespace ShopifyAccess.Services
 		#region Constructors
 		public WebRequestServices( ShopifyAuthorizationConfig authorizationConfig )
 		{
-			Condition.Requires( authorizationConfig, "authorizationConfig" ).IsNotNull();
+			if( authorizationConfig == null )
+			{
+				throw new ArgumentNullException( nameof(authorizationConfig), "authorizationConfig must not be null" );
+			}
 
 			this._authorizationConfig = authorizationConfig;
 			this._clientCredentials = new ShopifyClientCredentials( authorizationConfig.ShopName, "authorization" );
@@ -40,7 +42,10 @@ namespace ShopifyAccess.Services
 
 		public WebRequestServices( ShopifyClientCredentials clientCredentials, HttpClient httpClient = null )
 		{
-			Condition.Requires( clientCredentials, "clientCredentials" ).IsNotNull();
+			if( clientCredentials == null )
+			{
+				throw new ArgumentNullException( nameof(clientCredentials), "clientCredentials must not be null" );
+			}
 
 			this._clientCredentials = clientCredentials;
 			this.HttpClient = httpClient ?? this.CreateHttpClient( this._clientCredentials.AccessToken );
@@ -74,7 +79,10 @@ namespace ShopifyAccess.Services
 
 		public async Task< T > GetResponseAsync< T >( ShopifyCommand command, string endpoint, CancellationToken token, Mark mark, int timeout )
 		{
-			Condition.Requires( mark, "mark" ).IsNotNull();
+			if( mark == null )
+			{
+				throw new ArgumentNullException( nameof(mark), "mark must not be null" );
+			}
 
 			this.ThrowIfOperationCanceledException( token, mark );
 
@@ -98,7 +106,10 @@ namespace ShopifyAccess.Services
 		public async Task< ResponsePage< T > > GetResponsePageAsync< T >( ShopifyCommand command, string endpoint, CancellationToken token, 
 			Mark mark, int timeout )
 		{
-			Condition.Requires( mark, "mark" ).IsNotNull();
+			if( mark == null )
+			{
+				throw new ArgumentNullException( nameof(mark), "mark must not be null" );
+			}
 
 			var uri = this.CreateRequestUri( command, endpoint );
 			ShopifyLogger.LogGetRequest( uri, mark, timeout );
@@ -134,7 +145,10 @@ namespace ShopifyAccess.Services
 
 		public async Task< T > PostDataAsync< T >( ShopifyCommand command, string jsonContent, CancellationToken token, Mark mark, int timeout )
 		{
-			Condition.Requires( mark, "mark" ).IsNotNull();
+			if( mark == null )
+			{
+				throw new ArgumentNullException( nameof(mark), "mark must not be null" );
+			}
 
 			var url = this.CreateRequestUri( command, endpoint: "" );
 			ShopifyLogger.LogUpdateRequest( url, jsonContent, mark, timeout );
@@ -158,7 +172,10 @@ namespace ShopifyAccess.Services
 
 		public async Task< IEnumerable< T > > GetReportDocumentAsync< T >( string url, Func< Stream, IEnumerable< T > > parseMethod, CancellationToken cancellationToken, Mark mark, int timeout ) where T : class
 		{
-			Condition.Requires( mark, "mark" ).IsNotNull();
+			if( mark == null )
+			{
+				throw new ArgumentNullException( nameof(mark), "mark must not be null" );
+			}
 
 			this.ThrowIfOperationCanceledException( cancellationToken, mark );
 
@@ -182,7 +199,10 @@ namespace ShopifyAccess.Services
 
 		public string RequestPermanentToken( string code, Mark mark )
 		{
-			Condition.Requires( mark, "mark" ).IsNotNull();
+			if( mark == null )
+			{
+				throw new ArgumentNullException( nameof(mark), "mark must not be null" );
+			}
 
 			var command = ShopifyCommand.GetAccessToken;
 			var url = new Uri( string.Concat( this._authorizationConfig.Host, command.Command ) );
