@@ -30,7 +30,6 @@ namespace ShopifyAccessTests.Products
 
 		[ Test ]
 		[ Explicit ]
-		//TODO GUARD-3946 Run test
 		public async Task GetProductsCreatedAfterAsync()
 		{
 			var productsStartUtc = DateTime.Parse( "2025-01-06T17:14:34Z" ); 
