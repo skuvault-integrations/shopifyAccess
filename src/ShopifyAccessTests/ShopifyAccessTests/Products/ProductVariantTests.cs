@@ -36,8 +36,6 @@ namespace ShopifyAccessTests.Products
 
 			var products = await this.Service.GetProductsCreatedAfterAsync( productsStartUtc, CancellationToken.None, _mark );
 
-			//TODO GUARD-3945 Temp useful query:
-			//	Newtonsoft.Json.JsonConvert.SerializeObject( products.Products.Where(x => x.Variants.Count > 1).Select(y => new {Title = y.Title, Variants = Newtonsoft.Json.JsonConvert.SerializeObject(y.Variants.Select(a => new {Sku = a.Sku}))} ) )
 			Assert.That( products.Products, Is.Not.Empty );
 		}
 
