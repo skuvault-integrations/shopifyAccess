@@ -12,11 +12,6 @@ namespace ShopifyAccess.GraphQl.Queries
 		/// </summary>
 		internal const int MaxItemsPerResponse = 250;
 
-		/// <summary>
-		/// The maximum number of variants per product GraphQL will return as part of the product query
-		/// </summary>
-		internal const int MaxVariantsPerProduct = 250;
-
 		public static string GetCurrentBulkOperationStatusRequest()
 		{
 			var request = new { query = CleanUpRequest( CurrentBulkOperationQuery.Query ) };
