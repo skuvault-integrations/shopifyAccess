@@ -73,35 +73,11 @@ namespace ShopifyAccess.GraphQl.Queries.Products
 		/// <param name="$first">Number of products to return</param>
 		/// <param name="$after">Cursor for pagination</param>
 		internal const string Query =
-			@"query ($query: String, $first: Int, $after: String, $maxVariantsPerProduct: Int) {
+			@"query ($query: String, $first: Int, $after: String) {
 				products(query: $query, first: $first, after: $after) {
 					nodes {
 						title
 						id
-						variants(first: $maxVariantsPerProduct) {
-							nodes {
-								sku
-								title
-								barcode
-								inventoryItem {
-									measurement {
-										weight {
-											value
-											unit
-										}
-									}
-								}
-								price
-								image
-								{
-									url
-								}
-								updatedAt
-							}
-						}
-						variantsCount {
-							count
-						}
 						vendor
 						media(first: 250)
 						{

@@ -7,6 +7,7 @@ using CuttingEdge.Conditions;
 using Netco.Extensions;
 using ServiceStack;
 using ShopifyAccess.GraphQl;
+using ShopifyAccess.GraphQl.Models;
 using ShopifyAccess.GraphQl.Models.Orders;
 using ShopifyAccess.GraphQl.Models.Products;
 using ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions;
@@ -206,7 +207,7 @@ namespace ShopifyAccess
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
 					mark, token );
 
-				return response?.ToShopifyProductsLegacy();
+				return response?.ToShopifyProducts();
 			}
 			finally
 			{
@@ -226,9 +227,9 @@ namespace ShopifyAccess
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
 					mark, token );
 
-				var productVariants = await this.GetAdditionalProductVariantsAsync( response, token, mark );
+				await this.PopulateProductsVariantsAsync( response, token, mark );
 
-				return response?.ToShopifyProducts( productVariants );
+				return response?.ToShopifyProducts();
 			}
 			finally
 			{
@@ -254,7 +255,7 @@ namespace ShopifyAccess
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
 					mark, token );
 
-				return response?.ToShopifyProductsLegacy();
+				return response?.ToShopifyProducts();
 			}
 			finally
 			{
@@ -279,9 +280,9 @@ namespace ShopifyAccess
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
 					mark, token );
 
-				var productVariants = await this.GetAdditionalProductVariantsAsync( response, token, mark );
+				await this.PopulateProductsVariantsAsync( response, token, mark );
 
-				return response?.ToShopifyProducts( productVariants );
+				return response?.ToShopifyProducts();
 			}
 			finally
 			{
@@ -290,30 +291,29 @@ namespace ShopifyAccess
 		}
 
 		/// <summary>
-		/// Get additional variants for products that have more than <see cref="QueryBuilder.MaxItemsPerResponse"/> variants
+		/// Get variants for products
 		/// </summary>
 		/// <param name="products"></param>
 		/// <param name="token"></param>
 		/// <param name="mark"></param>
 		/// <returns>Dictionary of productId (key), productVariants (value)</returns>
 		//TODO GUARD-3946 Add unit tests confirming that this path gets executed
-		private async Task< IDictionary< string, List< ShopifyAccess.GraphQl.Models.Products.ProductVariant > > > GetAdditionalProductVariantsAsync( List< Product > products, CancellationToken token, Mark mark )
+		private async Task PopulateProductsVariantsAsync( List< Product > products, CancellationToken token, Mark mark )
 		{
-			//TODO GUARD-3946 11.4 BOD Instead get all product variants here and none in the original GetProducts query
-			var productIdsWithExtraVariants = products.Where( x => ( x.TotalVariantsCount?.Count ?? 0 ) > QueryBuilder.MaxItemsPerResponse )
-				.Select( p => p.Id ).Distinct().ToList();
-			var additionalProductVariants = new Dictionary< string, List< ShopifyAccess.GraphQl.Models.Products.ProductVariant > >();
-			foreach( var productIdWithExtraVariants in productIdsWithExtraVariants )
+			if( products == null )
 			{
-				//TODO GUARD-3946 Might be easier to just append to the original product.Variations list, if possible/feasible
-				var productVariants = ( await this.GetProductVariantsByProductIdAsync( productIdWithExtraVariants, mark, token ) )?.ToList()
-				                      ??  new List< ShopifyAccess.GraphQl.Models.Products.ProductVariant >();
-				if( productVariants.Any() )
+				return;
+			}
+
+			foreach( var product in products.Where( product => product?.Id != null ) )
+			{
+				var productVariants = ( await this.GetProductVariantsByProductIdAsync( product.Id, mark, token ) )?.ToList();
+				if( productVariants?.Any() ?? false )
 				{
-					additionalProductVariants.Add( productIdWithExtraVariants, productVariants.ToList() );
+					product.Variants = new Nodes< GraphQl.Models.Products.ProductVariant >
+						{ Items = productVariants };
 				}
 			}
-			return additionalProductVariants;
 		}
 
 		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryAsync( CancellationToken token, Mark mark )

@@ -111,8 +111,7 @@ namespace ShopifyAccess.GraphQl.Queries
 				//TODO GUARD-3946 Everything below this line is identical in this method and GetProductsCreatedBeforeButUpdatedAfter.
 				//	Extract into a common if makes sense and doesn't make code harder to understand
 				after,
-				first = productsPerPage,
-				maxVariantsPerProduct = MaxItemsPerResponse
+				first = productsPerPage
 			};
 			var request = new { query = CleanUpRequest( GetProductsQuery.Query ), variables };
 			return request.ToJson();
@@ -161,8 +160,7 @@ namespace ShopifyAccess.GraphQl.Queries
 			{
 				query = $"created_at:<='{createdAtMaxAndUpdatedAtMinUtc.ToIso8601()}' AND updated_at:>='{createdAtMaxAndUpdatedAtMinUtc.ToIso8601()}'",
 				after,
-				first = productsPerPage,
-				maxVariantsPerProduct = MaxItemsPerResponse
+				first = productsPerPage
 			};
 			var request = new { query = CleanUpRequest( GetProductsQuery.Query ), variables };
 			return request.ToJson();
