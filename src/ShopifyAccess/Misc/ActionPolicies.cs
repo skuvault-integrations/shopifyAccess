@@ -11,15 +11,11 @@ namespace ShopifyAccess.Misc
 {
 	public static class ActionPolicies
 	{
-#if DEBUG
-		private const int RetryCount = 1;
-#else
 		private const int RetryCount = 10;
-#endif
 
-		public static ActionPolicy GetPolicy( Mark mark, string shop, CancellationToken token, [ CallerMemberName ] string callerName = "" )
+		public static ActionPolicy GetPolicy( Mark mark, string shop, CancellationToken token, [ CallerMemberName ] string callerName = "", int retryCount = 10)
 		{
-			return ActionPolicy.From( ex => ShouldRetry( ex, token ) ).Retry( RetryCount, ( ex, i ) =>
+			return ActionPolicy.From( ex => ShouldRetry( ex, token ) ).Retry( retryCount, ( ex, i ) =>
 			{
 				ShopifyLogger.Trace( ex, mark, "ShopName: {0}\tRetrying Shopify API get call for the {1} time. Caller:{2}.", shop, i, callerName );
 				SystemUtil.Sleep( TimeSpan.FromSeconds( 5 + 10 * i ) );
