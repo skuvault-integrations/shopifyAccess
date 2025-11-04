@@ -306,12 +306,10 @@ namespace ShopifyAccess
 			foreach( var productIdWithExtraVariants in productIdsWithExtraVariants )
 			{
 				//TODO GUARD-3946 Might be easier to just append to the original product.Variations list, if possible/feasible
-				//TODO GUARD-3946 11.4 AFTER LUNCH This has to be called with the pagination wrapper
 				var productVariants = ( await this.GetProductVariantsByProductIdAsync( productIdWithExtraVariants, mark, token ) )?.ToList()
 				                      ??  new List< ShopifyAccess.GraphQl.Models.Products.ProductVariant >();
 				if( productVariants.Any() )
 				{
-					//TODO GUARD-3946 This will add duplicates
 					additionalProductVariants.Add( productIdWithExtraVariants, productVariants.ToList() );
 				}
 			}
@@ -462,14 +460,13 @@ namespace ShopifyAccess
 		}
 
 		//TODO GUARD-3946 Add unit and integration tests
-		//TODO GUARD-3946 11.4 BOD 0 Figure out why this is returning nothing
 		internal async Task< IEnumerable< ShopifyAccess.GraphQl.Models.Products.ProductVariant > > GetProductVariantsByProductIdAsync( string productId, Mark mark, CancellationToken token )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark );
 
 			try
 			{
-				var response = await this._graphQlPaginationService.GetAllPagesAsync< GetProductVariantsData, ShopifyAccess.GraphQl.Models.Products.ProductVariant >( 
+				var response = await this._graphQlPaginationService.GetAllPagesAsync< GetProductVariantsData, ShopifyAccess.GraphQl.Models.Products.ProductVariant >(
 					async (nextCursor) => await this._webRequestServices.PostDataAsync< GetProductVariantsResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
 						QueryBuilder.GetProductVariants( productId, nextCursor ),
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] ),

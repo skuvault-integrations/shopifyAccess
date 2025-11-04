@@ -8,14 +8,21 @@ namespace ShopifyAccess.GraphQl.Models.Responses
 	{
 		public override Nodes< ProductVariant > GetItemsAndPagingInfo()
 		{
-			return this.Data.ProductVariants;
+			return this.Data.Product.Variants;
 		}
 	}
 
 	[ DataContract ]
 	internal class GetProductVariantsData
 	{
-		[ DataMember( Name = "productVariants" ) ]
-		public Nodes< ProductVariant > ProductVariants{ get; set; } = new Nodes< ProductVariant >();
+		[ DataMember( Name = "product" ) ]
+		public GetProductVariantsInnerData Product{ get; set; }
+	}
+
+	[ DataContract ]
+	 class GetProductVariantsInnerData
+	{
+		[ DataMember( Name = "variants" ) ]
+		public Nodes< ProductVariant > Variants{ get; set; } = new Nodes< ProductVariant >();
 	}
 }
