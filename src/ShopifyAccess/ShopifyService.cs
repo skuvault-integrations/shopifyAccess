@@ -299,17 +299,19 @@ namespace ShopifyAccess
 		//TODO GUARD-3946 Add unit tests confirming that this path gets executed
 		private async Task< IDictionary< string, List< ShopifyAccess.GraphQl.Models.Products.ProductVariant > > > GetAdditionalProductVariantsAsync( List< Product > products, CancellationToken token, Mark mark )
 		{
-			//TODO GUARD-3946 Or possibly, get all product variants here and none in the original GetProducts query
+			//TODO GUARD-3946 11.4 BOD Instead get all product variants here and none in the original GetProducts query
 			var productIdsWithExtraVariants = products.Where( x => ( x.TotalVariantsCount?.Count ?? 0 ) > QueryBuilder.MaxItemsPerResponse )
 				.Select( p => p.Id ).Distinct().ToList();
 			var additionalProductVariants = new Dictionary< string, List< ShopifyAccess.GraphQl.Models.Products.ProductVariant > >();
 			foreach( var productIdWithExtraVariants in productIdsWithExtraVariants )
 			{
 				//TODO GUARD-3946 Might be easier to just append to the original product.Variations list, if possible/feasible
+				//TODO GUARD-3946 11.4 AFTER LUNCH This has to be called with the pagination wrapper
 				var productVariants = ( await this.GetProductVariantsByProductIdAsync( productIdWithExtraVariants, mark, token ) )?.ToList()
 				                      ??  new List< ShopifyAccess.GraphQl.Models.Products.ProductVariant >();
 				if( productVariants.Any() )
 				{
+					//TODO GUARD-3946 This will add duplicates
 					additionalProductVariants.Add( productIdWithExtraVariants, productVariants.ToList() );
 				}
 			}
@@ -460,6 +462,7 @@ namespace ShopifyAccess
 		}
 
 		//TODO GUARD-3946 Add unit and integration tests
+		//TODO GUARD-3946 11.4 BOD 0 Figure out why this is returning nothing
 		internal async Task< IEnumerable< ShopifyAccess.GraphQl.Models.Products.ProductVariant > > GetProductVariantsByProductIdAsync( string productId, Mark mark, CancellationToken token )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark );

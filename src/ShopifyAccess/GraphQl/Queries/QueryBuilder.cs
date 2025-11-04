@@ -189,9 +189,8 @@ namespace ShopifyAccess.GraphQl.Queries
 		{
 			var variables = new
 			{
-				query = $"product_id:{productId}",
-				after,
-				first = MaxItemsPerResponse
+				productId,
+				after
 			};
 			var request = new { query = CleanUpRequest( GetProductVariantsQuery.GetVariantsQueryByProductId ), variables };
 			return request.ToJson();
