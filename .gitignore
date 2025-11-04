@@ -36,7 +36,7 @@ _rltm*
 license.txt
 
 #Ignore common build files
-build/*
+src/build/*
 log
 deployment
 
