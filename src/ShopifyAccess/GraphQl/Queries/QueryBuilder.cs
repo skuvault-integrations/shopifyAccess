@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ServiceStack;
 using ShopifyAccess.GraphQl.Helpers;
 using ShopifyAccess.GraphQl.Queries.Products;
@@ -177,20 +178,22 @@ namespace ShopifyAccess.GraphQl.Queries
 		}
 
 		//TODO GUARD-3946 Create tests
-		public static string GetProductVariantsByProductIds( IEnumerable< string > productIds, string after = null, int productVariantsPerPage = MaxItemsPerResponse )
+		public static string GetProductVariantsByProductIds( IEnumerable< long > productIds, string after = null, int variantsPerPage = MaxItemsPerResponse )
 		{
-			if( productVariantsPerPage > MaxItemsPerResponse )
+			if( variantsPerPage > MaxItemsPerResponse )
 			{
-				throw new ArgumentOutOfRangeException( nameof(productVariantsPerPage), productVariantsPerPage, $"{nameof(productVariantsPerPage)} should not be greater than {MaxItemsPerResponse}" );
+				throw new ArgumentOutOfRangeException( nameof(variantsPerPage), variantsPerPage, $"{nameof(variantsPerPage)} should not be greater than {MaxItemsPerResponse}" );
+			}
+			if( productIds.Count() > MaxItemsPerResponse )
+			{
+				throw new ArgumentOutOfRangeException( nameof(productIds), productIds.Count(), $"{nameof(productIds)} should not contain > {MaxItemsPerResponse} items" );
 			}
 			
-			//TODO GUARD-3946 Exit if null productIds or none
-			//TODO GUARD-3946 Throw if productIds count > MaxItemsPerResponse
 			var variables = new
 			{
 				query = $"product_ids:{productIds.Join(",")}",
 				after,
-				first = productVariantsPerPage
+				first = variantsPerPage
 			};
 			var request = new { query = CleanUpRequest( GetProductVariantsQuery.Query ), variables };
 			return request.ToJson();

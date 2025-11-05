@@ -91,6 +91,7 @@
     <Compile Include="GraphQl\Models\Products\InventoryItemMeasurement.cs" />
     <Compile Include="GraphQl\Models\Products\Product.cs" />
     <Compile Include="GraphQl\Models\Products\ProductVariant.cs" />
+    <Compile Include="GraphQl\Models\Products\ProductVariantWithProductId.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventory\InventoryLevelsNodes.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventory\InventoryQuantity.cs" />
     <Compile Include="GraphQl\Models\Responses\GetBulkOperationByIdResponse.cs" />

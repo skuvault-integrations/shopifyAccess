@@ -2,10 +2,9 @@ namespace ShopifyAccess.GraphQl.Queries.Products
 {
 	internal static class GetProductVariantsQuery
 	{
-		//TODO GUARD-3946 Test
 		internal const string Query =
 			@"query GetProductVariantsByProductIds($query: String, $first: Int, $after: String) {
-				productVariants(first: 250, after: $after, query: $query) {
+				productVariants(first: $first, after: $after, query: $query) {
 				 nodes {
 						product {
 						 id

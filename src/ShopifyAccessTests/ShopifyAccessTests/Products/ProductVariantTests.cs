@@ -5,7 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
+using ShopifyAccess;
+using ShopifyAccess.GraphQl.Helpers;
 using ShopifyAccess.Models;
+using ShopifyAccess.Models.Configuration.Command;
 using ShopifyAccess.Models.Product;
 using ShopifyAccess.Models.ProductVariant;
 
@@ -138,6 +141,25 @@ namespace ShopifyAccessTests.Products
 
 			var imagesUrlsQueries = productsWithImages.SelectMany( p => p.Images ).Select( i => new Uri( i.Src ).Query ).Where( q => !string.IsNullOrWhiteSpace( q ) );
 			imagesUrlsQueries.Should().BeEmpty();
+		}
+
+		[ Test ]
+		[ Explicit( "Calls the real API, and these productIds might no longer exist. Thus the result.Count assert might fail" ) ]
+		public async Task GetProductVariantsByProductIdsAsync_ReturnVariantsInPages()
+		{
+			const long nonExistingProductId = 1111;
+			var productIds = new [] { 9729995637050, 9733037949242, 9779221725498, 9943945019706, 9943946428730, nonExistingProductId };
+			const int simulateSmallPageSize = 1;
+
+			var result = ( await ( ( ShopifyService )this.Service ).GetProductVariantsByProductIdsAsync( productIds, _mark, CancellationToken.None, variantsPerPage : simulateSmallPageSize ) )
+				.ToList();
+
+			Assert.Multiple(() => {
+				Assert.That( result.Count, Is.GreaterThan( 1 ) );
+				var resultProductIds = result.Select( x => GraphQlIdParser.Product.GetId( x.Product.Id ) ).Distinct();
+				//Only returns variants whose parent product is one of productIds
+				Assert.That( resultProductIds.All( x => productIds.Contains( x )  ), Is.True );
+			} );
 		}
 
 		[ Test ]

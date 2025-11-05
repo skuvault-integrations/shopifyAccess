@@ -4,25 +4,18 @@ using ShopifyAccess.GraphQl.Models.Products;
 namespace ShopifyAccess.GraphQl.Models.Responses
 {
 	[ DataContract ]
-	internal class GetProductVariantsResponse: GraphQlResponseWithPages< GetProductVariantsData, ProductVariant >
+	internal class GetProductVariantsResponse: GraphQlResponseWithPages< GetProductVariantsData, ProductVariantWithProductId >
 	{
-		public override Nodes< ProductVariant > GetItemsAndPagingInfo()
+		public override Nodes< ProductVariantWithProductId > GetItemsAndPagingInfo()
 		{
-			return this.Data.Product.Variants;
+			return this.Data.Variants;
 		}
 	}
 
 	[ DataContract ]
 	internal class GetProductVariantsData
 	{
-		[ DataMember( Name = "product" ) ]
-		public GetProductVariantsInnerData Product{ get; set; }
-	}
-
-	[ DataContract ]
-	 class GetProductVariantsInnerData
-	{
-		[ DataMember( Name = "variants" ) ]
-		public Nodes< ProductVariant > Variants{ get; set; } = new Nodes< ProductVariant >();
+		[ DataMember( Name = "productVariants" ) ]
+		public Nodes< ProductVariantWithProductId > Variants{ get; set; } = new Nodes< ProductVariantWithProductId >();
 	}
 }

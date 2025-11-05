@@ -8,6 +8,7 @@ using Netco.Extensions;
 using ServiceStack;
 using ShopifyAccess.Extensions;
 using ShopifyAccess.GraphQl;
+using ShopifyAccess.GraphQl.Helpers;
 using ShopifyAccess.GraphQl.Models;
 using ShopifyAccess.GraphQl.Models.Orders;
 using ShopifyAccess.GraphQl.Models.Products;
@@ -308,7 +309,7 @@ namespace ShopifyAccess
 			}
 
 			var productIds = products.Where( product => product?.Id != null )
-				.Select( x => x.Id ).Distinct();
+				.Select( x => GraphQlIdParser.Product.GetId( x.Id ) ).Distinct();
 			//TODO GUARD-3946 Test to ensure that 250 isn't too many per batch
 			var productIdsBatches = productIds.SplitInBatches( QueryBuilder.MaxItemsPerResponse );
 			//TODO GUARD-3946 Re-add copies that were removed after the commit https://github.com/skuvault-integrations/shopifyAccess/pull/64/commits/efd44117763e03e48bdb3ffc3006fdf26c88c845
@@ -468,20 +469,19 @@ namespace ShopifyAccess
 			}
 		}
 
-		//TODO GUARD-3946 Add unit and integration tests
-		internal async Task< IEnumerable< ShopifyAccess.GraphQl.Models.Products.ProductVariant > > GetProductVariantsByProductIdsAsync( IEnumerable< string > productIds, Mark mark, CancellationToken token )
+		internal async Task< IEnumerable< ProductVariantWithProductId > > GetProductVariantsByProductIdsAsync( IEnumerable< long > productIds, Mark mark, CancellationToken token, int variantsPerPage = RequestMaxLimit )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark );
 
 			try
 			{
-				var response = await this._graphQlPaginationService.GetAllPagesAsync< GetProductVariantsData, ShopifyAccess.GraphQl.Models.Products.ProductVariant >(
+				var response = await this._graphQlPaginationService.GetAllPagesAsync< GetProductVariantsData, ProductVariantWithProductId >(
 					async (nextCursor) => await this._webRequestServices.PostDataAsync< GetProductVariantsResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
-						QueryBuilder.GetProductVariantsByProductIds( productIds, nextCursor ),
-						token, mark, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] ),
+						QueryBuilder.GetProductVariantsByProductIds( productIds, nextCursor, variantsPerPage ),
+						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
 					mark, token );
 
-				return response?.ToList() ?? new List< ShopifyAccess.GraphQl.Models.Products.ProductVariant >();
+				return response?.ToList() ?? new List< ProductVariantWithProductId >();
 			}
 			finally
 			{
