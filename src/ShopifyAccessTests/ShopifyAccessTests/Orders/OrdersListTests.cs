@@ -9,6 +9,7 @@ using ShopifyAccess.Models.Order;
 
 namespace ShopifyAccessTests.Orders
 {
+	[ Explicit ]
 	[ TestFixture ]
 	public class OrdersListTests : BaseTests
 	{

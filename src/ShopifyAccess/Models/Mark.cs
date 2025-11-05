@@ -1,5 +1,4 @@
 ﻿using System;
-using CuttingEdge.Conditions;
 
 namespace ShopifyAccess.Models
 {
@@ -9,7 +8,10 @@ namespace ShopifyAccess.Models
 
 		public Mark( string value )
 		{
-			Condition.Requires( value, "value" ).IsNotNullOrEmpty();
+			if( string.IsNullOrEmpty( value ) )
+			{
+				throw new ArgumentException( "value must not be null or empty", nameof(value) );
+			}
 
 			this.Value = value;
 		}

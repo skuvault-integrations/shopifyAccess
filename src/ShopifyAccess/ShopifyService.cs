@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CuttingEdge.Conditions;
 using Netco.Extensions;
 using ServiceStack;
 using ShopifyAccess.GraphQl;
@@ -59,9 +58,20 @@ namespace ShopifyAccess
 
 		public ShopifyService( ShopifyClientCredentials clientCredentials, ShopifyTimeouts operationsTimeouts, ShopifyCommandFactory shopifyCommandFactory )
 		{
-			Condition.Requires( clientCredentials, "clientCredentials" ).IsNotNull();
-			Condition.Requires( operationsTimeouts, "operationsTimeouts" ).IsNotNull();
-			Condition.Requires( shopifyCommandFactory, "shopifyCommandFactory" ).IsNotNull();
+			if( clientCredentials == null )
+			{
+				throw new ArgumentNullException( nameof(clientCredentials), "clientCredentials must not be null" );
+			}
+
+			if( operationsTimeouts == null )
+			{
+				throw new ArgumentNullException( nameof(operationsTimeouts), "operationsTimeouts must not be null" );
+			}
+
+			if( shopifyCommandFactory == null )
+			{
+				throw new ArgumentNullException( nameof(shopifyCommandFactory), "shopifyCommandFactory must not be null" );
+			}
 
 			this._shopName = clientCredentials.ShopName;
 			this._webRequestServices = new WebRequestServices( clientCredentials );

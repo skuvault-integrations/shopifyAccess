@@ -6,8 +6,8 @@ using System.Runtime.CompilerServices;
 using Netco.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using ShopifyAccess.Models;
 using ShopifyAccess.Models.Order;
+using Mark = ShopifyAccess.Models.Mark;
 
 namespace ShopifyAccess.Misc
 {

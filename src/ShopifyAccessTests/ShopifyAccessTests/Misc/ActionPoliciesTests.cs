@@ -68,7 +68,7 @@ namespace ShopifyAccessTests.Misc
 			};
 
 			// Act, Assert
-			ActionPolicies.GetPolicy( Mark.Create, ShopName, CancellationToken.None ).Invoking( p => p.Get( action ) ).Should().Throw< ShopifyTransientException >();
+			ActionPolicies.GetPolicy( Mark.Create, ShopName, CancellationToken.None, retryCount: 1 ).Invoking( p => p.Get( action ) ).Should().Throw< ShopifyTransientException >();
 			counter.Should().Be( 2 );
 		}
 

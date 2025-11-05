@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using CuttingEdge.Conditions;
 using ShopifyAccess.GraphQl.Models.Responses;
 using ShopifyAccess.GraphQl.Queries;
 using ShopifyAccess.Misc;
@@ -112,7 +111,11 @@ namespace ShopifyAccess.GraphQl.Services
 
 		public async Task< CurrentBulkOperation > GetBulkOperationByIdAsync( string gid, Mark mark, CancellationToken cancellationToken )
 		{
-			Condition.Requires( gid, nameof(gid) ).IsNotNullOrEmpty();
+			if( string.IsNullOrEmpty( gid ) )
+			{
+				throw new ArgumentException( "gid must not be null or empty", nameof(gid) );
+			}
+
 
 			ShopifyLogger.LogOperationStart( this._shopName, mark );
 			try

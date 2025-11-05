@@ -1,4 +1,4 @@
-﻿using CuttingEdge.Conditions;
+﻿using System;
 
 namespace ShopifyAccess.Models.Configuration
 {
@@ -9,7 +9,10 @@ namespace ShopifyAccess.Models.Configuration
 
 		protected ShopifyShop( string shopName )
 		{
-			Condition.Requires( shopName, "shopName" ).IsNotNullOrWhiteSpace();
+			if( string.IsNullOrWhiteSpace( shopName ) )
+			{
+				throw new ArgumentException( "shopName must not be null or whitespace", nameof(shopName) );
+			}
 
 			this.Host = string.Format( "https://{0}.myshopify.com", shopName );
 			this.ShopName = shopName;

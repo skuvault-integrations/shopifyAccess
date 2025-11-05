@@ -9,6 +9,7 @@ namespace ShopifyAccessTests.Users
 	/// Note: These tests may fails for our sandbox account as the User resource is available for private apps and custom apps installed 
 	/// on Shopify Plus stores (see https://shopify.dev/docs/api/admin-rest/2023-04/resources/user)
 	/// </summary>
+	[ Explicit ]
 	[ TestFixture ]
 	public class UsersTests : BaseTests
 	{

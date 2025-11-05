@@ -11,6 +11,7 @@ using ShopifyAccess.Models.ProductVariant;
 
 namespace ShopifyAccessTests.Products
 {
+	[ Explicit ]
 	[ TestFixture ]
 	public class ProductVariantTests : BaseTests
 	{

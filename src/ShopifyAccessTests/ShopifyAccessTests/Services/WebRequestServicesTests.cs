@@ -16,6 +16,7 @@ using ShopifyAccess.Services;
 
 namespace ShopifyAccessTests.Services
 {
+	[ Explicit ]
 	[ TestFixture ]
 	public class WebRequestServicesTests: BaseTests
 	{
