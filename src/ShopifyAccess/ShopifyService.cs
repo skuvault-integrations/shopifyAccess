@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CuttingEdge.Conditions;
 using Netco.Extensions;
 using ServiceStack;
+using ShopifyAccess.Extensions;
 using ShopifyAccess.GraphQl;
 using ShopifyAccess.GraphQl.Models;
 using ShopifyAccess.GraphQl.Models.Orders;
@@ -298,6 +299,7 @@ namespace ShopifyAccess
 		/// <param name="mark"></param>
 		/// <returns>Dictionary of productId (key), productVariants (value)</returns>
 		//TODO GUARD-3946 Add unit tests confirming that this path gets executed
+		//TODO GUARD-3946 Instead pass List< string > productIds (just numeric, not string). Rename back to what it was
 		private async Task PopulateProductsVariantsAsync( List< Product > products, CancellationToken token, Mark mark )
 		{
 			if( products == null )
@@ -305,14 +307,21 @@ namespace ShopifyAccess
 				return;
 			}
 
-			foreach( var product in products.Where( product => product?.Id != null ) )
+			var productIds = products.Where( product => product?.Id != null )
+				.Select( x => x.Id ).Distinct();
+			//TODO GUARD-3946 Test to ensure that 250 isn't too many per batch
+			var productIdsBatches = productIds.SplitInBatches( QueryBuilder.MaxItemsPerResponse );
+			//TODO GUARD-3946 Re-add copies that were removed after the commit https://github.com/skuvault-integrations/shopifyAccess/pull/64/commits/efd44117763e03e48bdb3ffc3006fdf26c88c845
+			//	Removed in https://github.com/skuvault-integrations/shopifyAccess/pull/64/commits/1296a212e69f756ccdd820fa5f133943bb3ec37b
+			foreach( var productIdsBatch in productIdsBatches )
 			{
-				var productVariants = ( await this.GetProductVariantsByProductIdAsync( product.Id, mark, token ) )?.ToList();
-				if( productVariants?.Any() ?? false )
-				{
-					product.Variants = new Nodes< GraphQl.Models.Products.ProductVariant >
-						{ Items = productVariants };
-				}
+				var productVariants = ( await this.GetProductVariantsByProductIdsAsync( productIdsBatch.ToList(), mark, token ) )?.ToList();
+				//TODO GUARD-3946 Instead populate the dictionary and return. Then add variations only in ShopifyProduct class (not the Product DTO we use to deserialize)
+				// if( productVariants?.Any() ?? false )
+				// {
+				// 	product.Variants = new Nodes< GraphQl.Models.Products.ProductVariant >
+				// 		{ Items = productVariants };
+				// }
 			}
 		}
 
@@ -460,7 +469,7 @@ namespace ShopifyAccess
 		}
 
 		//TODO GUARD-3946 Add unit and integration tests
-		internal async Task< IEnumerable< ShopifyAccess.GraphQl.Models.Products.ProductVariant > > GetProductVariantsByProductIdAsync( string productId, Mark mark, CancellationToken token )
+		internal async Task< IEnumerable< ShopifyAccess.GraphQl.Models.Products.ProductVariant > > GetProductVariantsByProductIdsAsync( IEnumerable< string > productIds, Mark mark, CancellationToken token )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark );
 
@@ -468,7 +477,7 @@ namespace ShopifyAccess
 			{
 				var response = await this._graphQlPaginationService.GetAllPagesAsync< GetProductVariantsData, ShopifyAccess.GraphQl.Models.Products.ProductVariant >(
 					async (nextCursor) => await this._webRequestServices.PostDataAsync< GetProductVariantsResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
-						QueryBuilder.GetProductVariants( productId, nextCursor ),
+						QueryBuilder.GetProductVariantsByProductIds( productIds, nextCursor ),
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProductsInventory ] ),
 					mark, token );
 

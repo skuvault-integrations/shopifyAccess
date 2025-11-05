@@ -65,6 +65,7 @@
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Exceptions\ShopifyHttpRequestExceptions.cs" />
+    <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="GraphQl\BulkOperationStatus.cs" />
     <Compile Include="GraphQl\Helpers\DateTimeExtensions.cs" />
     <Compile Include="GraphQl\Helpers\GraphQlIdParser.cs" />
