@@ -209,7 +209,7 @@ namespace ShopifyAccess
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
 					mark, token );
 
-				return response?.ToShopifyProducts();
+				return response?.ToShopifyProductsLegacy();
 			}
 			finally
 			{
@@ -231,7 +231,8 @@ namespace ShopifyAccess
 
 				await this.PopulateProductsVariantsAsync( response, token, mark );
 
-				return response?.ToShopifyProducts();
+				//TODO GUARD-3946 Pass in the dictionary returned from the reverted method above
+				return response?.ToShopifyProducts( new Dictionary< string, List< GraphQl.Models.Products.ProductVariant > >() );
 			}
 			finally
 			{
@@ -257,7 +258,7 @@ namespace ShopifyAccess
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
 					mark, token );
 
-				return response?.ToShopifyProducts();
+				return response?.ToShopifyProductsLegacy();
 			}
 			finally
 			{
@@ -284,7 +285,8 @@ namespace ShopifyAccess
 
 				await this.PopulateProductsVariantsAsync( response, token, mark );
 
-				return response?.ToShopifyProducts();
+				//TODO GUARD-3946 Pass in the dictionary returned from the reverted method above
+				return response?.ToShopifyProducts( new Dictionary< string, List< GraphQl.Models.Products.ProductVariant > >() );
 			}
 			finally
 			{
@@ -317,7 +319,7 @@ namespace ShopifyAccess
 			foreach( var productIdsBatch in productIdsBatches )
 			{
 				var productVariants = ( await this.GetProductVariantsByProductIdsAsync( productIdsBatch.ToList(), mark, token ) )?.ToList();
-				//TODO GUARD-3946 Instead populate the dictionary and return. Then add variations only in ShopifyProduct class (not the Product DTO we use to deserialize)
+				//TODO GUARD-3946 11.6 BOD Instead populate the dictionary and return. Then add variations only in ShopifyProduct class (not the Product DTO we use to deserialize)
 				// if( productVariants?.Any() ?? false )
 				// {
 				// 	product.Variants = new Nodes< GraphQl.Models.Products.ProductVariant >
