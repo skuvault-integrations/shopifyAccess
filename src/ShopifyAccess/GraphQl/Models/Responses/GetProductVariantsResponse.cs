@@ -1,9 +1,8 @@
-﻿using System.Runtime.Serialization;
+﻿using Newtonsoft.Json;
 using ShopifyAccess.GraphQl.Models.Products;
 
 namespace ShopifyAccess.GraphQl.Models.Responses
 {
-	[ DataContract ]
 	internal class GetProductVariantsResponse: GraphQlResponseWithPages< GetProductVariantsData, ProductVariantWithProductId >
 	{
 		public override Nodes< ProductVariantWithProductId > GetItemsAndPagingInfo()
@@ -12,10 +11,9 @@ namespace ShopifyAccess.GraphQl.Models.Responses
 		}
 	}
 
-	[ DataContract ]
 	internal class GetProductVariantsData
 	{
-		[ DataMember( Name = "productVariants" ) ]
+		[ JsonProperty( "productVariants" ) ]
 		public Nodes< ProductVariantWithProductId > Variants{ get; set; } = new Nodes< ProductVariantWithProductId >();
 	}
 }

@@ -188,7 +188,7 @@ namespace ShopifyAccess.GraphQl.Queries
 			{
 				throw new ArgumentOutOfRangeException( nameof(productIds), productIds.Count(), $"{nameof(productIds)} should not contain > {MaxItemsPerResponse} items" );
 			}
-			
+
 			var variables = new
 			{
 				query = $"product_ids:{productIds.Join(",")}",

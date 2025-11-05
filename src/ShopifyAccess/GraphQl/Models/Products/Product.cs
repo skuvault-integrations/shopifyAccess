@@ -9,7 +9,7 @@ namespace ShopifyAccess.GraphQl.Models.Products
 		public string Title{ get; set; }
 
 		[ JsonProperty( "variants" ) ]
-		//After GUARD-3946, variants below are null initially, when request products. They are filled in a separate call
+		//TODO GUARD-3954 Remove on feature cleanup, since after GUARD-3946 and the feature toggle variants will not be requested in the GetProducts call
 		public Nodes< Products.ProductVariant > Variants{ get; set; }
 
 		[ JsonProperty( "id" ) ]

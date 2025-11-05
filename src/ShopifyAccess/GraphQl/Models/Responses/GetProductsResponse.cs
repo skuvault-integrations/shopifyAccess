@@ -25,7 +25,7 @@ namespace ShopifyAccess.GraphQl.Models.Responses
 
 	internal static class GetProductsResponseExtensions
 	{
-		internal static ShopifyProducts ToShopifyProducts( this List< Product > responseProducts )
+		internal static ShopifyProducts ToShopifyProducts( this List< Products.Product > responseProducts )
 		{
 			return responseProducts != null
 				? new ShopifyProducts
