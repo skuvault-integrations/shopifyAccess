@@ -13,9 +13,9 @@ namespace ShopifyAccess.GraphQl.Queries.Products
 		internal const string QueryVariantsWithProductId =
 			@"query GetProductVariants($query: String, $first: Int, $after: String) {
 				productVariants(first: $first, after: $after, query: $query) {
-				 nodes {
+					nodes {
 						product {
-						 id
+							id
 						}
 						sku
 						title
@@ -30,11 +30,11 @@ namespace ShopifyAccess.GraphQl.Queries.Products
 						}
 						price
 						updatedAt
-				 }
-				 pageInfo {
-					hasNextPage
-					endCursor
-				 }
+					}
+					pageInfo {
+						hasNextPage
+						endCursor
+					}
 				}
 			}";
 	}
