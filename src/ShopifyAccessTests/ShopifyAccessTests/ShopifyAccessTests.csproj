@@ -101,6 +101,7 @@
     <Compile Include="GraphQl\Models\Orders\Extensions\OrderExtensionsTests.cs" />
     <Compile Include="GraphQl\Models\Products\Extensions\ProductExtensionsTests.cs" />
     <Compile Include="GraphQl\Models\Products\Extensions\ProductVariantExtensionsTests.cs" />
+    <Compile Include="GraphQl\Models\Products\Extensions\ProductVariantsExtensionsTests.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventoryReport\Extensions\ProductVariantsInventoryReportParserTests.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventoryReport\ProductVariantTests.cs" />
     <Compile Include="GraphQl\Queries\Orders\OrderQueryBuilderTests.cs" />

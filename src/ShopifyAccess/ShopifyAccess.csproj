@@ -87,6 +87,7 @@
     <Compile Include="GraphQl\Models\PageInfo.cs" />
     <Compile Include="GraphQl\Models\Products\Extensions\ProductExtensions.cs" />
     <Compile Include="GraphQl\Models\Products\Extensions\ProductVariantExtensions.cs" />
+    <Compile Include="GraphQl\Models\Products\Extensions\ProductVariantsExtensions.cs" />
     <Compile Include="GraphQl\Models\Products\InventoryItem.cs" />
     <Compile Include="GraphQl\Models\Products\InventoryItemMeasurement.cs" />
     <Compile Include="GraphQl\Models\Products\Product.cs" />

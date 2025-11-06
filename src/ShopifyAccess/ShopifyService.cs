@@ -302,7 +302,6 @@ namespace ShopifyAccess
 		/// <param name="mark"></param>
 		/// <returns>Dictionary of productId (key), productVariants (value)</returns>
 		//TODO GUARD-3946 Add unit tests confirming that this path gets executed
-		//TODO GUARD-3946 Instead pass List< string > productIds (just numeric, not string). Rename back to what it was
 		private async Task< IDictionary< long, List< GraphQl.Models.Products.ProductVariant > > > GetProductsVariantsAsync( List< Product > products, CancellationToken token, Mark mark )
 		{
 			var productVariants = new Dictionary< long, List< GraphQl.Models.Products.ProductVariant > >();
