@@ -34,7 +34,7 @@ namespace ShopifyAccess
 	{
 		private readonly WebRequestServices _webRequestServices;
 		private readonly IReportGenerator _reportGenerator;
-		private const int RequestMaxLimit = 250;
+		internal const int RequestMaxLimit = 250;
 		private const int RequestInventoryLevelsMaxLimit = 50;
 		private readonly string _shopName;
 		// One throttler for all requests because used same limit for all API
@@ -312,7 +312,6 @@ namespace ShopifyAccess
 
 			var productIds = products.Where( product => product?.Id != null )
 				.Select( x => GraphQlIdParser.Product.GetId( x.Id ) ).Distinct();
-			//TODO GUARD-3946 Test to ensure that 250 isn't too many per batch
 			var productIdsBatches = productIds.SplitInBatches( QueryBuilder.MaxItemsPerResponse );
 			//TODO GUARD-3946 Re-add copies that were removed after the commit https://github.com/skuvault-integrations/shopifyAccess/pull/64/commits/efd44117763e03e48bdb3ffc3006fdf26c88c845
 			//	Removed in https://github.com/skuvault-integrations/shopifyAccess/pull/64/commits/1296a212e69f756ccdd820fa5f133943bb3ec37b

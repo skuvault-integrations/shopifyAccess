@@ -8,7 +8,6 @@ using NUnit.Framework;
 using ShopifyAccess;
 using ShopifyAccess.GraphQl.Helpers;
 using ShopifyAccess.Models;
-using ShopifyAccess.Models.Configuration.Command;
 using ShopifyAccess.Models.Product;
 using ShopifyAccess.Models.ProductVariant;
 
@@ -149,10 +148,9 @@ namespace ShopifyAccessTests.Products
 
 		[ Test ]
 		[ Explicit( "Calls the real API, and these productIds might no longer exist. Thus the result.Count assert might fail" ) ]
-		public async Task GetProductVariantsByProductIdsAsync_ReturnVariantsInPages()
+		public async Task GetProductVariantsByProductIdsAsync_ReturnsVariantsForPassedInProductIds_WhenMultiplePages()
 		{
-			const long nonExistingProductId = 1111;
-			var productIds = new [] { 9729995637050, 9733037949242, 9779221725498, 9943945019706, 9943946428730, nonExistingProductId };
+			var productIds = GetExistingProductIds();
 			const int simulateSmallPageSize = 1;
 
 			var result = ( await ( ( ShopifyService )this.Service ).GetProductVariantsByProductIdsAsync( productIds, _mark, CancellationToken.None, variantsPerPage : simulateSmallPageSize ) )
@@ -164,6 +162,42 @@ namespace ShopifyAccessTests.Products
 				//Only returns variants whose parent product is one of productIds
 				Assert.That( resultProductIds.All( x => productIds.Contains( x )  ), Is.True );
 			} );
+		}
+
+		[ Test ]
+		[ Explicit ]
+		public async Task GetProductVariantsByProductIdsAsync_ReturnsVariants_WhenMaxNumberOfProductIdsSent()
+		{
+			var productIds = GetExistingProductIds();
+			AppendRandomProductIds( productIds, ShopifyService.RequestMaxLimit );
+
+			var result = ( await ( ( ShopifyService )this.Service ).GetProductVariantsByProductIdsAsync( productIds, _mark, CancellationToken.None ) )
+				.ToList();
+
+			Assert.That( result.Count, Is.GreaterThan( 1 ) );
+		}
+
+		/// <summary>
+		/// Appends random(-ish) productIds, so that the <param name="productIds" /> array is <param name="maxProductIds" /> long at the end.
+		/// </summary>
+		/// <param name="productIds"></param>
+		/// <param name="maxProductIds"></param>
+		private static void AppendRandomProductIds( List< long > productIds, int maxProductIds )
+		{
+			var nextFakeProductId = productIds.Last() + 1;
+			for( var i = productIds.Count; i < maxProductIds; i++ )
+			{
+				productIds.Add( nextFakeProductId++ );
+			}
+		}
+
+		/// <summary>
+		/// Get productIds that exist in the qa-skuvault-development Shopify test store 
+		/// </summary>
+		/// <returns></returns>
+		private static List< long > GetExistingProductIds()
+		{
+			return new List< long > { 9729995637050, 9733037949242, 9779221725498, 9943945019706, 9943946428730 };
 		}
 
 		[ Test ]
