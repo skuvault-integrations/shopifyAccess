@@ -10,18 +10,18 @@ namespace ShopifyAccess.GraphQl.Models.Products.Extensions
 	internal static class ProductVariantsExtensions
 	{
 		/// <summary>
-		/// Append <paramref name="productVariantToAdd" /> to <paramref name="existingProductVariants" />
+		/// Append <paramref name="productVariantsToAdd" /> to <paramref name="existingProductVariants" />
 		/// </summary>
 		/// <param name="existingProductVariants">Dictionary of productVariants keyed off the parent productId</param>
-		/// <param name="productVariantToAdd"></param>
-		internal static void AppendVariants( this IDictionary< long, List< ProductVariant > > existingProductVariants, List< ProductVariantWithProductId > productVariantToAdd )
+		/// <param name="productVariantsToAdd"></param>
+		internal static void AppendVariants( this IDictionary< long, List< ProductVariant > > existingProductVariants, List< ProductVariantWithProductId > productVariantsToAdd )
 		{
-			if( existingProductVariants == null || ( !productVariantToAdd?.Any() ?? true ) )
+			if( existingProductVariants == null || ( !productVariantsToAdd?.Any() ?? true ) )
 			{
 				return;
 			}
 
-			foreach( var productVariant in productVariantToAdd )
+			foreach( var productVariant in productVariantsToAdd )
 			{
 				var productId = GraphQlIdParser.Product.GetId( productVariant.Product.Id );
 				if( existingProductVariants.ContainsKey( productId ) )
