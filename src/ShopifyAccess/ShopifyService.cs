@@ -30,8 +30,6 @@ using ProductVariant = ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Pro
 
 namespace ShopifyAccess
 {
-	//TODO GUARD-3946 Re-add copies that were removed after the commit https://github.com/skuvault-integrations/shopifyAccess/pull/64/commits/efd44117763e03e48bdb3ffc3006fdf26c88c845
-	//	Removed in https://github.com/skuvault-integrations/shopifyAccess/pull/64/commits/1296a212e69f756ccdd820fa5f133943bb3ec37b
 	public sealed class ShopifyService: IShopifyService
 	{
 		private readonly WebRequestServices _webRequestServices;

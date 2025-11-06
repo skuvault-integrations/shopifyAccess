@@ -35,6 +35,12 @@ namespace ShopifyAccess.GraphQl.Models.Responses
 				: new ShopifyProducts();
 		}
 
+		/// <summary>
+		/// Convert Products API response payload to SkuVault ShopifyProduct 
+		/// </summary>
+		/// <param name="responseProducts">Main products properties</param>
+		/// <param name="variantsByProductId">Dictionary of productId (key), productVariants (value)</param>
+		/// <returns></returns>
 		//TODO GUARD-3946 Add tests
 		internal static ShopifyProducts ToShopifyProducts( this List< Product > responseProducts, IDictionary< long, List< ProductVariant > > variantsByProductId )
 		{

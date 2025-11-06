@@ -195,7 +195,7 @@ namespace ShopifyAccess.GraphQl.Queries
 				after,
 				first = variantsPerPage
 			};
-			var request = new { query = CleanUpRequest( GetProductVariantsQuery.Query ), variables };
+			var request = new { query = CleanUpRequest( GetProductVariantsQuery.QueryVariantsWithProductId ), variables };
 			return request.ToJson();
 		}
 

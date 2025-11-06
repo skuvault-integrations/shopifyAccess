@@ -66,9 +66,8 @@ namespace ShopifyAccess.GraphQl.Queries.Products
 
 		/// <summary>
 		/// Query to get products, for the products sync
-		/// https://shopify.dev/docs/api/admin-graphql/2024-04/queries/products 
+		/// https://shopify.dev/docs/api/admin-graphql/2025-07/queries/products
 		/// </summary>
-		///	<remarks>Only gets the first 250 product variants</remarks>
 		/// <param name="$query">Filter</param>
 		/// <param name="$first">Number of products to return</param>
 		/// <param name="$after">Cursor for pagination</param>
