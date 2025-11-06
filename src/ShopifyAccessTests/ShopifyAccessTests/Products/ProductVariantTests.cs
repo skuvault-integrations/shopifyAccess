@@ -178,7 +178,7 @@ namespace ShopifyAccessTests.Products
 		}
 
 		/// <summary>
-		/// Appends random(-ish) productIds, so that the <param name="productIds" /> array is <param name="maxProductIds" /> long at the end.
+		/// Appends random(-ish) productIds, so that the <paramref name="productIds" /> array is <paramref name="maxProductIds" /> long at the end.
 		/// </summary>
 		/// <param name="productIds"></param>
 		/// <param name="maxProductIds"></param>

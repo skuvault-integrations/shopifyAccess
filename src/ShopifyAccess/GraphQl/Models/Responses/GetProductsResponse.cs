@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using ShopifyAccess.GraphQl.Helpers;
 using ShopifyAccess.GraphQl.Models.Products;
 using ShopifyAccess.GraphQl.Models.Products.Extensions;
 using ShopifyAccess.Models.Product;
@@ -35,7 +36,7 @@ namespace ShopifyAccess.GraphQl.Models.Responses
 		}
 
 		//TODO GUARD-3946 Add tests
-		internal static ShopifyProducts ToShopifyProducts( this List< Products.Product > responseProducts, IDictionary< string, List< ProductVariant > > variants )
+		internal static ShopifyProducts ToShopifyProducts( this List< Product > responseProducts, IDictionary< long, List< ProductVariant > > variantsByProductId )
 		{
 			var shopifyProducts = new ShopifyProducts();
 			if( responseProducts == null || !responseProducts.Any() )
@@ -44,7 +45,7 @@ namespace ShopifyAccess.GraphQl.Models.Responses
 			}
 
 			//No variants
-			if( !variants?.Any() ?? true )
+			if( !variantsByProductId?.Any() ?? true )
 			{
 				return new ShopifyProducts
 					{ Products = responseProducts.Select( x => x.ToShopifyProduct() ).ToList() };
@@ -52,7 +53,7 @@ namespace ShopifyAccess.GraphQl.Models.Responses
 
 			foreach( var product in responseProducts )
 			{
-				variants.TryGetValue( product.Id, out var productVariants ); 
+				variantsByProductId.TryGetValue( GraphQlIdParser.Product.GetId( product.Id ), out var productVariants ); 
 				shopifyProducts.Products.Add( product.ToShopifyProduct( productVariants ) );
 			}
 			return shopifyProducts;

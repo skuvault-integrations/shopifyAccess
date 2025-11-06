@@ -9,9 +9,9 @@ using ServiceStack;
 using ShopifyAccess.Extensions;
 using ShopifyAccess.GraphQl;
 using ShopifyAccess.GraphQl.Helpers;
-using ShopifyAccess.GraphQl.Models;
 using ShopifyAccess.GraphQl.Models.Orders;
 using ShopifyAccess.GraphQl.Models.Products;
+using ShopifyAccess.GraphQl.Models.Products.Extensions;
 using ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions;
 using ShopifyAccess.GraphQl.Models.Responses;
 using ShopifyAccess.GraphQl.Queries;
@@ -30,6 +30,8 @@ using ProductVariant = ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Pro
 
 namespace ShopifyAccess
 {
+	//TODO GUARD-3946 Re-add copies that were removed after the commit https://github.com/skuvault-integrations/shopifyAccess/pull/64/commits/efd44117763e03e48bdb3ffc3006fdf26c88c845
+	//	Removed in https://github.com/skuvault-integrations/shopifyAccess/pull/64/commits/1296a212e69f756ccdd820fa5f133943bb3ec37b
 	public sealed class ShopifyService: IShopifyService
 	{
 		private readonly WebRequestServices _webRequestServices;
@@ -229,10 +231,9 @@ namespace ShopifyAccess
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
 					mark, token );
 
-				await this.PopulateProductsVariantsAsync( response, token, mark );
+				var productsVariants = await this.GetProductsVariantsAsync( response, token, mark );
 
-				//TODO GUARD-3946 Pass in the dictionary returned from the reverted method above
-				return response?.ToShopifyProducts( new Dictionary< string, List< GraphQl.Models.Products.ProductVariant > >() );
+				return response?.ToShopifyProducts( productsVariants );
 			}
 			finally
 			{
@@ -283,10 +284,9 @@ namespace ShopifyAccess
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
 					mark, token );
 
-				await this.PopulateProductsVariantsAsync( response, token, mark );
+				var productsVariants = await this.GetProductsVariantsAsync( response, token, mark );
 
-				//TODO GUARD-3946 Pass in the dictionary returned from the reverted method above
-				return response?.ToShopifyProducts( new Dictionary< string, List< GraphQl.Models.Products.ProductVariant > >() );
+				return response?.ToShopifyProducts( productsVariants );
 			}
 			finally
 			{
@@ -295,7 +295,7 @@ namespace ShopifyAccess
 		}
 
 		/// <summary>
-		/// Get variants for products
+		/// Get variants for the passed in products
 		/// </summary>
 		/// <param name="products"></param>
 		/// <param name="token"></param>
@@ -303,28 +303,23 @@ namespace ShopifyAccess
 		/// <returns>Dictionary of productId (key), productVariants (value)</returns>
 		//TODO GUARD-3946 Add unit tests confirming that this path gets executed
 		//TODO GUARD-3946 Instead pass List< string > productIds (just numeric, not string). Rename back to what it was
-		private async Task PopulateProductsVariantsAsync( List< Product > products, CancellationToken token, Mark mark )
+		private async Task< IDictionary< long, List< GraphQl.Models.Products.ProductVariant > > > GetProductsVariantsAsync( List< Product > products, CancellationToken token, Mark mark )
 		{
-			if( products == null )
+			var productVariants = new Dictionary< long, List< GraphQl.Models.Products.ProductVariant > >();
+			if( !products?.Any() ?? true )
 			{
-				return;
+				return productVariants;
 			}
 
 			var productIds = products.Where( product => product?.Id != null )
 				.Select( x => GraphQlIdParser.Product.GetId( x.Id ) ).Distinct();
 			var productIdsBatches = productIds.SplitInBatches( QueryBuilder.MaxItemsPerResponse );
-			//TODO GUARD-3946 Re-add copies that were removed after the commit https://github.com/skuvault-integrations/shopifyAccess/pull/64/commits/efd44117763e03e48bdb3ffc3006fdf26c88c845
-			//	Removed in https://github.com/skuvault-integrations/shopifyAccess/pull/64/commits/1296a212e69f756ccdd820fa5f133943bb3ec37b
 			foreach( var productIdsBatch in productIdsBatches )
 			{
-				var productVariants = ( await this.GetProductVariantsByProductIdsAsync( productIdsBatch.ToList(), mark, token ) )?.ToList();
-				//TODO GUARD-3946 11.6 BOD Instead populate the dictionary and return. Then add variations only in ShopifyProduct class (not the Product DTO we use to deserialize)
-				// if( productVariants?.Any() ?? false )
-				// {
-				// 	product.Variants = new Nodes< GraphQl.Models.Products.ProductVariant >
-				// 		{ Items = productVariants };
-				// }
+				var batchProductVariants = ( await this.GetProductVariantsByProductIdsAsync( productIdsBatch.ToList(), mark, token ) )?.ToList();
+				productVariants.AppendVariants( batchProductVariants );
 			}
+			return productVariants;
 		}
 
 		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryAsync( CancellationToken token, Mark mark )

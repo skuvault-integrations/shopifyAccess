@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using ShopifyAccess.GraphQl.Models.Common;
@@ -77,7 +78,36 @@ namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 			
 			Assert.That( shopifyProductVariant.ImageUrl, Is.EqualTo( string.Empty ) );
 		}
-		
+
+		[ Test ]
+		public void AppendVariants_AddsVariants_WhenNoneExist()
+		{
+			var existingVariants = new Dictionary< long, List< ProductVariant > >();
+			var productId = _randomizer.NextLong();
+			var sku =  _randomizer.GetString();
+			var appendVariants = new List< ProductVariantWithProductId >
+			{
+				new ProductVariantWithProductId
+				{
+					Product = new VariantParentProduct { Id = $"gid://shopify/Product/{productId}" },
+					Sku = sku
+				}
+			};
+
+			existingVariants.AppendVariants( appendVariants );
+
+			Assert.Multiple( () => {
+				Assert.That( existingVariants.Count, Is.EqualTo( appendVariants.Count ) );
+				//TODO GUARD-3946 Assert key and value
+			} );
+		}
+
+		//TODO GUARD-3946 AppendVariants_AddsVariants_andDoesNotAlterExistingVariant_WhenProductAlreadyHasVariants()
+
+		//TODO GUARD-3946 Potentially
+		//	This is an abnormal case. Now it'll just append duplicates to the list (not dictionary)
+		//AppendVariants_DoesNotAlterVariants_WhenProductAlreadyHasVariantWithSameSku()
+
 		private static ProductVariant CreateProductVariant() =>
 			new ProductVariant
 			{
