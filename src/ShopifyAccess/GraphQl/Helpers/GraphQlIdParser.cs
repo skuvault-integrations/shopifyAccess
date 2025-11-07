@@ -8,6 +8,7 @@ namespace ShopifyAccess.GraphQl.Helpers
 		private readonly string GidPrefix;
 
 		internal static readonly GraphQlIdParser ProductVariant = new GraphQlIdParser( "Product Variant", "gid://shopify/ProductVariant/" );
+		internal static readonly GraphQlIdParser Product = new GraphQlIdParser( "Product", "gid://shopify/Product/" );
 		internal static readonly GraphQlIdParser InventoryItem = new GraphQlIdParser( "Inventory Item", "gid://shopify/InventoryItem/" );
 		internal static readonly GraphQlIdParser Location = new GraphQlIdParser( "Location", "gid://shopify/Location/" );
 		internal static readonly GraphQlIdParser Order = new GraphQlIdParser( "Order", "gid://shopify/Order/" );

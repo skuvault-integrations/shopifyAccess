@@ -11,13 +11,13 @@ namespace ShopifyAccessTests.Cancellation
 	public class CancellationTokenTests : BaseTests
 	{
 		private static readonly Mark _mark = Mark.Create;
-		
+
 		[ Test ]
 		public void CancelRequest()
 		{
 			var cancellationTokenSource = new CancellationTokenSource();
 
-			Assert.ThrowsAsync< TaskCanceledException >( async () =>
+			Assert.ThrowsAsync< OperationCanceledException >( async () =>
 			{
 				cancellationTokenSource.Cancel();
 				await this.Service.GetProductsCreatedAfterAsync( DateTime.UtcNow, cancellationTokenSource.Token, _mark );

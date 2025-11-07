@@ -65,9 +65,6 @@ namespace ShopifyAccess.GraphQl.Models.Orders
 		[ DataMember( Name = "quantity" ) ]
 		public int Quantity{ get; set; }
 
-		[ DataMember( Name = "product" ) ]
-		public Product Product{ get; set; }
-
 		[ DataMember( Name = "originalUnitPriceSet" ) ]
 		public PriceSet OriginalUnitPriceSet{ get; set; }
 
