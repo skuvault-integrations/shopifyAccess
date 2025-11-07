@@ -8,22 +8,23 @@ namespace ShopifyAccess.GraphQl.Models.Products
 	{
 		[ DataMember( Name = "sku" ) ]
 		public string Sku{ get; set; }
-		
+
 		[ DataMember( Name = "title" ) ]
 		public string Title{ get; set; }
-		
+
 		[ DataMember( Name = "barcode" ) ]
 		public string Barcode{ get; set; }
-		
+
 		[ DataMember( Name = "inventoryItem" ) ]
 		public Products.InventoryItem InventoryItem{ get; set; }
-		
+
 		[ DataMember( Name = "price" ) ]
 		public decimal? Price{ get; set; }
-		
+
 		[ DataMember( Name = "image" ) ]
+		[ Obsolete( "TODO GUARD-3958: Switch to 'media' if desired, or remove" ) ]
 		public Image Image{ get; set; }
-		
+
 		[ DataMember( Name = "updatedAt" ) ]
 		public DateTime? UpdatedAt{ get; set; }
 	}
