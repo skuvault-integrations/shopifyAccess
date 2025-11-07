@@ -65,6 +65,7 @@
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Exceptions\ShopifyHttpRequestExceptions.cs" />
+    <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="GraphQl\BulkOperationStatus.cs" />
     <Compile Include="GraphQl\Helpers\DateTimeExtensions.cs" />
     <Compile Include="GraphQl\Helpers\GraphQlIdParser.cs" />
@@ -86,10 +87,12 @@
     <Compile Include="GraphQl\Models\PageInfo.cs" />
     <Compile Include="GraphQl\Models\Products\Extensions\ProductExtensions.cs" />
     <Compile Include="GraphQl\Models\Products\Extensions\ProductVariantExtensions.cs" />
+    <Compile Include="GraphQl\Models\Products\Extensions\ProductVariantsExtensions.cs" />
     <Compile Include="GraphQl\Models\Products\InventoryItem.cs" />
     <Compile Include="GraphQl\Models\Products\InventoryItemMeasurement.cs" />
     <Compile Include="GraphQl\Models\Products\Product.cs" />
     <Compile Include="GraphQl\Models\Products\ProductVariant.cs" />
+    <Compile Include="GraphQl\Models\Products\ProductVariantWithProductId.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventory\InventoryLevelsNodes.cs" />
     <Compile Include="GraphQl\Models\ProductVariantsInventory\InventoryQuantity.cs" />
     <Compile Include="GraphQl\Models\Responses\GetBulkOperationByIdResponse.cs" />
@@ -103,13 +106,15 @@
     <Compile Include="GraphQl\Models\Responses\GetOrdersResponse.cs" />
     <Compile Include="GraphQl\Models\Responses\GetProductsResponse.cs" />
     <Compile Include="GraphQl\Models\Responses\GetProductVariantsInventoryResponse.cs" />
+    <Compile Include="GraphQl\Models\Responses\GetProductVariantsResponse.cs" />
     <Compile Include="GraphQl\Queries\BulkOperationByIdQuery.cs" />
     <Compile Include="GraphQl\Queries\CurrentBulkOperationQuery.cs" />
-    <Compile Include="GraphQl\Queries\GetProductsQuery.cs" />
     <Compile Include="GraphQl\Queries\GetProductVariantInventoryQuery.cs" />
     <Compile Include="GraphQl\Queries\GetProductVariantsInventoryReportQuery.cs" />
     <Compile Include="GraphQl\Queries\Orders\GetOrdersQuery.cs" />
     <Compile Include="GraphQl\Queries\Orders\OrderQueryBuilder.cs" />
+    <Compile Include="GraphQl\Queries\Products\GetProductsQuery.cs" />
+    <Compile Include="GraphQl\Queries\Products\GetProductVariantsQuery.cs" />
     <Compile Include="GraphQl\Queries\QueryBuilder.cs" />
     <Compile Include="GraphQl\ReportType.cs" />
     <Compile Include="GraphQl\Services\PaginationService.cs" />

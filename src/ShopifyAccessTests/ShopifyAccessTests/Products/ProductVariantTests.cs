@@ -5,6 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
+using ShopifyAccess;
+using ShopifyAccess.GraphQl.Helpers;
 using ShopifyAccess.Models;
 using ShopifyAccess.Models.Product;
 using ShopifyAccess.Models.ProductVariant;
@@ -15,7 +17,19 @@ namespace ShopifyAccessTests.Products
 	public class ProductVariantTests : BaseTests
 	{
 		private static readonly Mark _mark = Mark.Create;
-		
+
+		[ Test ]
+		[ Explicit ]
+		//TODO GUARD-3954 Remove on feature cleanup
+		public async Task GetProductsCreatedAfterLegacyAsync()
+		{
+			var productsStartUtc = DateTime.Parse( "2025-01-06T17:14:34Z" ); 
+
+			var products = await this.Service.GetProductsCreatedAfterLegacyAsync( productsStartUtc, CancellationToken.None, _mark );
+
+			Assert.That( products.Products, Is.Not.Empty );
+		}
+
 		[ Test ]
 		[ Explicit ]
 		public async Task GetProductsCreatedAfterAsync()
@@ -26,7 +40,19 @@ namespace ShopifyAccessTests.Products
 
 			Assert.That( products.Products, Is.Not.Empty );
 		}
-		
+
+		[ Test ]
+		[ Explicit ]
+		//TODO GUARD-3954 Remove on feature cleanup
+		public async Task GetProductsCreatedBeforeButUpdatedAfterLegacyAsync()
+		{
+			var productsStartUtc = DateTime.Parse( "2025-01-13T20:52:49Z" );
+
+			var products = await this.Service.GetProductsCreatedBeforeButUpdatedAfterLegacyAsync( productsStartUtc, CancellationToken.None, _mark );
+
+			Assert.That( products.Products, Is.Not.Empty );
+		}
+
 		[ Test ]
 		[ Explicit ]
 		public async Task GetProductsCreatedBeforeButUpdatedAfterAsync()
@@ -39,6 +65,7 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
+		[ Explicit ]
 		public async Task GetProductVariantsInventoryAsync()
 		{
 			var productVariants = await this.Service.GetProductVariantsInventoryAsync( CancellationToken.None, _mark );
@@ -47,6 +74,7 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
+		[ Explicit ]
 		public async Task GetAndUpdateProductAsync()
 		{
 			const string sku = "testsku1";
@@ -63,6 +91,21 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
+		//TODO GUARD-3954 Remove on feature cleanup
+		public async Task WhenGetProductsCreatedAfterLegacyAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
+		{
+			var dateFrom = new DateTime( 2021, 6, 1 );
+			var products = await this.Service.GetProductsCreatedAfterLegacyAsync( dateFrom, CancellationToken.None, _mark );
+			var productsWithImages = products.Products.Where( p => p.Images != null && p.Images.Any() );
+
+			productsWithImages.Should().NotBeNullOrEmpty();
+
+			var imagesUrlsQueries = productsWithImages.SelectMany( p => p.Images ).Select( i => new Uri( i.Src ).Query ).Where( q => !string.IsNullOrWhiteSpace( q ) );
+			imagesUrlsQueries.Should().BeEmpty();
+		}
+
+		[ Test ]
+		[ Explicit ]
 		public async Task WhenGetProductsCreatedAfterAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
 		{
 			var dateFrom = new DateTime( 2021, 6, 1 );
@@ -76,6 +119,21 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
+		//TODO GUARD-3954 Remove on feature cleanup
+		public async Task WhenGetProductsCreatedBeforeButUpdatedAfterLegacyAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
+		{
+			var dateFrom = new DateTime( 2023, 6, 1 );
+			var products = await this.Service.GetProductsCreatedBeforeButUpdatedAfterLegacyAsync( dateFrom, CancellationToken.None, _mark );
+			var productsWithImages = products.Products.Where( p => p.Images != null && p.Images.Any() );
+
+			productsWithImages.Should().NotBeNullOrEmpty();
+
+			var imagesUrlsQueries = productsWithImages.SelectMany( p => p.Images ).Select( i => new Uri( i.Src ).Query ).Where( q => !string.IsNullOrWhiteSpace( q ) );
+			imagesUrlsQueries.Should().BeEmpty();
+		}
+
+		[ Test ]
+		[ Explicit ]
 		public async Task WhenGetProductsCreatedBeforeButUpdatedAfterAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
 		{
 			var dateFrom = new DateTime( 2023, 6, 1 );
@@ -86,6 +144,49 @@ namespace ShopifyAccessTests.Products
 
 			var imagesUrlsQueries = productsWithImages.SelectMany( p => p.Images ).Select( i => new Uri( i.Src ).Query ).Where( q => !string.IsNullOrWhiteSpace( q ) );
 			imagesUrlsQueries.Should().BeEmpty();
+		}
+
+		[ Test ]
+		[ Explicit( "Calls the real API, and these productIds might no longer exist. Thus the result.Count assert might fail" ) ]
+		public async Task GetProductVariantsByProductIdsAsync_ReturnsVariantsForPassedInProductIds_WhenMultiplePages()
+		{
+			var productIds = GetExistingProductIds();
+			const int simulateSmallPageSize = 1;
+
+			var result = ( await ( ( ShopifyService )this.Service ).GetProductVariantsByProductIdsAsync( productIds, _mark, CancellationToken.None, variantsPerPage : simulateSmallPageSize ) ).ToList();
+
+			Assert.Multiple(() => {
+				Assert.That( result.Count, Is.GreaterThan( 1 ) );
+				var resultProductIds = result.Select( x => GraphQlIdParser.Product.GetId( x.Product.Id ) ).Distinct();
+				//Only returns variants whose parent product is one of productIds
+				Assert.That( resultProductIds.All( x => productIds.Contains( x )  ), Is.True );
+			} );
+		}
+
+		[ Test ]
+		[ Explicit ]
+		public async Task GetProductVariantsByProductIdsAsync_ReturnsVariants_WhenMaxNumberOfProductIdsSent()
+		{
+			var productIds = GetExistingProductIds();
+			AppendRandomProductIds( productIds, ShopifyService.RequestMaxLimit );
+
+			var result = ( await ( ( ShopifyService )this.Service ).GetProductVariantsByProductIdsAsync( productIds, _mark, CancellationToken.None ) ).ToList();
+
+			Assert.That( result.Count, Is.GreaterThan( 1 ) );
+		}
+
+		/// <summary>
+		/// Appends random(-ish) productIds, so that the <paramref name="productIds" /> array is <paramref name="maxProductIds" /> long at the end.
+		/// </summary>
+		/// <param name="productIds"></param>
+		/// <param name="maxProductIds"></param>
+		private static void AppendRandomProductIds( List< long > productIds, int maxProductIds )
+		{
+			var nextFakeProductId = productIds.Last() + 1;
+			for( var i = productIds.Count; i < maxProductIds; i++ )
+			{
+				productIds.Add( nextFakeProductId++ );
+			}
 		}
 
 		[ Test ]
@@ -200,6 +301,15 @@ namespace ShopifyAccessTests.Products
 				v1.InventoryLevels.InventoryLevels.Should().BeEquivalentTo( v2.InventoryLevels.InventoryLevels,
 					o => o.Excluding( memberInfo => memberInfo.Name.Equals( "UpdatedAt" ) ) );
 			}
+		}
+
+		/// <summary>
+		/// Get productIds that exist in the qa-skuvault-development Shopify test store 
+		/// </summary>
+		/// <returns></returns>
+		private static List< long > GetExistingProductIds()
+		{
+			return new List< long > { 9729995637050, 9733037949242, 9779221725498, 9943945019706, 9943946428730 };
 		}
 	}
 }

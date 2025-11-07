@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using CuttingEdge.Conditions;
 using Netco.Extensions;
 using ServiceStack;
+using ShopifyAccess.Extensions;
 using ShopifyAccess.GraphQl;
-using ShopifyAccess.GraphQl.Models;
+using ShopifyAccess.GraphQl.Helpers;
 using ShopifyAccess.GraphQl.Models.Orders;
 using ShopifyAccess.GraphQl.Models.Products;
+using ShopifyAccess.GraphQl.Models.Products.Extensions;
 using ShopifyAccess.GraphQl.Models.ProductVariantsInventory.Extensions;
 using ShopifyAccess.GraphQl.Models.Responses;
 using ShopifyAccess.GraphQl.Queries;
@@ -32,7 +34,7 @@ namespace ShopifyAccess
 	{
 		private readonly WebRequestServices _webRequestServices;
 		private readonly IReportGenerator _reportGenerator;
-		private const int RequestMaxLimit = 250;
+		internal const int RequestMaxLimit = 250;
 		private const int RequestInventoryLevelsMaxLimit = 50;
 		private readonly string _shopName;
 		// One throttler for all requests because used same limit for all API
@@ -194,6 +196,27 @@ namespace ShopifyAccess
 		#endregion
 
 		#region Products
+		//TODO GUARD-3954 Remove on feature cleanup
+		public async Task< ShopifyProducts > GetProductsCreatedAfterLegacyAsync( DateTime productsStartUtc, CancellationToken token, Mark mark )
+		{
+			ShopifyLogger.LogOperationStart( this._shopName, mark, $"productsStartUtc: '{productsStartUtc}'" );
+
+			try
+			{
+				var response = await this._graphQlPaginationService.GetAllPagesAsync< GetProductsData, Product >( 
+					async (nextCursor) => await this._webRequestServices.PostDataAsync< GetProductsResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
+						QueryBuilder.GetProductsCreatedOnOrAfterRequestLegacy( productsStartUtc, nextCursor ),
+						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
+					mark, token );
+
+				return response?.ToShopifyProductsLegacy();
+			}
+			finally
+			{
+				ShopifyLogger.LogOperationEnd( this._shopName, mark );
+			}
+		}
+
 		public async Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark, $"productsStartUtc: '{productsStartUtc}'" );
@@ -206,14 +229,42 @@ namespace ShopifyAccess
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
 					mark, token );
 
-				return response?.ToShopifyProducts();
+				var productsVariants = await this.GetProductsVariantsAsync( response, token, mark );
+
+				return response?.ToShopifyProducts( productsVariants );
 			}
 			finally
 			{
 				ShopifyLogger.LogOperationEnd( this._shopName, mark );
 			}
 		}
-		
+
+		//TODO GUARD-3954 Remove on feature cleanup
+		public async Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterLegacyAsync( DateTime productsStartUtc, CancellationToken token, Mark mark )
+		{
+			ShopifyLogger.LogOperationStart( this._shopName, mark, $"productsStartUtc: '{productsStartUtc}'" );
+			
+			if( productsStartUtc == DateTime.MinValue )
+			{
+				return new ShopifyProducts();
+			}
+
+			try
+			{
+				var response = await this._graphQlPaginationService.GetAllPagesAsync< GetProductsData, Product >( 
+					async (nextCursor) => await this._webRequestServices.PostDataAsync< GetProductsResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
+						QueryBuilder.GetProductsCreatedBeforeButUpdatedAfterLegacy( productsStartUtc, nextCursor ),
+						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
+					mark, token );
+
+				return response?.ToShopifyProductsLegacy();
+			}
+			finally
+			{
+				ShopifyLogger.LogOperationEnd( this._shopName, mark );
+			}
+		}
+
 		public async Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark )
 		{
 			ShopifyLogger.LogOperationStart( this._shopName, mark, $"productsStartUtc: '{productsStartUtc}'" );
@@ -231,12 +282,40 @@ namespace ShopifyAccess
 						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
 					mark, token );
 
-				return response?.ToShopifyProducts();
+				var productsVariants = await this.GetProductsVariantsAsync( response, token, mark );
+
+				return response?.ToShopifyProducts( productsVariants );
 			}
 			finally
 			{
 				ShopifyLogger.LogOperationEnd( this._shopName, mark );
 			}
+		}
+
+		/// <summary>
+		/// Get variants for the passed in products
+		/// </summary>
+		/// <param name="products"></param>
+		/// <param name="token"></param>
+		/// <param name="mark"></param>
+		/// <returns>Dictionary of productId (key), productVariants (value)</returns>
+		private async Task< IDictionary< long, List< GraphQl.Models.Products.ProductVariant > > > GetProductsVariantsAsync( List< Product > products, CancellationToken token, Mark mark )
+		{
+			var productVariants = new Dictionary< long, List< GraphQl.Models.Products.ProductVariant > >();
+			if( !products?.Any() ?? true )
+			{
+				return productVariants;
+			}
+
+			var productIds = products.Where( product => product?.Id != null )
+				.Select( x => GraphQlIdParser.Product.GetId( x.Id ) ).Distinct();
+			var productIdsBatches = productIds.SplitInBatches( QueryBuilder.MaxItemsPerResponse );
+			foreach( var productIdsBatch in productIdsBatches )
+			{
+				var batchProductVariants = ( await this.GetProductVariantsByProductIdsAsync( productIdsBatch.ToList(), mark, token ) )?.ToList();
+				productVariants.AppendVariants( batchProductVariants );
+			}
+			return productVariants;
 		}
 
 		public async Task< List< ShopifyProductVariant > > GetProductVariantsInventoryAsync( CancellationToken token, Mark mark )
@@ -375,6 +454,26 @@ namespace ShopifyAccess
 				return response?
 					.Where( FilterProductVariants )
 					.Select( y => y.ToShopifyProductVariantForInventory() ).ToList() ?? new List< ShopifyProductVariant >();
+			}
+			finally
+			{
+				ShopifyLogger.LogOperationEnd( this._shopName, mark );
+			}
+		}
+
+		internal async Task< IEnumerable< ProductVariantWithProductId > > GetProductVariantsByProductIdsAsync( IEnumerable< long > productIds, Mark mark, CancellationToken token, int variantsPerPage = RequestMaxLimit )
+		{
+			ShopifyLogger.LogOperationStart( this._shopName, mark );
+
+			try
+			{
+				var response = await this._graphQlPaginationService.GetAllPagesAsync< GetProductVariantsData, ProductVariantWithProductId >(
+					async (nextCursor) => await this._webRequestServices.PostDataAsync< GetProductVariantsResponse >( this._shopifyCommandFactory.CreateGraphQlCommand(),
+						QueryBuilder.GetProductVariantsByProductIds( productIds, nextCursor, variantsPerPage ),
+						token, mark, this._timeouts[ ShopifyOperationEnum.GetProducts ] ),
+					mark, token );
+
+				return response?.ToList() ?? new List< ProductVariantWithProductId >();
 			}
 			finally
 			{

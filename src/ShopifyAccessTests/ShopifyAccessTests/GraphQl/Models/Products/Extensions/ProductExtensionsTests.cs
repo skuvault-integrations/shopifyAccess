@@ -7,6 +7,7 @@ using ShopifyAccess.GraphQl.Models;
 using ShopifyAccess.GraphQl.Models.Common;
 using ShopifyAccess.GraphQl.Models.Products;
 using ShopifyAccess.GraphQl.Models.Products.Extensions;
+using ShopifyAccess.Models.ProductVariant;
 
 namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 {
@@ -14,12 +15,13 @@ namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 	{
 		private static readonly Randomizer _randomizer = new Randomizer();
 		
+		//TODO GUARD-3954 Remove ToShopifyProductLegacy_ tests on feature cleanup
 		[ Test ]
-		public void ToShopifyProduct_ShouldMapAllFieldsCorrectly_WhenAllTopLevelFieldsProvided()
+		public void ToShopifyProductLegacy_ShouldMapAllFieldsCorrectly_WhenAllTopLevelFieldsProvided()
 		{
 			var product = CreateProduct();
 			
-			var shopifyProduct = product.ToShopifyProduct();
+			var shopifyProduct = product.ToShopifyProductLegacy();
 			
 			Assert.Multiple(() =>
 			{
@@ -34,36 +36,123 @@ namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 		}
 
 		[ Test ]
-		public void ToShopifyProduct_ShouldReturnEmptyProductVariantsList_WhenVariantsListIsNull()
+		public void ToShopifyProductLegacy_ShouldReturnEmptyProductVariantsList_WhenVariantsListIsNull()
 		{
 			var product = CreateProduct();
 			product.Variants = null; 
 			
-			var shopifyProduct = product.ToShopifyProduct();
+			var shopifyProduct = product.ToShopifyProductLegacy();
 			
 			Assert.That( shopifyProduct.Variants, Is.Empty );
 		}
 		
 		[ Test ]
-		public void ToShopifyProduct_ShouldReturnEmptyImagesList_WhenProductMediaListIsNull()
+		public void ToShopifyProductLegacy_ShouldReturnEmptyImagesList_WhenProductMediaListIsNull()
 		{
 			var product = CreateProduct();
 			product.Media = null;
 			
-			var shopifyProduct = product.ToShopifyProduct();
+			var shopifyProduct = product.ToShopifyProductLegacy();
 			
 			Assert.That( shopifyProduct.Images, Is.Empty );
 		}
 		
 		[ Test ]
-		public void ToShopifyProduct_ShouldDefaultUpdatedAtDate_WhenDatePassedIsNull()
+		public void ToShopifyProductLegacy_ShouldDefaultUpdatedAtDate_WhenDatePassedIsNull()
 		{
 			var product = CreateProduct();
 			product.UpdatedAt = null;
 			
-			var shopifyProduct = product.ToShopifyProduct();
+			var shopifyProduct = product.ToShopifyProductLegacy();
 			
 			Assert.That( shopifyProduct.UpdatedAt, Is.EqualTo( default( DateTime ) ) );
+		}
+
+		[ Test ]
+		public void ToShopifyProduct_ShouldMapAllProductFieldsCorrectly_WhenAllTopLevelFieldsProvided()
+		{
+			var product = CreateProduct();
+
+			var shopifyProduct = product.ToShopifyProduct();
+
+			Assert.Multiple( () =>
+			{
+				Assert.That( shopifyProduct.Title, Is.EqualTo( product.Title ) );
+				Assert.That( shopifyProduct.Vendor, Is.EqualTo( product.Vendor ) );
+				Assert.That( shopifyProduct.Images.Single().Src, Is.EqualTo( product.Media.Items.Single().Preview.Image.Url ) );
+				Assert.That( shopifyProduct.Type, Is.EqualTo( product.ProductType ) );
+				Assert.That( shopifyProduct.BodyHtml, Is.EqualTo( product.DescriptionHtml ) );
+				Assert.That( shopifyProduct.UpdatedAt, Is.EqualTo( product.UpdatedAt.Value ) );
+			} );
+		}
+
+		[ Test ]
+		public void ToShopifyProduct_ShouldPopulateVariants_WhenPassedIn()
+		{
+			var product = CreateProductWithoutVariants();
+			const string testsku = "testSku";
+			const string testsku2 = "testSku2";
+			var productVariants = new List< ProductVariant >{
+				new ProductVariant { Sku = testsku },
+				new ProductVariant { Sku = testsku2 }
+			};
+			var shopifyProduct = product.ToShopifyProduct( productVariants );
+
+			Assert.Multiple( () =>
+			{
+				Assert.That( shopifyProduct.Variants, Has.Count.EqualTo( productVariants.Count ) );
+				Assert.That( shopifyProduct.Variants.Any( x => x.Sku == testsku ), Is.True );
+				Assert.That( shopifyProduct.Variants.Any( x => x.Sku == testsku2 ), Is.True );
+			} );
+		}
+
+		[ Test ]
+		public void ToShopifyProduct_ShouldPopulateAllVariantFields_WhenVariantPassedIn()
+		{
+			var product = CreateProductWithoutVariants();
+			var productVariant = CreateProductVariant();
+			var productVariants = new List< ProductVariant >{ productVariant };
+
+			var shopifyProduct = product.ToShopifyProduct( productVariants );
+
+			Assert.Multiple( () =>
+			{
+				Assert.That( shopifyProduct.Variants, Has.Count.EqualTo( productVariants.Count ) );
+				AssertVariantFieldsMatch( shopifyProduct.Variants.Single( x => x.Sku == productVariant.Sku ), productVariant );
+			} );
+		}
+
+		[ Test ]
+		public void ToShopifyProductShouldReturnEmptyProductVariantsList_WhenVariantsListIsNull()
+		{
+			var product = CreateProduct();
+			product.Variants = null;
+
+			var shopifyProduct = product.ToShopifyProduct();
+
+			Assert.That( shopifyProduct.Variants, Is.Empty );
+		}
+
+		[ Test ]
+		public void ToShopifyProductShouldReturnEmptyImagesList_WhenProductMediaListIsNull()
+		{
+			var product = CreateProduct();
+			product.Media = null;
+
+			var shopifyProduct = product.ToShopifyProduct();
+
+			Assert.That( shopifyProduct.Images, Is.Empty );
+		}
+
+		[ Test ]
+		public void ToShopifyProductShouldDefaultUpdatedAtDate_WhenDatePassedIsNull()
+		{
+			var product = CreateProduct();
+			product.UpdatedAt = null;
+
+			var shopifyProduct = product.ToShopifyProduct();
+
+			Assert.That( shopifyProduct.UpdatedAt, Is.EqualTo( default(DateTime) ) );
 		}
 
 		private static Product CreateProduct()
@@ -74,6 +163,19 @@ namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 				Vendor = _randomizer.GetString(),
 				Media = CreateMediaItems(),
 				Variants = CreateVariants(),
+				ProductType = _randomizer.GetString(),  
+				DescriptionHtml = _randomizer.GetString(),
+				UpdatedAt = DateTime.UtcNow
+			};
+		}
+
+		private static Product CreateProductWithoutVariants()
+		{
+			return new Product
+			{
+				Title = _randomizer.GetString(),
+				Vendor = _randomizer.GetString(),
+				Media = CreateMediaItems(),
 				ProductType = _randomizer.GetString(),  
 				DescriptionHtml = _randomizer.GetString(),
 				UpdatedAt = DateTime.UtcNow
@@ -100,34 +202,46 @@ namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 			};
 		
 		private static Nodes< ProductVariant > CreateVariants() =>
-			new Nodes< ProductVariant >
-			{
-				Items = new List< ProductVariant >
-				{
-					new ProductVariant
-						{
-							Sku = _randomizer.GetString(),
-							Title = _randomizer.GetString(),
-							Barcode = _randomizer.GetString(),
-							Image = new Image
-							{
-								Url = _randomizer.GetString()
-							},
-							Price = _randomizer.NextDecimal(),
-							InventoryItem = new InventoryItem
-							{
-								Measurement = new InventoryItemMeasurement
-								{
-									Weight = new Weight
-									{
-										Unit = "KILOGRAMS",
-										Value = _randomizer.NextFloat()
-									}
-								}
-							},
-							UpdatedAt = DateTime.UtcNow
-						}
-				}
+			new Nodes< ProductVariant > {
+				Items = new List< ProductVariant > { CreateProductVariant() }
 			};
+
+		private static ProductVariant CreateProductVariant()
+		{
+			return new ProductVariant
+			{
+				Sku = _randomizer.GetString(),
+				Title = _randomizer.GetString(),
+				Barcode = _randomizer.GetString(),
+				Image = new Image
+				{
+					Url = _randomizer.GetString()
+				},
+				Price = _randomizer.NextDecimal(),
+				InventoryItem = new InventoryItem
+				{
+					Measurement = new InventoryItemMeasurement
+					{
+						Weight = new Weight
+						{
+							Unit = "KILOGRAMS",
+							Value = _randomizer.NextFloat()
+						}
+					}
+				},
+				UpdatedAt = DateTime.UtcNow
+			};
+		}
+
+		private static void AssertVariantFieldsMatch( ShopifyProductVariant actualVariant, ProductVariant expectedVariant )
+		{
+			Assert.That( actualVariant.Sku, Is.EqualTo( expectedVariant.Sku ) );
+			Assert.That( actualVariant.Title, Is.EqualTo( expectedVariant.Title ) );
+			Assert.That( actualVariant.Barcode, Is.EqualTo( expectedVariant.Barcode ) );
+			Assert.That( actualVariant.Weight, Is.EqualTo( decimal.Parse( expectedVariant.InventoryItem.Measurement.Weight.Value.ToString() ) ) );
+			Assert.That( actualVariant.WeightUnit.ToString(), Is.EqualTo( expectedVariant.InventoryItem.Measurement.Weight.Unit ) );
+			Assert.That( actualVariant.Price, Is.EqualTo( expectedVariant.Price ) );
+			Assert.That( actualVariant.UpdatedAt, Is.EqualTo( expectedVariant.UpdatedAt ) );
+		}
 	}
 }

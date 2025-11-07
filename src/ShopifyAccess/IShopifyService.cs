@@ -57,8 +57,28 @@ namespace ShopifyAccess
 		/// <param name="productsStartUtc"></param>
 		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
 		/// <param name="token">CancellationToken</param>
+		/// <returns>Products with variants (inventory items), but only the first 250 variants per product</returns>
+		//TODO GUARD-3954 Remove on feature cleanup
+		Task< ShopifyProducts > GetProductsCreatedAfterLegacyAsync( DateTime productsStartUtc, CancellationToken token, Mark mark );
+
+		/// <summary>
+		/// Get products created after the given date async
+		/// </summary>
+		/// <param name="productsStartUtc"></param>
+		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
+		/// <param name="token">CancellationToken</param>
 		/// <returns>Products with variants (inventory items)</returns>
 		Task< ShopifyProducts > GetProductsCreatedAfterAsync( DateTime productsStartUtc, CancellationToken token, Mark mark );
+
+		/// <summary>
+		/// Get products created before the given date but updated after async
+		/// </summary>
+		/// <param name="productsStartUtc"></param>
+		/// <param name="mark">Mark is a special tag, which help to search in logs</param>
+		/// <param name="token">CancellationToken</param>
+		/// <returns>Products with variants (inventory items), but only the first 250 variants per product</returns>
+		//TODO GUARD-3954 Remove on feature cleanup
+		Task< ShopifyProducts > GetProductsCreatedBeforeButUpdatedAfterLegacyAsync( DateTime productsStartUtc, CancellationToken token, Mark mark );
 
 		/// <summary>
 		/// Get products created before the given date but updated after async

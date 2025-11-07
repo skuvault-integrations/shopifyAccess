@@ -77,7 +77,7 @@ namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 			
 			Assert.That( shopifyProductVariant.ImageUrl, Is.EqualTo( string.Empty ) );
 		}
-		
+
 		private static ProductVariant CreateProductVariant() =>
 			new ProductVariant
 			{
