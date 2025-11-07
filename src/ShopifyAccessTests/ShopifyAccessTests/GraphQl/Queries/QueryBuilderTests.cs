@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
@@ -244,8 +246,46 @@ namespace ShopifyAccessTests.GraphQl.Queries
 		public void GetAllProductVariants_ThrowsArgumentOutOfRangeException_WhenProductsPerPageExceedsMaximum()
 		{
 			var tooManyProductsPerPage = 251;
-			
+
 			Assert.Throws< ArgumentOutOfRangeException > ( () => QueryBuilder.GetAllProductVariants( after: null, tooManyProductsPerPage ) );
+		}
+
+		[ Test ]
+		public void GetProductVariantsByProductIds_ThrowsArgumentOutOfRangeException_WhenVariantsPerPageExceedsMaximum()
+		{
+			const int tooManyVariantsPerPage = QueryBuilder.MaxItemsPerResponse + 1;
+			var productIds = new []{ _randomizer.NextLong() };
+
+			Assert.Throws< ArgumentOutOfRangeException > ( () => 
+				QueryBuilder.GetProductVariantsByProductIds( productIds, variantsPerPage: tooManyVariantsPerPage ) );
+		}
+
+		[ Test ]
+		public void GetProductVariantsByProductIds_ThrowsArgumentOutOfRangeException_WhenTooManyProductIdsPassedIn()
+		{
+			var tooManyProductIds = Enumerable.Range( 0, QueryBuilder.MaxItemsPerResponse + 1 )
+				.Select( _ => _randomizer.NextLong() ).ToList();
+
+			Assert.Throws< ArgumentOutOfRangeException > ( () => 
+				QueryBuilder.GetProductVariantsByProductIds( tooManyProductIds ) );
+		}
+
+		[ Test ]
+		public void GetProductVariantsByProductIds_ReturnsRequestQuery()
+		{
+			var productId1 = _randomizer.NextLong();
+			var productId2 = _randomizer.NextLong();
+			var productIds = new [] { productId1, productId2 };
+			var after = _randomizer.GetString();
+			var variantsPerPage = ( int )_randomizer.NextUInt( 1, QueryBuilder.MaxItemsPerResponse );
+
+			var result = QueryBuilder.GetProductVariantsByProductIds( productIds, after, variantsPerPage );
+
+			Assert.Multiple( () => {
+				Assert.That( result.Contains( $"product_ids:{productId1},{productId2}" ), Is.True );
+				Assert.That( result.Contains( after ), Is.True );
+				Assert.That( result.Contains( variantsPerPage.ToString() ), Is.True );
+			} );
 		}
 	}
 }

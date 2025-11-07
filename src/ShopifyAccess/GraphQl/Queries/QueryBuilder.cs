@@ -177,7 +177,6 @@ namespace ShopifyAccess.GraphQl.Queries
 			return request.ToJson();
 		}
 
-		//TODO GUARD-3946 Create tests
 		public static string GetProductVariantsByProductIds( IEnumerable< long > productIds, string after = null, int variantsPerPage = MaxItemsPerResponse )
 		{
 			if( variantsPerPage > MaxItemsPerResponse )
