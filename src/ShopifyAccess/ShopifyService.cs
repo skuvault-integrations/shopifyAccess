@@ -299,7 +299,6 @@ namespace ShopifyAccess
 		/// <param name="token"></param>
 		/// <param name="mark"></param>
 		/// <returns>Dictionary of productId (key), productVariants (value)</returns>
-		//TODO GUARD-3946 Add unit tests confirming that this path gets executed
 		private async Task< IDictionary< long, List< GraphQl.Models.Products.ProductVariant > > > GetProductsVariantsAsync( List< Product > products, CancellationToken token, Mark mark )
 		{
 			var productVariants = new Dictionary< long, List< GraphQl.Models.Products.ProductVariant > >();

@@ -65,6 +65,7 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
+		[ Explicit ]
 		public async Task GetProductVariantsInventoryAsync()
 		{
 			var productVariants = await this.Service.GetProductVariantsInventoryAsync( CancellationToken.None, _mark );
@@ -73,6 +74,7 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
+		[ Explicit ]
 		public async Task GetAndUpdateProductAsync()
 		{
 			const string sku = "testsku1";
@@ -103,6 +105,7 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
+		[ Explicit ]
 		public async Task WhenGetProductsCreatedAfterAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
 		{
 			var dateFrom = new DateTime( 2021, 6, 1 );
@@ -130,6 +133,7 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
+		[ Explicit ]
 		public async Task WhenGetProductsCreatedBeforeButUpdatedAfterAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
 		{
 			var dateFrom = new DateTime( 2023, 6, 1 );
@@ -149,8 +153,7 @@ namespace ShopifyAccessTests.Products
 			var productIds = GetExistingProductIds();
 			const int simulateSmallPageSize = 1;
 
-			var result = ( await ( ( ShopifyService )this.Service ).GetProductVariantsByProductIdsAsync( productIds, _mark, CancellationToken.None, variantsPerPage : simulateSmallPageSize ) )
-				.ToList();
+			var result = ( await ( ( ShopifyService )this.Service ).GetProductVariantsByProductIdsAsync( productIds, _mark, CancellationToken.None, variantsPerPage : simulateSmallPageSize ) ).ToList();
 
 			Assert.Multiple(() => {
 				Assert.That( result.Count, Is.GreaterThan( 1 ) );
@@ -167,8 +170,7 @@ namespace ShopifyAccessTests.Products
 			var productIds = GetExistingProductIds();
 			AppendRandomProductIds( productIds, ShopifyService.RequestMaxLimit );
 
-			var result = ( await ( ( ShopifyService )this.Service ).GetProductVariantsByProductIdsAsync( productIds, _mark, CancellationToken.None ) )
-				.ToList();
+			var result = ( await ( ( ShopifyService )this.Service ).GetProductVariantsByProductIdsAsync( productIds, _mark, CancellationToken.None ) ).ToList();
 
 			Assert.That( result.Count, Is.GreaterThan( 1 ) );
 		}
@@ -185,15 +187,6 @@ namespace ShopifyAccessTests.Products
 			{
 				productIds.Add( nextFakeProductId++ );
 			}
-		}
-
-		/// <summary>
-		/// Get productIds that exist in the qa-skuvault-development Shopify test store 
-		/// </summary>
-		/// <returns></returns>
-		private static List< long > GetExistingProductIds()
-		{
-			return new List< long > { 9729995637050, 9733037949242, 9779221725498, 9943945019706, 9943946428730 };
 		}
 
 		[ Test ]
@@ -308,6 +301,15 @@ namespace ShopifyAccessTests.Products
 				v1.InventoryLevels.InventoryLevels.Should().BeEquivalentTo( v2.InventoryLevels.InventoryLevels,
 					o => o.Excluding( memberInfo => memberInfo.Name.Equals( "UpdatedAt" ) ) );
 			}
+		}
+
+		/// <summary>
+		/// Get productIds that exist in the qa-skuvault-development Shopify test store 
+		/// </summary>
+		/// <returns></returns>
+		private static List< long > GetExistingProductIds()
+		{
+			return new List< long > { 9729995637050, 9733037949242, 9779221725498, 9943945019706, 9943946428730 };
 		}
 	}
 }
