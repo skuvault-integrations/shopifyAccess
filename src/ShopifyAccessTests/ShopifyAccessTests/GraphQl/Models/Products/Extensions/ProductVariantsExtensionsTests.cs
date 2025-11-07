@@ -4,6 +4,7 @@ using NUnit.Framework;
 using NUnit.Framework.Internal;
 using ShopifyAccess.GraphQl.Models.Products;
 using ShopifyAccess.GraphQl.Models.Products.Extensions;
+using ShopifyAccessTests.GraphQl.Helpers;
 
 namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 {
@@ -18,7 +19,7 @@ namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 			var productId = _randomizer.NextLong();
 			var appendVariants = new List< ProductVariantWithProductId > {
 				new ProductVariantWithProductId {
-					Product = new VariantParentProduct { Id = CreateGraphQlProductId( productId ) },
+					Product = new VariantParentProduct { Id = GraphQlIdsGenerator.CreateProductId( productId ) },
 					Sku = _randomizer.GetString()
 				}
 			};
@@ -43,7 +44,7 @@ namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 			var productId = existingProductId + 1;
 			var appendVariants = new List< ProductVariantWithProductId > {
 				new ProductVariantWithProductId {
-					Product = new VariantParentProduct { Id = CreateGraphQlProductId( productId ) },
+					Product = new VariantParentProduct { Id = GraphQlIdsGenerator.CreateProductId( productId ) },
 					Sku = existingSku + "1" 
 				}
 			};
@@ -70,7 +71,7 @@ namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 			};
 			var appendVariants = new List< ProductVariantWithProductId > {
 				new ProductVariantWithProductId {
-					Product = new VariantParentProduct { Id = CreateGraphQlProductId( productId ) },
+					Product = new VariantParentProduct { Id = GraphQlIdsGenerator.CreateProductId( productId ) },
 					Sku = existingSku + "1" 
 				}
 			};
@@ -100,7 +101,7 @@ namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 			};
 			var appendVariants = new List< ProductVariantWithProductId > {
 				new ProductVariantWithProductId {
-					Product = new VariantParentProduct { Id = CreateGraphQlProductId( productId ) },
+					Product = new VariantParentProduct { Id = GraphQlIdsGenerator.CreateProductId( productId ) },
 					Sku = sku 
 				}
 			};
@@ -115,11 +116,6 @@ namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 				Assert.That( product1Variants[ 0 ], Is.EqualTo( existingProductVariant ) );
 				Assert.That( product1Variants[ 1 ], Is.EqualTo( appendVariants[ 0 ] ) );
 			} );
-		}
-
-		private static string CreateGraphQlProductId( long productId )
-		{
-			return $"gid://shopify/Product/{productId}";
 		}
 	}
 }

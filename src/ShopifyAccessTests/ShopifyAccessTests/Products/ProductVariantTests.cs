@@ -32,7 +32,6 @@ namespace ShopifyAccessTests.Products
 
 		[ Test ]
 		[ Explicit ]
-		//TODO GUARD-3946 Run test
 		public async Task GetProductsCreatedAfterAsync()
 		{
 			var productsStartUtc = DateTime.Parse( "2025-01-06T17:14:34Z" ); 
@@ -56,7 +55,6 @@ namespace ShopifyAccessTests.Products
 
 		[ Test ]
 		[ Explicit ]
-		//TODO GUARD-3946 Rerun tests
 		public async Task GetProductsCreatedBeforeButUpdatedAfterAsync()
 		{
 			var productsStartUtc = DateTime.Parse( "2025-01-13T20:52:49Z" );
@@ -105,7 +103,6 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
-		//TODO GUARD-3946 Run test
 		public async Task WhenGetProductsCreatedAfterAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
 		{
 			var dateFrom = new DateTime( 2021, 6, 1 );
@@ -133,7 +130,6 @@ namespace ShopifyAccessTests.Products
 		}
 
 		[ Test ]
-		//TODO GUARD-3946 Run test
 		public async Task WhenGetProductsCreatedBeforeButUpdatedAfterAsyncIsCalled_ThenProductsImagesUrlsAreExpectedWithoutQueryPart()
 		{
 			var dateFrom = new DateTime( 2023, 6, 1 );

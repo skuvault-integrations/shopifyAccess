@@ -7,6 +7,7 @@ using ShopifyAccess.GraphQl.Models;
 using ShopifyAccess.GraphQl.Models.Common;
 using ShopifyAccess.GraphQl.Models.Products;
 using ShopifyAccess.GraphQl.Models.Products.Extensions;
+using ShopifyAccess.Models.ProductVariant;
 
 namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 {
@@ -68,7 +69,7 @@ namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 		}
 
 		[ Test ]
-		public void ToShopifyProduct_ShouldMapAllFieldsCorrectly_WhenAllTopLevelFieldsProvided()
+		public void ToShopifyProduct_ShouldMapAllProductFieldsCorrectly_WhenAllTopLevelFieldsProvided()
 		{
 			var product = CreateProduct();
 
@@ -102,6 +103,22 @@ namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 				Assert.That( shopifyProduct.Variants, Has.Count.EqualTo( productVariants.Count ) );
 				Assert.That( shopifyProduct.Variants.Any( x => x.Sku == testsku ), Is.True );
 				Assert.That( shopifyProduct.Variants.Any( x => x.Sku == testsku2 ), Is.True );
+			} );
+		}
+
+		[ Test ]
+		public void ToShopifyProduct_ShouldPopulateAllVariantFields_WhenVariantPassedIn()
+		{
+			var product = CreateProductWithoutVariants();
+			var productVariant = CreateProductVariant();
+			var productVariants = new List< ProductVariant >{ productVariant };
+
+			var shopifyProduct = product.ToShopifyProduct( productVariants );
+
+			Assert.Multiple( () =>
+			{
+				Assert.That( shopifyProduct.Variants, Has.Count.EqualTo( productVariants.Count ) );
+				AssertVariantFieldsMatch( shopifyProduct.Variants.Single( x => x.Sku == productVariant.Sku ), productVariant );
 			} );
 		}
 
@@ -185,34 +202,46 @@ namespace ShopifyAccessTests.GraphQl.Models.Products.Extensions
 			};
 		
 		private static Nodes< ProductVariant > CreateVariants() =>
-			new Nodes< ProductVariant >
-			{
-				Items = new List< ProductVariant >
-				{
-					new ProductVariant
-						{
-							Sku = _randomizer.GetString(),
-							Title = _randomizer.GetString(),
-							Barcode = _randomizer.GetString(),
-							Image = new Image
-							{
-								Url = _randomizer.GetString()
-							},
-							Price = _randomizer.NextDecimal(),
-							InventoryItem = new InventoryItem
-							{
-								Measurement = new InventoryItemMeasurement
-								{
-									Weight = new Weight
-									{
-										Unit = "KILOGRAMS",
-										Value = _randomizer.NextFloat()
-									}
-								}
-							},
-							UpdatedAt = DateTime.UtcNow
-						}
-				}
+			new Nodes< ProductVariant > {
+				Items = new List< ProductVariant > { CreateProductVariant() }
 			};
+
+		private static ProductVariant CreateProductVariant()
+		{
+			return new ProductVariant
+			{
+				Sku = _randomizer.GetString(),
+				Title = _randomizer.GetString(),
+				Barcode = _randomizer.GetString(),
+				Image = new Image
+				{
+					Url = _randomizer.GetString()
+				},
+				Price = _randomizer.NextDecimal(),
+				InventoryItem = new InventoryItem
+				{
+					Measurement = new InventoryItemMeasurement
+					{
+						Weight = new Weight
+						{
+							Unit = "KILOGRAMS",
+							Value = _randomizer.NextFloat()
+						}
+					}
+				},
+				UpdatedAt = DateTime.UtcNow
+			};
+		}
+
+		private static void AssertVariantFieldsMatch( ShopifyProductVariant actualVariant, ProductVariant expectedVariant )
+		{
+			Assert.That( actualVariant.Sku, Is.EqualTo( expectedVariant.Sku ) );
+			Assert.That( actualVariant.Title, Is.EqualTo( expectedVariant.Title ) );
+			Assert.That( actualVariant.Barcode, Is.EqualTo( expectedVariant.Barcode ) );
+			Assert.That( actualVariant.Weight, Is.EqualTo( decimal.Parse( expectedVariant.InventoryItem.Measurement.Weight.Value.ToString() ) ) );
+			Assert.That( actualVariant.WeightUnit.ToString(), Is.EqualTo( expectedVariant.InventoryItem.Measurement.Weight.Unit ) );
+			Assert.That( actualVariant.Price, Is.EqualTo( expectedVariant.Price ) );
+			Assert.That( actualVariant.UpdatedAt, Is.EqualTo( expectedVariant.UpdatedAt ) );
+		}
 	}
 }
