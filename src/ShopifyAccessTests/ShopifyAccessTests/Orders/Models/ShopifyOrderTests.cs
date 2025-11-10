@@ -64,5 +64,26 @@ namespace ShopifyAccessTests.Orders.Models
 			// Assert
 			order.SourceName.Should().Be( ShopifySourceNameEnum.Undefined );
 		}
+		
+		// TODO GUARD-3910 Delete on feature cleanup. No longer relevant since with GraphQl we don't use ShopifyOrder for deserialization
+		[ Test ]
+		public void DeserializeShopifyOrder_ReturnsUndefinedShopifyFinancialStatus_WhenApiReturnsNullFinancialStatus()
+		{
+			const string serializedShopifyOrder = @"{ ""financial_status"" : null }";
+
+			var result = JsonConvert.DeserializeObject< ShopifyOrder >( serializedShopifyOrder );
+
+			Assert.That( result.FinancialStatus, Is.EqualTo( ShopifyFinancialStatus.Undefined ) );
+		}
+
+		[ Test ]
+		public void DeserializeOrder_ReturnsUndefinedShopifyFinancialStatus_WhenApiReturnsNullFinancialStatus()
+		{
+			const string serializedOrder = @"{ ""displayFinancialStatus"" : null }";
+
+			var result = JsonConvert.DeserializeObject< Order >( serializedOrder );
+
+			Assert.That( result.FinancialStatus, Is.EqualTo( ShopifyFinancialStatus.Undefined ) );
+		}
 	}
 }

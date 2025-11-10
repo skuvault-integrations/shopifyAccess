@@ -37,6 +37,7 @@ namespace ShopifyAccess.GraphQl.Models.Orders
 		public DateTime? CancelledAt{ get; set; }
 
 		[ DataMember( Name = "displayFinancialStatus" ) ]
+		//TODO PBL-9369 Handle a null financial_status the same way we do RawFulfillmentStatus -> FulfillmentStatus (Enum.TryParse< FulfillmentStatusEnum >)
 		public ShopifyFinancialStatus FinancialStatus{ get; set; }
 
 		[ DataMember( Name = "fulfillments" ) ]
