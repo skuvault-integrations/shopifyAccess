@@ -39,6 +39,8 @@ namespace ShopifyAccess.Models.Order
 		[ DataMember( Name = "cancelled_at" ) ]
 		public DateTime? CancelledAt{ get; set; }
 
+		// TODO GUARD-3910 During feature cleanup, this field will no longer be used for deserialization, but as a simple DTO to return data to v1.
+		//	Therefore, remove RawFinancialStatus and change to simple  public ShopifyFinancialStatus FinancialStatus{ get; set; }
 		[ DataMember( Name = "financial_status" ) ]
 		private string RawFinancialStatus{ get; set; }
 
