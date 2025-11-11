@@ -20,7 +20,7 @@ namespace ShopifyAccessTests
 		public void Init()
 		{
 			Directory.SetCurrentDirectory( TestContext.CurrentContext.TestDirectory );
-			const string credentialsFilePath = @"..\..\Files\ShopifyCredentials.csv";
+			const string credentialsFilePath = @"..\..\..\Files\ShopifyCredentials.csv";
 			NetcoLogger.LoggerFactory = new ConsoleLoggerFactory();
 
 			var cc = new CsvContext();

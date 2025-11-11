@@ -106,17 +106,4 @@ namespace ShopifyAccess.Models.Order
 		cancelled,
 		any
 	}
-
-	public enum ShopifyOrderFinancialStatus
-	{
-		Undefined,
-		authorized,
-		pending,
-		paid,
-		partially_paid,
-		abandoned,
-		refunded,
-		voided,
-		any
-	}
 }
