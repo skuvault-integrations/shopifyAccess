@@ -59,7 +59,7 @@ namespace ShopifyAccess.Services.Utils
 		/// <summary>
 		/// Verifies that an incoming Shopify webhook request is authentic.
 		/// </summary>
-		/// <param name="requestHeaders">The request's headers (see Request.Headers in ASP.NET MVC)
+		/// <param name="requestHeaders">The request's headers (see Request.Headers in ASP.NET MVC)</param>
 		/// <param name="request">The body of the request.</param>
 		/// <param name="clientSecret">app's secret key.</param>
 		/// <returns>A boolean indicating whether the webhook is authentic or not.</returns>

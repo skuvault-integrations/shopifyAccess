@@ -37,7 +37,12 @@ namespace ShopifyAccess.GraphQl.Models.Orders
 		public DateTime? CancelledAt{ get; set; }
 
 		[ DataMember( Name = "displayFinancialStatus" ) ]
-		public ShopifyFinancialStatus FinancialStatus{ get; set; }
+		private string RawFinancialStatus{ get; set; }
+
+		[ JsonIgnore ]
+		public ShopifyFinancialStatus FinancialStatus =>
+			Enum.TryParse< ShopifyFinancialStatus >( this.RawFinancialStatus, true, out var financialStatus )
+				? financialStatus : ShopifyFinancialStatus.Undefined;
 
 		[ DataMember( Name = "fulfillments" ) ]
 		public IEnumerable< Fulfillment > Fulfillments{ get; set; }

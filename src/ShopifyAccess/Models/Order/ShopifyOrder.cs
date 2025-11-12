@@ -6,6 +6,9 @@ using ShopifyAccess.Models.Order.Discounts;
 
 namespace ShopifyAccess.Models.Order
 {
+	// TODO GUARD-3910 During feature cleanup, remove serialization attributes from this class.
+	//	It's no longer used for (de)serialization, but only to pass the order to v1. ShopifyAccess.GraphQl.Models.Orders is now used to get API responses,
+	//	and is then mapped to this classes instance. 
 	[ DataContract ]
 	public sealed class ShopifyOrder
 	{
@@ -36,8 +39,18 @@ namespace ShopifyAccess.Models.Order
 		[ DataMember( Name = "cancelled_at" ) ]
 		public DateTime? CancelledAt{ get; set; }
 
+		// TODO GUARD-3910 During feature cleanup, this field will no longer be used for deserialization, but as a simple DTO to return data to v1.
+		//	Therefore, remove RawFinancialStatus and change to simple  public ShopifyFinancialStatus FinancialStatus{ get; set; }
 		[ DataMember( Name = "financial_status" ) ]
-		public ShopifyFinancialStatus FinancialStatus{ get; set; }
+		private string RawFinancialStatus{ get; set; }
+
+		[ JsonIgnore ]
+		public ShopifyFinancialStatus FinancialStatus
+		{
+			get => Enum.TryParse< ShopifyFinancialStatus >( this.RawFinancialStatus, true, out var status )
+				? status : ShopifyFinancialStatus.Undefined;
+			set => this.RawFinancialStatus = value.ToString();
+		}
 
 		[ DataMember( Name = "fulfillments" ) ]
 		public IEnumerable< ShopifyFulfillment > Fulfillments{ get; set; }
