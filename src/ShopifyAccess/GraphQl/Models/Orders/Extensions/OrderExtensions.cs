@@ -44,7 +44,7 @@ namespace ShopifyAccess.GraphQl.Models.Orders.Extensions
 				Id = item.Id,
 				Sku = item.Sku,
 				Quantity = item.Quantity,
-				Price = item.Price?.ShopMoney?.Amount ?? 0,
+				Price = item.Variant?.Price ?? 0,   //item.Price?.ShopMoney?.Amount ?? 0,
 				Title = item.Title,
 				TotalDiscount = item.TotalDiscount?.ShopMoney?.Amount ?? 0,
 				TotalDiscountSet = item.TotalDiscount.ToShopifyPriceSet(),

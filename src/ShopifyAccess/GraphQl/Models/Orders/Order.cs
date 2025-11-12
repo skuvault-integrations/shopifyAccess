@@ -13,6 +13,7 @@ namespace ShopifyAccess.GraphQl.Models.Orders
 		public string Id{ get; set; }
 
 		[ DataMember( Name = "totalPriceSet" ) ]
+		//TODO GUARD-3939 This is not being used in v1. Why even request it from Walmart?!
 		public PriceSet Total{ get; set; }
 
 		[ DataMember( Name = "createdAt" ) ]

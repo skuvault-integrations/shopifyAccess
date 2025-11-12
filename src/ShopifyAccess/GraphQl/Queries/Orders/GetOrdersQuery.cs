@@ -21,6 +21,10 @@ namespace ShopifyAccess.GraphQl.Queries.Orders
           title
           quantity
           sku
+          variant
+          {
+            price
+          }
           originalUnitPriceSet {
             shopMoney {
               amount

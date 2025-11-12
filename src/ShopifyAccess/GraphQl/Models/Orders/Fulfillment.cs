@@ -66,6 +66,7 @@ namespace ShopifyAccess.GraphQl.Models.Orders
 		public int Quantity{ get; set; }
 
 		[ DataMember( Name = "originalUnitPriceSet" ) ]
+		//TODO GUARD-3939 This is not being used in v1. And is probably null anyway. Remove
 		public PriceSet OriginalUnitPriceSet{ get; set; }
 
 		[ DataMember( Name = "variant" ) ]
